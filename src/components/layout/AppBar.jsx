@@ -21,10 +21,14 @@ const AppBar = () => {
 
       <div className="container px-4 mx-auto relative text-sm">
         <div className="flex justify-between items-center">
+
+          
           <div className="flex items-center flex-shrink-0">
             <img src={logo} alt="Logo" className='h-10 w-10 mr-2' />
             <span className="text-xl tracking-tight">UCMP </span>
           </div>
+
+
           <ul className='hidden lg:flex ml-14 space-x-12'>
             <li>
               <Link to="/" className="hover:underline">Home</Link>
@@ -42,6 +46,8 @@ const AppBar = () => {
               <Link to="/about" className="hover:underline">About</Link>
             </li>
           </ul>
+
+
           <div className="hidden lg:flex justify-center space-x-12 items-center">
             <a href="#" className="py-2 px-3 rounded-md">
               Sign In
@@ -56,7 +62,8 @@ const AppBar = () => {
             <button onClick={toggleMenu} className="text-white">
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            </div>
+          </div>
+
         </div>
 
         {isOpen && (
@@ -72,16 +79,21 @@ const AppBar = () => {
                 <Link to="/about" onClick={toggleMenu} className="hover:underline py-4">About</Link>
               </li>
             </ul>
+
             <div className="flex justify-center space-x-6 items-center mt-4">
               <a href="#" className="py-2 px-3 rounded-md">
                 Sign In
               </a>
-              <a href="#" className="bg-gradient-to-r from-green-600 to-green-900 py-2 px-3 rounded-md">
+              <a href="/login" className="bg-gradient-to-r from-green-600 to-green-900 py-2 px-3 rounded-md">
                 Log In
               </a>
             </div>
+
           </div>
+
         )}
+
+
         
       </div>
       

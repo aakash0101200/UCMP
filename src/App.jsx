@@ -13,6 +13,8 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 //Route is a component that renders a UI component when its path matches the current location
 //Link is a component that renders an anchor tag that navigates to a different route when clicked it's like a hyperlinks but smoother and more powerful
 import './App.css'
+import { ToastContainer } from 'react-toastify'; // Import toast for notifications
+import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 
 import LoginPage from './pages/LoginPage';
 import Home from './pages/Home';
@@ -39,6 +41,8 @@ const App = () => {
 
          {/* Add more routes as needed */}
        </Routes>
+
+       <ToastContainer position='top-right' autoClose={3000} /> {/* Toast notifications container */}
     
     </>
     
