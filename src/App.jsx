@@ -31,8 +31,10 @@ import StudentDashboard from './pages/StudentDashboard'; //the student dashboard
 const App = () => {
 
   return (
+
     <BrowserRouter>
       <> {/* Fragment to group multiple elements without adding extra nodes */}
+        
 
         <AppBar />  {/* This stays fixed at the top on every page */}
 

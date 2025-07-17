@@ -1,9 +1,17 @@
 export const subjectData = [
-  { name: "Mathematics", attendance: 30 },
-  { name: "DSA", attendance: 80 },
-  { name: "OOPs", attendance: 70 },
-  { name: "OS", attendance: 85 },
-  { name: "Web Development", attendance: 65 }
+  {
+    name: "Mathematics",
+    totalClasses: 20,
+    attendedClasses: 16,
+  },
+  {
+    name: "Physics",
+    totalClasses: 18,
+    attendedClasses: 1,
+  },
+  {
+    name: "Chemistry",
+    totalClasses: 22,
+    attendedClasses: 20,
+  },
 ];
-
-export const TestData =[subjectData];
