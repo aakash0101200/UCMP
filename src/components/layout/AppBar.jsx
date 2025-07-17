@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 import { Link } from "react-router-dom"; //add navigation links using the Link component from react-router-dom
 import logo from "../../assets/logo.png";
-
+import StudentDashboard from "../../pages/StudentDashboard";
 const AppBar = () => {
 
   // State to manage the open/close state of the mobile menu

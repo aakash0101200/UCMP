@@ -22,6 +22,7 @@ import Home from './pages/Home';
 import AppBar from './components/layout/AppBar'; //the top navigation bar (like a header) of the app
 import HeroSection from './components/layout/HeroSection'; //the first section of the home page with specific size and margin (The big banner at the top of the home page)
 import FeatureCard from './components/layout/FeatureCard';
+import StudentDashboard from './pages/StudentDashboard'; //the student dashboard page (like a room in the house where students can see their information and features of the app)
 //FeatureCard is a component that displays a feature of the app with an icon, title, and description
 
 
@@ -30,24 +31,24 @@ import FeatureCard from './components/layout/FeatureCard';
 const App = () => {
 
   return (
-    <BrowserRouter> 
-    <> {/* Fragment to group multiple elements without adding extra nodes */}
+    <BrowserRouter>
+      <> {/* Fragment to group multiple elements without adding extra nodes */}
 
-       <AppBar />  {/* This stays fixed at the top on every page */}
-       
-       <Routes>
-         <Route path="/" element={<Home />} />
-         <Route path="/login" element={<LoginPage />} />
+        <AppBar />  {/* This stays fixed at the top on every page */}
 
-         {/* Add more routes as needed */}
-       </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/student" element={<StudentDashboard />} /> {/* Student Dashboard page */}
+          {/* Add more routes as needed */}
+        </Routes>
 
-       <ToastContainer position='top-right' autoClose={3000} /> {/* Toast notifications container */}
-    
-    </>
-    
+        <ToastContainer position='top-right' autoClose={3000} /> {/* Toast notifications container */}
+
+      </>
+
     </BrowserRouter>
-      
+
   );
 }
 

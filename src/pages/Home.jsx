@@ -3,6 +3,7 @@ import React from "react";
 import HeroSection from "../components/layout/HeroSection";
 import FeatureCard from "../components/layout/FeatureCard";
 import Footer from "../components/layout/Footer";
+
 const Home = () => {
 
     
@@ -19,7 +20,7 @@ const Home = () => {
             <div className="max-w-7xl mx-auto pt-10 px-10">
                <FeatureCard />
             </div>
-
+          
          <Footer/>
         </div>
     );
