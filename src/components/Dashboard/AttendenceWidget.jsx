@@ -95,26 +95,34 @@ function renderSubjectAttendance() {
     return (
         <div className="bg-neutral-800 text-xs">
             {subjectWiseAttendance.map((subject, index) => (
-                <div key={index} className="max-w-80">
+                <div key={index} className="max-w-full">
                     <div className="text-xs font-medium text-gray-200 my-1" >
                         {subject.name} - <span>{subject.totalClasses}/{subject.attendedClasses}</span>
                     </div>
-                    <ProgressBar
-                        completed={subject.percentage}
-                        maxCompleted={100}
-                        height="8px"
-                        borderRadius="8px"
-                        labelAlignment="outside"
-                        baseBgColor="#ffffff"
-                        labelClassName="text-gray-200"
-                        bgColor={
-                            subject.percentage >= 75
-                                ? "#16a34a" // green
-                                : subject.percentage >= 60
-                                    ? "#facc15" // yellow
-                                    : "#dc2626" // red
-                        }
-                    />
+                    <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                            <ProgressBar
+                                completed={subject.percentage}
+                                maxCompleted={100}
+                                height="8px"
+                                borderRadius="8px"
+                                isLabelVisible={false}
+                                baseBgColor="#374151"
+                                bgColor={
+                                    subject.percentage >= 75
+                                        ? "#16a34a" // green
+                                        : subject.percentage >= 60
+                                            ? "#facc15" // yellow
+                                            : "#dc2626" // red
+                                }
+                            />
+                        </div>
+                        <span className="text-gray-300 text-[11px] w-10 text-left">
+                            {subject.percentage}%
+                        </span>
+                    </div>
+
+
                 </div>
             ))}
         </div>
