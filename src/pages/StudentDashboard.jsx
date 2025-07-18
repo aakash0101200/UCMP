@@ -1,6 +1,6 @@
 import React from 'react';
 
-
+import Calendar from '../components/Calendar/CalendarContainer';
 import Attendance from "../components/Dashboard/AttendenceWidget";
 
 export default function StudentDashboard() {
@@ -8,6 +8,7 @@ export default function StudentDashboard() {
         <div className="student-dashboard">
             <h1 className="text-2xl font-bold mb-6">Student Dashboard</h1>
             <Attendance />
+            <Calendar />
         </div>
        
 
