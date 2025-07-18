@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ThemeProvider } from '@/components/Theme/theme-provider';
 
 //State for values that change over time (e.g form inputs, API data, toggle states) its like notebook for the app
 //useState is a hook that allows you to add state to functional components
@@ -18,6 +17,7 @@ import { ToastContainer } from 'react-toastify'; // Import toast for notificatio
 import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import Home from './pages/Home';
 
 import AppBar from './components/layout/AppBar'; //the top navigation bar (like a header) of the app
@@ -29,24 +29,28 @@ import StudentDashboard from './pages/StudentDashboard'; //the student dashboard
 
 
 /* THE BLUEPRINT */
-export default function App() {
+const App = () => {
+
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <BrowserRouter>
-        <>
-          <AppBar />
+    <BrowserRouter>
+      <> {/* Fragment to group multiple elements without adding extra nodes */}
 
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/student" element={<StudentDashboard />} />
-            {/* add more routes as needed */}
-          </Routes>
+        <AppBar />  {/* This stays fixed at the top on every page */}
 
-          <ToastContainer position="top-right" autoClose={3000} />
-        </>
-      </BrowserRouter>
-    </ThemeProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/student" element={<StudentDashboard />} /> {/* Student Dashboard page */}
+          {/* Add more routes as needed */}
+        </Routes>
+
+        <ToastContainer position='top-right' autoClose={3000} /> {/* Toast notifications container */}
+
+      </>
+
+    </BrowserRouter>
+
   );
 }
 
@@ -61,7 +65,7 @@ export default function App() {
 
 //App is the main component of the app that renders the layout and the routes
 
-
+export default App;
 
 
 
