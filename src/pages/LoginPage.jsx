@@ -124,7 +124,9 @@ export default function LoginPage() {
             Register here
           </Link>
         </p>
+
       </form>
+      
     </div>
   );
 }
