@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src"]
+}
+// This is a jsconfig.json file that configures the JavaScript project settings
+// It specifies the base URL and paths for module resolution, allowing for cleaner imports
