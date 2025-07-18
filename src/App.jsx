@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ThemeProvider } from '@/components/Theme/theme-provider';
 
 //State for values that change over time (e.g form inputs, API data, toggle states) its like notebook for the app
 //useState is a hook that allows you to add state to functional components
@@ -29,28 +30,26 @@ import StudentDashboard from './pages/StudentDashboard'; //the student dashboard
 
 
 /* THE BLUEPRINT */
-const App = () => {
-
+export default function App() {
   return (
-    <BrowserRouter>
-      <> {/* Fragment to group multiple elements without adding extra nodes */}
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <BrowserRouter>
+        <>
+          <AppBar />
 
-        <AppBar />  {/* This stays fixed at the top on every page */}
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/student" element={<StudentDashboard />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/student" element={<StudentDashboard />} /> {/* Student Dashboard page */}
-          {/* Add more routes as needed */}
-        </Routes>
+            {/* add more routes as needed */}
+          </Routes>
 
-        <ToastContainer position='top-right' autoClose={3000} /> {/* Toast notifications container */}
-
-      </>
-
-    </BrowserRouter>
-
+          <ToastContainer position="top-right" autoClose={3000} />
+        </>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
@@ -65,7 +64,7 @@ const App = () => {
 
 //App is the main component of the app that renders the layout and the routes
 
-export default App;
+
 
 
 
