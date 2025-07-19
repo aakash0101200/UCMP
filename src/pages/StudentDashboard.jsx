@@ -1,8 +1,9 @@
 import React from 'react';
 
-import Calendar from '../components/Calendar/CalendarContainer';
+import Calendar from '../components/Calendar/EventCalendar';
 import Attendance from "../components/Dashboard/AttendenceWidget";
-
+import '../components/Calendar/styles/calendar.css'
+import '../components/Calendar/styles/notification.css'
 export default function StudentDashboard() {
     return (
         <div className="student-dashboard">
