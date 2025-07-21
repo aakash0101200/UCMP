@@ -1,5 +1,6 @@
 import React from "react";
 
+import StudentDashboard from "./StudentDashboard";
 import { toast } from "react-toastify"; // Import toast for notifications
 import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 
@@ -43,26 +44,24 @@ export default function LoginPage() {
 
 
       // assuming that backend responds with { token, use}
-      const { token, user } = response.data;
+      const { token, role } = response.data;
 
       // Store the token in localStorage or context for authentication
       localStorage.setItem('authToken', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('role', role);
 
         toast.success('Login successful! 🎉');
         console.log('Login successful:', response.data);
 
-      setTimeout(() => navigate('/dashboard'), 1500); // Navigate to the dashboard or home page after successful login
+      setTimeout(() => navigate('/student'), 1500); // Navigate to the dashboard or home page after successful login
 
     } catch (error) {
       if(error.response && error.response.data && error.response.data.message) {
         // Handle specific error responses from the backend
 
         toast.error(`Login failed: ${error.response.data.message}`);
-        console.error('Login error:', error.response.data.message);
       } else {
         toast.error('Login error:', error);
-        console.error('Login error:', error);
         
       }
     }
