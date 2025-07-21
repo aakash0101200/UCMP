@@ -415,7 +415,9 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
 
           {/* Dropdown and checkbox section */}
           <div className="flex items-center gap-4">
-            {/* Dropdown for announcement type */}
+
+
+            {/* Dropdown for announcement type */}    {/** need updation + */}
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -436,7 +438,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
                   setFormData({ ...formData, isCompleted: e.target.checked })
                 }
               />
-              Completed
+              Completed {/** closed */}
             </label>
           </div>
 
@@ -461,6 +463,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
           </div>
         </form>
       )}
+
 
       {/* List of all announcements with edit/delete options */}
       <div className="space-y-4">
