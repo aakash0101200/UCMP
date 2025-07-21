@@ -1,5 +1,6 @@
 import { Icon } from "lucide-react";
 import { features } from "../../utils/features";
+
 const FeatureCard = ({ icon, title, description }) => {
   return (
     <div className="relative mt-20 border-b border-neutral-800 min-h-[800px] hover:shadow-xl transition-shadow duration-300">
@@ -30,9 +31,7 @@ const FeatureCard = ({ icon, title, description }) => {
                 <p className="text-md p-2 mb-20 text-neutral-400">
                   {feature.description}
                 </p>
-              </div>
-              
-        
+              </div>        
             </div>
           </div>
         ))}
