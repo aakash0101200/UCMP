@@ -26,6 +26,7 @@ import HeroSection from './components/layout/HeroSection'; //the first section o
 import FeatureCard from './components/layout/FeatureCard';
 import StudentDashboard from './pages/StudentDashboard'; //the student dashboard page (like a room in the house where students can see their information and features of the app)
 //FeatureCard is a component that displays a feature of the app with an icon, title, and description
+import AdminDashboard from './pages/AdminDashboard';
 
 
 
@@ -41,6 +42,8 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/student" element={<StudentDashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+
             <Route path="/register" element={<RegisterPage />} />
 
             {/* add more routes as needed */}

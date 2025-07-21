@@ -16,7 +16,8 @@ export default function AttendanceWidget() {
 
     console.log(view);
     return (
-        <section className="bg-neutral-800 rounded-2xl shadow-md shadow-neutral-900 p-5 w-70 max-w-sm ml-70">
+        <>
+        <section className="bg-neutral-800 rounded-2xl shadow-md shadow-neutral-900 p-5 w-70 max-w-sm">
             <div className="flex justify-between items-center text-gray-100 mb-4 border-0 border-b border-neutral-700 pb-4 gap-1">
                 <h2 className="text-md text-gray-200">Attendance Overview</h2>
                 <br />
@@ -63,6 +64,7 @@ export default function AttendanceWidget() {
                 )}
             </AnimatePresence>
         </section>
+        </>
     )
 }
 
