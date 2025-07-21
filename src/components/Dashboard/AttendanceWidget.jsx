@@ -17,16 +17,16 @@ export default function AttendanceWidget() {
     console.log(view);
     return (
         <>
-        <section className="bg-neutral-800 rounded-2xl shadow-md shadow-neutral-900 p-5 w-70 max-w-sm">
-            <div className="flex justify-between items-center text-gray-100 mb-4 border-0 border-b border-neutral-700 pb-4 gap-1">
-                <h2 className="text-md text-gray-200">Attendance Overview</h2>
+        <section className="bg-neutral-800 rounded-2xl shadow-md shadow-neutral-900 p-4 max-w-sm max-h-sm">
+            <div className="flex justify-between items-center text-gray-100 border-0 border-b border-neutral-700 pb-4 gap-1">
+                <h6 className="text-xs text-gray-200">Attendance Overview</h6>
                 <br />
-                {/* <select value={view} onChange={(e) => setView(e.target.value)} className="bg-neutral-900 text-gray-200 text-xs px-2 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                <select value={view} onChange={(e) => setView(e.target.value)} className="bg-neutral-900 text-gray-200 text-xs px-1 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
                     <option value="average" onClick={() => setView('average')}>Average</option>
                     <option value="subject" onClick={() => setView('subject')}>Subject</option>
-                </select> */}
+                </select>
 
-                <button onClick={() => setView('average')} className={`text-xs rounded-md px-4 py-2 cursor-pointer transition-colors ${view === 'average' ? (
+                {/* <button onClick={() => setView('average')} className={`text-xs rounded-md px-4 py-2 cursor-pointer transition-colors ${view === 'average' ? (
                     'bg-indigo-600 '
                 ) : (
                     'bg-neutral-900')}`}>
@@ -37,7 +37,7 @@ export default function AttendanceWidget() {
                 ) : (
                     'bg-neutral-900')}`}>
                     Subject-wise
-                </button>
+                </button> */}
 
             </div>
             <AnimatePresence mode="wait">
@@ -137,6 +137,8 @@ function renderSubjectAttendance() {
     );
 
 }
+
+
 
 
 

@@ -18,7 +18,7 @@ const AppBar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg bg-white/20 dark:bg-indigo-900/20 border-b border-neutral-700/60">
+    <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg bg-white/20 dark:bg-indigo-500/20 border-b border-neutral-700/60">
       <div className="container px-4 mx-auto relative text-sm">
         <div className="flex justify-between items-center">
 

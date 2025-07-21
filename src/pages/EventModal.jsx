@@ -21,7 +21,7 @@ const EventModal = ({ initialDate, onClose, onSave }) => {
         
         {/* Input for Event Title */}
         <div className="mb-4">
-          <label htmlFor="eventTitle" className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
+          <label htmlFor="eventTitle" className="block text-xs font-medium text-gray-700 mb-1">Event Title</label>
           <input
             id="eventTitle"
             type="text"
@@ -34,7 +34,7 @@ const EventModal = ({ initialDate, onClose, onSave }) => {
 
         {/* NEW: Input for Event Date */}
         <div className="mb-6">
-          <label htmlFor="eventDate" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+          <label htmlFor="eventDate" className="block text-xs font-medium text-gray-700 mb-1">Date</label>
           <input
             id="eventDate"
             type="date"

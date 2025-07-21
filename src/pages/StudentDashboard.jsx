@@ -1,22 +1,36 @@
 import React from "react";
 
 // Import the widgets that will be displayed on this page
-import Calendar from "./Calendar";
+// import Calendar from "./Calendar";
 import AttendanceWidget from "../components/Dashboard/AttendanceWidget";
 import AnnouncementTimeline from "../components/Announcements/AnnouncementTimeline";
-import Sidebar from "../components/Dashboard/Sidebar";
+import Sidebar from "./Sidebar.jsx"
+import Calendar2 from "./Calendar2";
 
 export default function StudentDashboard() {
   return (
-    <>
-      <div>
-        <div className="grid grid-col">
-            
+    <div className="flex h-screen">
+      <Sidebar />
+      
+      <div className="p-6 space-y-6">
+
+        <div className="flex flex-col md:flex-row gap-6">
+          <AttendanceWidget /><AttendanceWidget /><AttendanceWidget /><AttendanceWidget /><AttendanceWidget />
+          
         </div>
+        <div className="flex flex-col md:flex-row gap-6">
+          
+          
+        </div>
+        <Calendar2 />
       </div>
-    </>
+    </div>
+
+
   );
 }
+
+
 
 // // This is the main container for the dashboard page's content
 //     <div>
