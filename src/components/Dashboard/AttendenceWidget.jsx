@@ -5,6 +5,7 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import { motion, AnimatePresence } from 'framer-motion';
 import { subjectData } from '../../utils/attendanceData';
 import { div, h2 } from "framer-motion/client";
+import { Button } from "@/components/ui/button"; // Import the Button component
 
 const subjectWiseAttendance = subjectData.map((subject) => ({ ...subject, percentage: ((subject.attendedClasses / subject.totalClasses) * 100).toFixed(2) }))
 const totalPercentage = subjectWiseAttendance.reduce((sum, subject) => sum + parseFloat(subject.percentage), 0);
@@ -13,12 +14,17 @@ const averagePercentage = (totalPercentage / subjectWiseAttendance.length).toFix
 export default function AttendanceWidget() {
     const [view, setView] = useState('average');
 
-    console.log(subjectWiseAttendance);
+    console.log(view);
     return (
-        <section className="bg-neutral-800 rounded-2xl shadow-md shadow-neutral-900 p-5 w-full max-w-sm">
-            <div className="flex justify-between items-center mb-4">
+        <section className="bg-neutral-800 rounded-2xl shadow-md shadow-neutral-900 p-5 w-70 max-w-sm ml-70">
+            <div className="flex justify-between items-center text-gray-100 mb-4 border-0 border-b border-neutral-700 pb-4 gap-1">
                 <h2 className="text-md text-gray-200">Attendance Overview</h2>
                 <br />
+                {/* <select value={view} onChange={(e) => setView(e.target.value)} className="bg-neutral-900 text-gray-200 text-xs px-2 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                    <option value="average" onClick={() => setView('average')}>Average</option>
+                    <option value="subject" onClick={() => setView('subject')}>Subject</option>
+                </select> */}
+
                 <button onClick={() => setView('average')} className={`text-xs rounded-md px-4 py-2 cursor-pointer transition-colors ${view === 'average' ? (
                     'bg-indigo-600 '
                 ) : (
@@ -66,7 +72,7 @@ function renderAverageAttendance(averagePercentage) {
     return (
         <div className="flex justify-around">
 
-            <div className="w-30 h-30">
+            <div className="w-40 h-40">
                 <CircularProgressbar
                     value={averagePercentage}
                     text={`${averagePercentage}%`}
@@ -84,10 +90,10 @@ function renderAverageAttendance(averagePercentage) {
                     })}
                 />
             </div>
-            <div className="flex flex-col items-center mt-6">
+            {/* <div className="flex flex-col items-center mt-6">
                 <h2 className="text-lg text-gray-200 mb-2">Overall Attendance</h2>
                 <p className="text-sm text-gray-400">Average: {averagePercentage}%</p>
-            </div>
+            </div> */}
         </div>
     );
 }
@@ -97,7 +103,7 @@ function renderSubjectAttendance() {
             {subjectWiseAttendance.map((subject, index) => (
                 <div key={index} className="max-w-full">
                     <div className="text-xs font-medium text-gray-200 my-1" >
-                        {subject.name} - <span>{subject.totalClasses}/{subject.attendedClasses}</span>
+                        {subject.name} - <span>{subject.attendedClasses}/{subject.totalClasses}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="flex-1">
@@ -278,4 +284,3 @@ function renderSubjectAttendance() {
 //     </Card>
 //   );
 // }
-
