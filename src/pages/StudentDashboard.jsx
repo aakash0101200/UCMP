@@ -5,7 +5,7 @@ import React from "react";
 import AttendanceWidget from "../components/Dashboard/AttendanceWidget";
 import AnnouncementTimeline from "../components/Announcements/AnnouncementTimeline";
 import Sidebar from "./Sidebar.jsx"
-import Calendar2 from "./Calendar2";
+import Calendar from "./Calendar";
 
 export default function StudentDashboard() {
   return (
@@ -19,10 +19,8 @@ export default function StudentDashboard() {
           
         </div>
         <div className="flex flex-col md:flex-row gap-6">
-          
-          
         </div>
-        <Calendar2 />
+        <Calendar />
       </div>
     </div>
 
