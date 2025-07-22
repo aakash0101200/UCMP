@@ -4,13 +4,19 @@ import { format } from 'date-fns';
 
 const EventModal = ({ initialDate, onClose, onSave }) => {
   const [title, setTitle] = useState('');
+
   // The modal now manages its own date state, initialized by the prop.
   const [eventDate, setEventDate] = useState(initialDate);
+
+//    useEffect(() => {
+//    setEventDate(initialDate)
+//  }, [initialDate])
 
   const handleSave = () => {
     if (title && eventDate) {
       // Pass an object with both title and the chosen date back to the parent.
-      onSave({ title, date: eventDate });
+      onSave({ title, date: format(eventDate, 'yyyy-MM-dd') })
+       onClose() ;
     }
   };
 
@@ -55,7 +61,7 @@ const EventModal = ({ initialDate, onClose, onSave }) => {
           <button
             onClick={handleSave}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
-            disabled={!title} // Disable button if title is empty
+            disabled={!title || !eventDate} // Disable button if title is empty
           >
             Save Event
           </button>
