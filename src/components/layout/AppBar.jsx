@@ -7,6 +7,7 @@ import { ModeToggle } from '@/components/Theme/ModeToggle';
 import { Link } from "react-router-dom"; //add navigation links using the Link component from react-router-dom
 import logo from "../../assets/logo.png";
 import StudentDashboard from "../../pages/StudentDashboard";
+import AdminDashboard from "../../pages/AdminDashboard";
 const AppBar = () => {
 
   // State to manage the open/close state of the mobile menu
@@ -34,6 +35,7 @@ const AppBar = () => {
             <li><Link to="/login" className="hover:underline">Login</Link></li>
             <li><Link to="/student" className="hover:underline">Student</Link></li>
             <li><Link to="/faculty" className="hover:underline">Faculty</Link></li>
+            <li><Link to="/admin" className="hover:underline">Admin</Link></li>
             <li><Link to="/about" className="hover:underline">About</Link></li>
           </ul>
 

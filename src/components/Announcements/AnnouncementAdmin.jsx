@@ -1,244 +1,6 @@
-// import React, { useState } from "react";
-// import {
-//   Plus,
-//   Edit3,
-//   Trash2,
-//   Save,
-//   X,
-//   Calendar,
-//   MapPin,
-//   User,
-//   Clock,
-//   AlertCircle,
-//   CheckCircle,
-// } from "lucide-react";
-
-// const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
-//   const [isComposing, setIsComposing] = useState(false);
-//   const [editingId, setEditingId] = useState(null);
-//   const [formData, setFormData] = useState({
-//     title: "",
-//     description: "",
-//     time: "",
-//     location: "",
-//     author: "",
-//     type: "update",
-//     isCompleted: false,
-//   });
-
-//   const resetForm = () => {
-//     setFormData({
-//       title: "",
-//       description: "",
-//       time: "",
-//       location: "",
-//       author: "",
-//       type: "update",
-//       isCompleted: false,
-//     });
-//     setEditingId(null);
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-
-//     if (!formData.title.trim() || !formData.description.trim()) {
-//       alert("Please fill in all required fields");
-//       return;
-//     }
-
-//     const newAnnouncement = {
-//       id: editingId || Date.now(),
-//       title: formData.title.trim(),
-//       description: formData.description.trim(),
-//       time: formData.time || new Date().toLocaleString(),
-//       location: formData.location.trim() || undefined,
-//       author: formData.author.trim() || "Admin",
-//       type: formData.type,
-//       isCompleted: formData.isCompleted,
-//     };
-
-//     if (editingId) {
-//       const updated = announcements.map((ann) =>
-//         ann.id === editingId ? newAnnouncement : ann
-//       );
-//       onAnnouncementsChange(updated);
-//     } else {
-//       onAnnouncementsChange([newAnnouncement, ...announcements]);
-//     }
-
-//     resetForm();
-//     setIsComposing(false);
-//   };
-
-//   const handleEdit = (announcement) => {
-//     setEditingId(announcement.id);
-//     setIsComposing(true);
-//     setFormData({
-//       title: announcement.title,
-//       description: announcement.description,
-//       time: announcement.time,
-//       location: announcement.location || "",
-//       author: announcement.author || "",
-//       type: announcement.type,
-//       isCompleted: announcement.isCompleted || false,
-//     });
-//   };
-
-//   const handleDelete = (id) => {
-//     const filtered = announcements.filter((a) => a.id !== id);
-//     onAnnouncementsChange(filtered);
-//   };
-
-//   return (
-//     <>
-//       <div className="border p-4 rounded-xl shadow-md bg-white">
-//         <div className="flex justify-between items-center mb-4">
-//           <h2 className="text-xl font-bold">Manage Announcements</h2>
-//           <button
-//             onClick={() => {
-//               resetForm();
-//               setIsComposing(!isComposing);
-//             }}
-//             className="flex items-center gap-1 text-sm text-blue-600"
-//           >
-//             <Plus size={16} />
-//             {isComposing ? "Cancel" : "New"}
-//           </button>
-//         </div>
-
-//         {isComposing && (
-//           <form onSubmit={handleSubmit} className="space-y-3 mb-6">
-//             <input
-//               className="w-full border p-2 rounded"
-//               placeholder="Title"
-//               value={formData.title}
-//               onChange={(e) =>
-//                 setFormData({ ...formData, title: e.target.value })
-//               }
-//             />
-//             <textarea
-//               className="w-full border p-2 rounded"
-//               placeholder="Description"
-//               value={formData.description}
-//               onChange={(e) =>
-//                 setFormData({ ...formData, description: e.target.value })
-//               }
-//             />
-//             <input
-//               className="w-full border p-2 rounded"
-//               placeholder="Time (optional)"
-//               value={formData.time}
-//               onChange={(e) =>
-//                 setFormData({ ...formData, time: e.target.value })
-//               }
-//             />
-//             <input
-//               className="w-full border p-2 rounded"
-//               placeholder="Location (optional)"
-//               value={formData.location}
-//               onChange={(e) =>
-//                 setFormData({ ...formData, location: e.target.value })
-//               }
-//             />
-//             <input
-//               className="w-full border p-2 rounded"
-//               placeholder="Author (optional)"
-//               value={formData.author}
-//               onChange={(e) =>
-//                 setFormData({ ...formData, author: e.target.value })
-//               }
-//             />
-//             <select
-//               className="w-full border p-2 rounded"
-//               value={formData.type}
-//               onChange={(e) =>
-//                 setFormData({ ...formData, type: e.target.value })
-//               }
-//             >
-//               <option value="update">Update</option>
-//               <option value="event">Event</option>
-//               <option value="deadline">Deadline</option>
-//               <option value="alert">Alert</option>
-//             </select>
-//             <div className="flex items-center gap-2">
-//               <input
-//                 type="checkbox"
-//                 checked={formData.isCompleted}
-//                 onChange={(e) =>
-//                   setFormData({ ...formData, isCompleted: e.target.checked })
-//                 }
-//               />
-//               <label>Mark as Completed</label>
-//             </div>
-//             <button
-//               type="submit"
-//               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-//             >
-//               {editingId ? "Update" : "Add"}
-//             </button>
-//           </form>
-//         )}
-
-//         <div className="space-y-4 max-h-[400px] overflow-y-auto">
-//           {announcements.map((announcement) => (
-//             <div
-//               key={announcement.id}
-//               className="p-4 border rounded-lg bg-gray-50 flex flex-col gap-2"
-//             >
-//               <div className="flex justify-between items-center">
-//                 <div className="flex items-center gap-2 font-semibold text-lg">
-//                   {announcement.type === "event" && <Calendar size={18} />}
-//                   {announcement.type === "deadline" && <Clock size={18} />}
-//                   {announcement.type === "alert" && <AlertCircle size={18} />}
-//                   {announcement.type === "update" && <CheckCircle size={18} />}
-//                   {announcement.title}
-//                 </div>
-//                 <div className="flex gap-2">
-//                   <button
-//                     onClick={() => handleEdit(announcement)}
-//                     className="text-blue-600 hover:text-blue-800"
-//                   >
-//                     <Edit3 size={16} />
-//                   </button>
-//                   <button
-//                     onClick={() => handleDelete(announcement.id)}
-//                     className="text-red-600 hover:text-red-800"
-//                   >
-//                     <Trash2 size={16} />
-//                   </button>
-//                 </div>
-//               </div>
-//               <p className="text-sm text-gray-700">
-//                 {announcement.description}
-//               </p>
-//               {announcement.location && (
-//                 <div className="flex items-center text-sm text-gray-500 gap-1">
-//                   <MapPin size={14} /> {announcement.location}
-//                 </div>
-//               )}
-//               <div className="flex items-center text-xs text-gray-500 gap-2">
-//                 <User size={12} /> {announcement.author} • {announcement.time}
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default AnnouncementAdmin;
-
-
-
-
-
-
-
-
 // Import React and useState hook
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import API from '../../Services/announcements.js';
 
 // Import icons from lucide-react for visual UI elements
 import {
@@ -251,6 +13,8 @@ import {
   AlertCircle, // Alert icon for type
   CheckCircle, // Tick icon for completed status
 } from 'lucide-react';
+
+
 
 // Main component: Admin interface to manage (create/edit/delete) announcements
 const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
@@ -286,7 +50,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
   };
 
   // Form submission handler (called when "Save" or "Update" is clicked)
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form behavior (like page reload)
 
     // Simple validation: title and description are required
@@ -297,7 +61,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
 
     // Create a new announcement object from form data
     const newAnnouncement = {
-      id: editingId || Date.now(), // Use existing ID if editing; otherwise, generate a unique one
+      // announcementId: editingId || 100, // Use existing ID if editing; otherwise, generate a unique one
       title: formData.title.trim(),
       description: formData.description.trim(),
       time: formData.time || new Date().toLocaleString(), // Default time if not given
@@ -307,20 +71,36 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
       isCompleted: formData.isCompleted,
     };
 
-    // If editing an existing announcement, update it
+
+
+    try{
+       
     if (editingId) {
-      const updated = announcements.map((a) =>
-        a.id === editingId ? newAnnouncement : a
+      // If editing an existing announcement, update it
+      const response = await API.put(`/${editingId}`, newAnnouncement);
+      const updatedAnnouncement = response.data;
+      const updatedList = announcements.map((a) =>
+        a.announcementId === editingId ? updatedAnnouncement : a
       );
-      onAnnouncementsChange(updated); // Update list
+      onAnnouncementsChange(updatedList); // Update list
     } else {
+      console.log("adding");
       // If creating a new announcement, add it to the beginning of the list
-      onAnnouncementsChange([newAnnouncement, ...announcements]);
+      const response = await API.post('/add', newAnnouncement);
+      const saveAnnouncement = response.data;
+      //Add new to the front of list
+      onAnnouncementsChange([saveAnnouncement, ...announcements]);
     }
 
     // After submitting: reset the form and close it
     resetForm();
     setIsComposing(false);
+    } catch (error){
+      console.error('Error in saving announcement:', error);
+      alert('Failed to save announcement...')
+    }
+    
+   
   };
 
   // Called when the user clicks the edit button on an existing announcement
@@ -336,14 +116,23 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
       isCompleted: announcement.isCompleted || false,
     });
 
-    setEditingId(announcement.id); // Switch form to edit mode
+    setEditingId(announcement.announcementId); // Switch form to edit mode
     setIsComposing(true);          // Open the form
   };
 
   // Called when the user clicks the delete button
-  const handleDelete = (id) => {
-    const filtered = announcements.filter((a) => a.id !== id); // Remove selected announcement
-    onAnnouncementsChange(filtered); // Update list
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure to delete this announcement')) 
+      return;
+
+    try{
+      await API.delete(`/${id}`);
+      const filtered = announcements.filter((a) => a.announcementId !== id); // Remove selected announcement
+      onAnnouncementsChange(filtered); // Update list
+    } catch (error){
+      console.error('Error in deleting announcement:', error);
+     alert("Delete failed. Try again!..");
+    }
   };
 
   return (
@@ -351,16 +140,15 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
       {/* Title and Add button section */}
 
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Manage Announcements</h2>
-        <button
-          onClick={() => {
-            resetForm();        // Clear any existing form data
-            setIsComposing(true); // Show the form 
-          }}
-          className="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 flex items-center gap-1"
-        >
-          <Plus className="w-4 h-4" /> Add {/* "+" icon and text */}
-        </button>
+         <h2 className="text-xl font-semibold">Manage Announcements</h2>
+            <button onClick={() => {
+               resetForm();        // Clear any existing form data
+               setIsComposing(true); // Show the form 
+               }} 
+              className="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 flex items-center gap-1"
+           >
+            <Plus className="w-4 h-4" /> Add {/* "+" icon and text */}
+            </button>
       </div>
 
 
@@ -442,7 +230,8 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
             </label>
           </div>
 
-          {/* Action buttons: Cancel or Save/Update */}
+          
+        {/* Action buttons: Cancel or Save/Update */}
           <div className="flex justify-end gap-2">
             <button
               type="button"
@@ -469,7 +258,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
       <div className="space-y-4">
         {announcements.map((a) => (
           <div
-            key={a.id}
+            key={a.announcementId}
             className="border p-4 rounded shadow-sm bg-white flex justify-between items-start"
           >
             {/* Left side: announcement content */}
@@ -479,12 +268,26 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
 
               {/* Metadata: time, location, author, type, completed */}
               <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-3">
-                <span><Clock className="inline w-4 h-4 mr-1" />{a.time}</span>
+                <span>
+                  <Clock className="inline w-4 h-4 mr-1" />{a.time}
+                </span>
+                
                 {a.location && (
-                  <span><MapPin className="inline w-4 h-4 mr-1" />{a.location}</span>
+                  <span>
+                    <MapPin className="inline w-4 h-4 mr-1" />
+                    {a.location}
+                  </span>
                 )}
-                <span><User className="inline w-4 h-4 mr-1" />{a.author}</span>
-                <span className="capitalize"><AlertCircle className="inline w-4 h-4 mr-1" />{a.type}</span>
+                <span>
+                  <User className="inline w-4 h-4 mr-1" />
+                  {a.author}
+                </span>
+                <span className="capitalize">
+                  <AlertCircle className="inline w-4 h-4 mr-1" />
+                  {a.type}
+                </span>
+                
+                
                 {a.isCompleted && (
                   <span className="text-green-600 flex items-center gap-1">
                     <CheckCircle className="w-4 h-4" /> Completed
@@ -502,7 +305,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
                 <Edit3 className="w-4 h-4" />
               </button>
               <button
-                onClick={() => handleDelete(a.id)} // Remove this announcement
+                onClick={() => handleDelete(a.announcementId)} // Remove this announcement
                 className="p-1 text-red-600 hover:text-red-800"
               >
                 <Trash2 className="w-4 h-4" />
@@ -517,5 +320,4 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
 
 // Export the component so it can be imported elsewhere (e.g. AdminDashboard)
 export default AnnouncementAdmin;
-
 

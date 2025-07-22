@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Clock, MapPin, User, ArrowRight } from "lucide-react";
-import announcements from "../datafiles/announcementData";
+import API from "../../Services/announcements.js";
 
 const AnnouncementTimeline = () => {
+  const [announcements, setAnnouncements] = useState([]);
+
   const getTypeStyles = (type) => {
     switch (type) {
       case "event":
@@ -35,6 +37,12 @@ const AnnouncementTimeline = () => {
         };
     }
   };
+
+  useEffect(() => {
+    API.get('/')
+      .then(response => setAnnouncements(response.data))
+      .catch(err => console.log('Failed to fetch announcements:', err));
+  }, []);
 
   return (
     <>
