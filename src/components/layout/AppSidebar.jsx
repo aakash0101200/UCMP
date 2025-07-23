@@ -46,12 +46,13 @@ const facultyMenu = [
   { title: 'Schedule',   to: '/faculty/schedule', Icon: Calendar },
 ];
 
-export function AppSidebar({ userRole = 'student' }) {
+export function AppSidebar({ userRole }) {
   const location = useLocation();
   const menuItems = userRole === 'faculty' ? facultyMenu : studentMenu;
 
   return (
-    <Sidebar variant="inset">
+    <SidebarProvider>
+      <Sidebar variant="inset">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-4 py-3">
           <img src={logo} alt="UCMP Logo" className="h-8 w-8" />
@@ -137,5 +138,8 @@ export function AppSidebar({ userRole = 'student' }) {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
+
+    </SidebarProvider>
+    
   );
 }
