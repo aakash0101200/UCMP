@@ -6,6 +6,7 @@ import AttendanceWidget from "../components/Dashboard/AttendanceWidget";
 import AnnouncementTimeline from "../components/Announcements/AnnouncementTimeline";
 import Sidebar from "./Sidebar.jsx"
 import Calendar from "./Calendar";
+import ProfileCard from "@/components/Profile/ProfileCard";
 
 export default function StudentDashboard() {
   return (
@@ -15,7 +16,8 @@ export default function StudentDashboard() {
       <div className="p-6 space-y-6">
 
         <div className="flex flex-col md:flex-row gap-6">
-          <AttendanceWidget /><AttendanceWidget /><AttendanceWidget /><AttendanceWidget /><AttendanceWidget />
+          <ProfileCard/>
+          <AttendanceWidget />
           
         </div>
         <div className="flex flex-col md:flex-row gap-6">
