@@ -4,27 +4,24 @@ import React from "react";
 // import Calendar from "./Calendar";
 import AttendanceWidget from "../components/Dashboard/AttendanceWidget";
 import AnnouncementTimeline from "../components/Announcements/AnnouncementTimeline";
-import Sidebar from "./Sidebar.jsx"
 import Calendar from "./Calendar";
-import ProfileCard from "@/components/Profile/ProfileCard";
+import DashboardLayout from '@/components/layout/DashboardLayout';
+
 
 export default function StudentDashboard() {
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      
-      <div className="p-6 space-y-6">
-
-        <div className="flex flex-col md:flex-row gap-6">
-          <ProfileCard/>
-          <AttendanceWidget />
-          
-        </div>
-        <div className="flex flex-col md:flex-row gap-6">
-        </div>
-        <Calendar />
+    <DashboardLayout userRole="student">
+      <h2 className="text-2xl font-bold mb-4">Student Dashboard</h2>
+     <div className="flex flex-col md:flex-row gap-6">
+      <AttendanceWidget/>
+      <AttendanceWidget/>
+      <AttendanceWidget/>
       </div>
-    </div>
+     <div className="flex h-screen">
+      <Calendar />
+      </div>
+     
+    </DashboardLayout>
 
 
   );

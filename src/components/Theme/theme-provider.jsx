@@ -1,22 +1,29 @@
+// src/components/Theme/theme-provider.jsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
+/* --------------------------------- Context --------------------------------- */
+
 const initialState = {
-  theme: 'system',
-  setTheme: () => {},
+  theme: 'system',          // 'light' | 'dark' | 'system'
+  setTheme: () => {},       // placeholder – replaced in provider
 };
 
 const ThemeProviderContext = createContext(initialState);
 
+/* ------------------------------- Provider ---------------------------------- */
+
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
-  storageKey = 'vite-ui-theme',
+  storageKey  = 'vite-ui-theme',
   ...props
 }) {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem(storageKey) || defaultTheme;
-  });
+  // 1. Initialise from localStorage or fallback
+  const [theme, setTheme] = useState(() =>
+    localStorage.getItem(storageKey) || defaultTheme,
+  );
 
+  // 2. Side effect: update <html> class every time theme changes
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
@@ -31,12 +38,13 @@ export function ThemeProvider({
     }
   }, [theme]);
 
+  // 3. Expose setter that persists to localStorage
   const value = {
     theme,
-    setTheme: newTheme => {
+    setTheme: (newTheme) => {
       localStorage.setItem(storageKey, newTheme);
       setTheme(newTheme);
-    }
+    },
   };
 
   return (
@@ -46,10 +54,11 @@ export function ThemeProvider({
   );
 }
 
+/* ------------------------------ Consumer Hook ------------------------------ */
+
 export function useTheme() {
-  const context = useContext(ThemeProviderContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+  const ctx = useContext(ThemeProviderContext);
+  if (ctx === undefined)
+    throw new Error('useTheme must be used within ThemeProvider');
+  return ctx;
 }

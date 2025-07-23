@@ -1,5 +1,5 @@
 import  { React, useEffect, useState } from 'react';
-import initialAnnouncements from '../components/datafiles/announcementData';
+import initialAnnouncements from '../components/Announcements/datafiles/announcementData';
 import AnnouncementAdmin from '../components/Announcements/AnnouncementAdmin';
 import API from '.././Services/announcements.js'
 

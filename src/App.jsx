@@ -1,115 +1,120 @@
-import { useState, useEffect } from 'react';
-import { ThemeProvider } from '@/components/Theme/theme-provider';
+// ──────────────────────────────────────────────────────────
+//  App.jsx – root of the SPA
+// ──────────────────────────────────────────────────────────
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
-//State for values that change over time (e.g form inputs, API data, toggle states) its like notebook for the app
-//useState is a hook that allows you to add state to functional components
-//useEffect is a hook that allows you to perform side effects in function components its like an assistant that helps you manage side effects in your app
-//Effects for side effects (e.g fetching data, subscriptions, timers)
+import { ThemeProvider } from './components/Theme/theme-provider';
+import LandingNavBar     from './components/layout/LandingNavBar';
+import DashboardNavBar   from './components/layout/DashboardNavBar';
+import {AppSidebar}        from './components/layout/AppSidebar'; // sidebar
 
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
-//BrowserRouter is a component that uses the HTML5 history API to keep your UI in sync with the URL it's like a GPS for your app that keeps track of the current location
+import Home              from './pages/Home';
+import About             from './pages/About';
+import ContactPage       from './pages/ContactPage';
 
-//Routes is a component that renders the first child <Route> that matches the current location
-//Route is a component that renders a UI component when its path matches the current location
-//Link is a component that renders an anchor tag that navigates to a different route when clicked it's like a hyperlinks but smoother and more powerful
-import './App.css'
-import { ToastContainer } from 'react-toastify'; // Import toast for notifications
-import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
-
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import Home from './pages/Home';
-
-import AppBar from './components/layout/AppBar'; //the top navigation bar (like a header) of the app
-import HeroSection from './components/layout/HeroSection'; //the first section of the home page with specific size and margin (The big banner at the top of the home page)
-import FeatureCard from './components/layout/FeatureCard';
-import StudentDashboard from './pages/StudentDashboard'; //the student dashboard page (like a room in the house where students can see their information and features of the app)
-//FeatureCard is a component that displays a feature of the app with an icon, title, and description
-import AdminDashboard from './pages/AdminDashboard';
+import LoginPage         from './pages/LoginPage';
+import RegisterPage      from './pages/RegisterPage';
+import StudentDashboard  from './pages/StudentDashboard';
+import FacultyDashboard  from './pages/FacultyDashboard';
+import AdminDashboard    from './pages/AdminDashboard';
 
 
 
-/* THE BLUEPRINT */
+import { useLocation } from "react-router-dom";
+
+import 'react-toastify/dist/ReactToastify.css';
+
+
+// Layout component that chooses which navbar and sidebar to show
+function Layout({ children }) {
+  const { pathname } = useLocation();
+  const isDashboard = pathname.startsWith('/student') ||
+                      pathname.startsWith('/faculty') ||
+                      pathname.startsWith('/admin');
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+
+  return (
+    <>
+      {isDashboard ? (
+        <>
+          <DashboardNavBar onSidebarToggle={() => setSidebarOpen(v => !v)} />
+          <AppSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        </>
+      ) : (
+        <LandingNavBar />
+      )}
+      {/* Only put the main wrapper **here** */}
+      <main className="min-h-screen bg-background text-foreground">
+        {children}
+      </main>
+    </>
+  );
+}
+
+
+// ──────────────────────────────────────────────────────────
+//  Root component
+// ──────────────────────────────────────────────────────────
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <BrowserRouter>
-        <>
-          <AppBar />
-
+        <Layout>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/student" element={<StudentDashboard />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-
+            <Route path="/"         element={<Home />} />
+            <Route path="/about"    element={<About />} />
+            <Route path="/contact"  element={<ContactPage />} />
+            <Route path="/login"    element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-
-            {/* add more routes as needed */}
+            <Route path="/student/*" element={<StudentDashboard />} />
+            <Route path="/faculty/*" element={<FacultyDashboard />} />
+            <Route path="/admin/*"   element={<AdminDashboard />} />
+            {/* Add more as needed */}
           </Routes>
-
           <ToastContainer position="top-right" autoClose={3000} />
-        </>
+        </Layout>
       </BrowserRouter>
     </ThemeProvider>
   );
 }
+/*──────────────────────────── Developer Guide ────────────────────────────
+1.  Providers
+    • ThemeProvider — toggles dark / light / system modes. Stores choice in
+      localStorage (key = 'vite-ui-theme').
+    • BrowserRouter — keeps UI in sync with URL via History API.
+    • ToastContainer — global toast engine (react-toastify).
 
-/* 
-└── BrowserRouter (GPS for whole app)
-    ├── AppBar (always visible header)
-    ├── Container (centered content)
-    │   └── HeroSection (main banner)
-    └── FeatureCard (feature boxes) //wrong bcz it is floating outside any page component
-*/
+2.  Shell
+    • NavBar — top navigation bar (logo, links, theme toggle, etc.).
+      Rendered once; never unmounts during route changes.
 
+3.  Main Content
+    • <main> receives theme variables via Tailwind CSS custom properties:
+        bg-background   — dynamic background colour
+        text-foreground — dynamic text colour
+    • min-h-screen ensures full-viewport height even on short pages.
 
-//App is the main component of the app that renders the layout and the routes
+4.  Routes
+    /              → <Home>             – landing page
+    /login         → <LoginPage>        – authentication
+    /register      → <RegisterPage>     – sign-up form
+    /student       → <StudentDashboard> – student portal
+    /admin         → <AdminDashboard>   – admin console
 
+5.  Styling
+    Tailwind classes prefixed by `bg-` or `text-` reference CSS variables
+    declared in your global theme file (see theme-provider.css).
 
+6.  Extending
+    • To add a new page, import the component and append a <Route>.
+    • To conditionally hide a route (e.g. role-based auth), wrap Routes in
+      <RequireAuth role="admin"> … </RequireAuth>.
 
+7.  Performance
+    NavBar is outside <Routes>, so it doesn’t re-render on every page swap
+    unless its own props/state change.
 
-
-
-/*
-a) Page Structure:
-
-Think of your app like a house:
-
-App.js = The foundation and layout
-
-pages/ = Different rooms (Home, Login)
-
-components/ = Furniture (AppBar, HeroSection)
-
-b) Navigation:
-BrowserRouter = The GPS that helps you navigate through the house
-Routes = The signs that tell you which room to go to
-Route = The specific path to a room (e.g., /home, /login)
-
-c) Components:
-AppBar = The header of the house (like a welcome mat)
-Footer = The footer of the house (like a doormat)
-HeroSection = The main living area (where you showcase your best features)
-FeatureCard = The furniture that highlights specific features of the house
-d) Styling:
-App.css = The paint and decor that make your house look nice
-You can use CSS to style your components and make them visually appealing
-e) State Management:
-useState = The notebook where you write down important information (like form inputs)
-useEffect = The assistant that helps you manage side effects (like fetching data)
-f) Example:
-In the Home page, you can have a HeroSection that welcomes users and FeatureCards that showcase
-the app's features. The LoginPage can have a form for users to log in. 
-g) Routing:
-When a user clicks on a link, the BrowserRouter updates the URL and renders the corresponding component
-(e.g., Home or LoginPage). This allows users to navigate through the app seamlessly.
-
---------------------------------------------------------------
-Important Notes:
-<BrowserRouter> must wrap everything that needs routing
-Component Order matters - this is how they'll appear on screen
-
-
-*/
+────────────────────────────────────────────────────────────────────────────*/
