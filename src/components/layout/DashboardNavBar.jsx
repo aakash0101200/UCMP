@@ -150,7 +150,7 @@ export default function DashboardNavBar({ onSidebarToggle }) {
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-lg border-b border-border">
+    <header className="sticky top-0 z-39 w-full bg-background/80 backdrop-blur-lg border-b border-border">
       <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
         {/* ─── Left section ─────────────────────────────── */}
         <div className="flex items-center gap-2">

@@ -10,18 +10,19 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function StudentDashboard() {
   return (
-    <DashboardLayout userRole="student">
+    <>
       <h2 className="text-2xl font-bold mb-4">Student Dashboard</h2>
      <div className="flex flex-col md:flex-row gap-6">
       <AttendanceWidget/>
       <AttendanceWidget/>
-      <AttendanceWidget/>
+      
+      
       </div>
      <div className="flex h-screen">
       <Calendar />
       </div>
      
-    </DashboardLayout>
+    </>
 
 
   );
