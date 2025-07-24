@@ -10,11 +10,11 @@ export default function About() {
     <div className="space-y-16">
       {/* Hero / Intro */}
       <section className="relative bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
-        <div className="mx-auto max-w-6xl px-4 py-20 text-center">
+        <div className="max-w-6xl px-4 py-20 mx-auto text-center">
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
             About UCMP
           </h1>
-          <p className="mt-6 text-lg sm:text-xl max-w-3xl mx-auto">
+          <p className="max-w-3xl mx-auto mt-6 text-lg sm:text-xl">
             The University College of Modern Pedagogy empowers the next generation
             of thinkers, creators, and leaders through world-class teaching,
             boundary-pushing research, and a commitment to community impact.
@@ -23,10 +23,10 @@ export default function About() {
       </section>
 
       {/* Mission / Vision */}
-      <section className="mx-auto max-w-6xl px-4">
+      <section className="max-w-6xl px-4 mx-auto">
         <div className="grid gap-12 lg:grid-cols-2">
           <div>
-            <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
+            <h2 className="mb-4 text-2xl font-semibold">Our Mission</h2>
             <p className="leading-relaxed text-muted-foreground">
               To cultivate an inclusive academic environment where curiosity is
               celebrated, innovation is encouraged, and every learner gains the
@@ -34,7 +34,7 @@ export default function About() {
             </p>
           </div>
           <div>
-            <h2 className="text-2xl font-semibold mb-4">Our Vision</h2>
+            <h2 className="mb-4 text-2xl font-semibold">Our Vision</h2>
             <p className="leading-relaxed text-muted-foreground">
               By 2030, UCMP aims to be among the top 50 globally recognized
               institutions for interdisciplinary research, sustainable
@@ -45,9 +45,9 @@ export default function About() {
       </section>
 
       {/* Quick Facts */}
-      <section className="bg-card text-card-foreground py-16">
-        <div className="mx-auto max-w-6xl px-4">
-          <h2 className="text-2xl font-semibold text-center mb-10">
+      <section className="py-16 bg-card text-card-foreground">
+        <div className="max-w-6xl px-4 mx-auto">
+          <h2 className="mb-10 text-2xl font-semibold text-center">
             UCMP at a Glance
           </h2>
 
@@ -71,11 +71,11 @@ export default function About() {
             ].map(({ Icon, label, value }) => (
               <div
                 key={label}
-                className="flex flex-col items-center rounded-lg bg-muted/40 p-8 text-center shadow-sm"
+                className="flex flex-col items-center p-8 text-center rounded-lg shadow-sm bg-muted/40"
               >
-                <Icon className="h-10 w-10 text-primary mb-4" />
+                <Icon className="w-10 h-10 mb-4 text-primary" />
                 <span className="text-3xl font-bold">{value}</span>
-                <span className="mt-2 text-sm text-muted-foreground uppercase tracking-wide">
+                <span className="mt-2 text-sm tracking-wide uppercase text-muted-foreground">
                   {label}
                 </span>
               </div>
@@ -85,8 +85,8 @@ export default function About() {
       </section>
 
       {/* Leadership */}
-      <section className="mx-auto max-w-6xl px-4">
-        <h2 className="text-2xl font-semibold mb-8 text-center">
+      <section className="max-w-6xl px-4 mx-auto">
+        <h2 className="mb-8 text-2xl font-semibold text-center">
           Leadership Team
         </h2>
 
@@ -110,12 +110,12 @@ export default function About() {
           ].map(({ name, role, img }) => (
             <article
               key={name}
-              className="flex flex-col items-center text-center space-y-4"
+              className="flex flex-col items-center space-y-4 text-center"
             >
               <img
                 src={img}
                 alt={name}
-                className="h-28 w-28 rounded-full object-cover border-4 border-primary"
+                className="object-cover border-4 rounded-full h-28 w-28 border-primary"
               />
               <div>
                 <h3 className="font-medium">{name}</h3>
@@ -127,9 +127,9 @@ export default function About() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 px-4 bg-light text-primary-foreground">
-        <div className="mx-auto max-w-4xl text-center space-y-6">
-          <h2 className="text-3xl font-bold">Join the UCMP Community</h2>
+      <section className="px-4 py-16 bg-light text-primary-foreground">
+        <div className="max-w-4xl mx-auto space-y-6 text-center text-black rounded-md bg-amber-200">
+          <h2 className="px-2 py-2 text-3xl font-bold text-black ">Join the UCMP Community</h2>
           <p className="leading-relaxed">
             Whether you are a prospective student, researcher, or partner
             institution, we invite you to be part of our journey toward a
@@ -137,7 +137,7 @@ export default function About() {
           </p>
           <a
             href="/contact"
-            className="inline-block bg-background text-foreground px-6 py-3 rounded-md font-medium hover:bg-background/80 transition-colors"
+            className="inline-block px-6 py-3 font-medium transition-colors border border-black rounded-md pb- bg-background text-foreground hover:bg-background/80"
           >
             Contact Admissions
           </a>
