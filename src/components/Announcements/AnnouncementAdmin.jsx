@@ -259,7 +259,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
         {announcements.map((a) => (
           <div
             key={a.announcementId}
-            className="border p-4 rounded shadow-sm bg-white flex justify-between items-start"
+            className="border p-4 rounded shadow-sm bg-white dark:bg-neutral-950 flex justify-between items-start"
           >
             {/* Left side: announcement content */}
             <div>

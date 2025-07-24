@@ -6,16 +6,20 @@ import AttendanceWidget from "../components/Dashboard/AttendanceWidget";
 import AnnouncementTimeline from "../components/Announcements/AnnouncementTimeline";
 import Calendar from "./Calendar";
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import TimetableWidget from "../components/Dashboard/TimetableWidget.jsx";
 
 
 export default function StudentDashboard() {
   return (
     <>
-      <h2 className="text-2xl font-bold mb-4">Student Dashboard</h2>
-     <div className="flex flex-col md:flex-row gap-6">
-      <AttendanceWidget/>
-      <AttendanceWidget/>
-      
+    <h2 className="text-2xl font-bold mb-4">Student Dashboard</h2>
+    <div className="p-6 space-y-6">
+          {/* Top widgets */}
+          <div className="flex flex-col md:flex-row gap-6">
+            <AttendanceWidget />
+            <TimetableWidget /> 
+            {/* Insert LineChart component here if needed */}
+          </div>    
       
       </div>
      <div className="flex h-screen">

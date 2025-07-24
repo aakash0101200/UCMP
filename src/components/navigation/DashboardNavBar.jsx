@@ -22,12 +22,12 @@ import { Badge } from '../../components/ui/badge';
 import logo from '../../assets/logo.png';
 
 
-export default function DashboardNavBar({ 
-  userRole = 'student', 
+export default function DashboardNavBar({
+  userRole = 'student',
   userName = 'User',
   userEmail = 'user@example.com',
   notificationCount = 0,
-  onLogout 
+  onLogout
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileSearch, setShowMobileSearch] = useState('false');
@@ -40,7 +40,7 @@ export default function DashboardNavBar({
     };
     return titles[role] || 'Dashboard';
   };
-//    const toggleSearch = () => setSearchOpen(!searchOpen);
+  //    const toggleSearch = () => setSearchOpen(!searchOpen);
 
   const handleLogout = () => {
     onLogout?.();
@@ -50,19 +50,19 @@ export default function DashboardNavBar({
     <>
       <header className="sticky top-0 left-0 h-16.25 z-30 flex items-center w-full border-b bg-sidebar  ">
         <div className="container flex h-16 items-center justify-between px-3">
-          
+
           {/* Left Section */}
           <div className="flex items-center gap-4">
             {/* Sidebar Trigger */}
             <SidebarTrigger className="md:hidden" />
-            
+
             {/* Logo & Branding - Hidden on mobile when sidebar trigger is shown */}
             <div className="flex items-center gap-3">
               <img src={logo} alt="UCMP" className="h-8 w-8" />
               <div className="hidden sm:flex flex-col leading-tight">
 
                 {/* <h1 className="font-semibold text-lg">UCMP</h1> */}
-                 <span className="font-semibold">{userName.split(' ')[0]}</span>
+                <span className="font-semibold">{userName.split(' ')[0]}</span>
 
                 <p className="text-xs text-muted-foreground">
                   {getRoleTitle(userRole)}
@@ -103,9 +103,10 @@ export default function DashboardNavBar({
                 <Button variant="ghost" size="icon" className="relative">
                   <Bell className="h-5 w-5" />
                   {notificationCount > 0 && (
-                    <Badge 
-                      variant="destructive" 
-                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs"
+                    <Badge
+                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs flex justify-center "
+                      variant="destructive"
+
                     >
                       {notificationCount > 99 ? '99+' : notificationCount}
                     </Badge>
@@ -169,7 +170,7 @@ export default function DashboardNavBar({
                   </a>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={handleLogout}
                   className="text-red-600 focus:text-red-600 "
                 >
