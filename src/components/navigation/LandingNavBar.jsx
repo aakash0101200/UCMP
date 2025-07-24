@@ -1,0 +1,86 @@
+// components/navigation/LandingNavBar.jsx
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
+import { ModeToggle } from '../Theme/ModeToggle';
+import { Button } from '../ui/button';
+import logo from '../../assets/logo.png';
+
+const navLinks = [
+  { to: '/', label: 'Home' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
+  { to: '/login', label: 'Login', variant: 'button' },
+
+];
+
+export default function LandingNavBar() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { pathname } = useLocation();
+
+  return (
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <img src={logo} alt="UCMP Logo" className="h-8 w-8" />
+            <span className="font-bold text-xl">UCMP</span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map(({ to, label, variant }) => (
+              <Link
+                key={to}
+                to={to}
+                className={variant === 'button'
+                    ? 'bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90'
+                    : pathname === to
+                    ? 'text-primary font-medium'
+                    : 'text-muted-foreground hover:text-foreground'
+                }>
+            
+                {label}
+              </Link>
+            ))}
+            <ModeToggle />
+          </div>
+
+          {/* Mobile Menu & Theme Toggle */}
+          <div className="flex md:hidden items-center gap-2">
+            <ModeToggle />
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
+
+
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-border bg-background px-4 py-3">
+            {navLinks.map(({ to, label, variant }) => (
+              <Link
+                key={to}
+                to={to}
+                onClick={() => setMobileMenuOpen(false)}
+                className={
+                  variant === 'button'
+                    ? 'block bg-primary text-primary-foreground px-4 py-2 rounded-md mb-2'
+                    : 'block px-3 py-2 rounded-md hover:bg-muted'
+                }
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}

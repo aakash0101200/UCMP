@@ -1,10 +1,12 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { ThemeProvider } from './components/Theme/theme-provider';
 
-import LandingNavBar from './components/layout/LandingNavBar';
-import DashboardNavBar from './components/layout/DashboardNavBar';
+import LandingNavBar from './components/navigation/LandingNavBar';
+import DashboardNavBar from './components/navigation/DashboardNavBar';
 import DashboardLayout from './components/layout/DashboardLayout';
 
 import Home from './pages/Home';
@@ -18,17 +20,27 @@ import AdminDashboard from './pages/AdminDashboard';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-// --- Public layout: navigation bar for all normal pages
-function PublicLayout({ children }) {
+// Layout to choose between public vs dashboard shells
+function AppShell({ children }) {
+    // useLocation must be inside BrowserRouter
+
+  const { pathname } = useLocation();
+  const isDashboard = 
+    pathname.startsWith('/student') ||
+    pathname.startsWith('/faculty') ||
+    pathname.startsWith('/admin');
+
   return (
     <>
-      <LandingNavBar />
-      <main className="min-h-screen bg-background text-foreground">
+      {isDashboard ? <DashboardNavBar /> : <LandingNavBar />}
+      {/* 3. Ensure main wrapper uses dark: variants */}
+      <main className="min-h-screen bg-background text-foreground dark:bg-background dark:text-foreground">
         {children}
       </main>
     </>
   );
 }
+
 
 export default function App() {
   return (
@@ -36,11 +48,48 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
-          <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
-          <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
-          <Route path="/login" element={<PublicLayout><LoginPage /></PublicLayout>} />
-          <Route path="/register" element={<PublicLayout><RegisterPage /></PublicLayout>} />
+
+           <Route
+            path="/"
+            element={
+              <AppShell>
+                <Home />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <AppShell>
+                <About />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <AppShell>
+                <ContactPage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <AppShell>
+                <LoginPage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <AppShell>
+                <RegisterPage />
+              </AppShell>
+            }
+          />
+
 
           {/* Dashboard routes */}
           <Route path="/student/*" element={

@@ -1,17 +1,41 @@
+// components/layout/DashboardLayout.jsx
 import React from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from './AppSidebar';
-import DashboardNavBar from './DashboardNavBar';
+import { SidebarProvider, SidebarInset } from '../ui/sidebar';
+import { AppSidebar } from '../navigation/AppSidebar';
+import DashboardNavBar from '../navigation/DashboardNavBar';
 
-export default function DashboardLayout({ children, userRole }) {
+export default function DashboardLayout({ 
+  children, 
+  userRole = 'student',
+  userName = 'User',
+  userEmail = 'user@example.com',
+  onLogout 
+}) {
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        <AppSidebar userRole={userRole} />
-        <div className="flex-1 flex flex-col">
-          <DashboardNavBar />
-          <div className="flex-1 p-4 lg:p-6">{children}</div>
-        </div>
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex min-h-screen w-full bg-background">
+        {/* Sidebar */}
+        <AppSidebar 
+          userRole={userRole} 
+          userName={userName}
+        />
+        
+        {/* Main Content Area */}
+        <SidebarInset className="flex-1">
+          {/* Dashboard Navbar */}
+          <DashboardNavBar 
+            userRole={userRole}
+            userName={userName}
+            userEmail={userEmail}
+            notificationCount={3}
+            onLogout={onLogout}
+          />
+          
+          {/* Page Content */}
+          <main className="flex-1 space-y-4 ml-3 p-6">
+            {children}
+          </main>
+        </SidebarInset>
       </div>
     </SidebarProvider>
   );

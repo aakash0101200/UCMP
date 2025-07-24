@@ -1,14 +1,4 @@
-// import React from "react";
 
-// export default function ProfileCard() {
-//   return (
-//     <>
-//     <section className="bg-[#F0F8FF] border-2 border-black rounded-2xl lg: w-xl">
-//         <h2>Profile goes here.. </h2>
-//     </section>
-//     </>
-//   );
-// }
 
 import React from "react";
 import profileImg from '../../assets/profile.jpg';
