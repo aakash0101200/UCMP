@@ -22,7 +22,7 @@ export default function StudentDashboard() {
 
           {/* Insert LineChart component here if needed */}
         </div>
-        <div className="flex flex-col md:flex-row gap-6 border-t-4 border-t-red-500 border-r-4 border-r-blue-500 border-b-4 border-b-green-500 border-l-4 border-l-yellow-500 rounded-xl p-4">
+        <div className="flex flex-col md:flex-row gap-6 border-t-1 border-t-red-500 border-r-1 border-r-blue-500 border-b-1 border-b-green-500 border-l-1 border-l-yellow-500 rounded-xl p-4">
           <AnnouncementTimeline />
           
         </div>

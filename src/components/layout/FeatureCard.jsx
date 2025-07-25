@@ -16,7 +16,7 @@ const FeatureCard = ({ icon, title, description }) => {
               Feature
           </span>
           <h2 className="text-3xl sm:text-5xl lg:text-6xl mt-10 lg:mt-20 tracking wide">
-             Transforming
+             Transforming {" "}
              <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
                Academic Management
             </span>
