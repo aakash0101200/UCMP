@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Clock, MapPin, User, ArrowRight } from "lucide-react";
-import API from "../../Services/announcements.js";
+import { Clock, MapPin, User, ArrowRight } from "lucide-react"; // Icons
+import API from "../../Services/announcements.js"; // API service for fetching announcements
 
 const AnnouncementTimeline = () => {
+  // State to store announcements fetched from the API
   const [announcements, setAnnouncements] = useState([]);
 
+  // Function to return style classes based on the announcement type
   const getTypeStyles = (type) => {
     switch (type) {
       case "event":
         return {
-          dot: "bg-purple-500",
-          line: "bg-purple-200",
-          bg: "bg-purple-50",
-          text: "text-purple-800",
+          dot: "bg-purple-500",     // color of the timeline dot
+          line: "bg-purple-200",    // color of the vertical line
+          bg: "bg-purple-50",       // background for the card
+          text: "text-purple-800",  // text color
         };
       case "deadline":
         return {
@@ -38,15 +40,19 @@ const AnnouncementTimeline = () => {
     }
   };
 
+  // Fetch announcements from the API when component mounts
   useEffect(() => {
     API.get('/')
-      .then(response => setAnnouncements(response.data))
+      .then(response => setAnnouncements(response.data)) // Set data in state
       .catch(err => console.log('Failed to fetch announcements:', err));
-  }, []);
+  }, []); // Empty dependency array = run only once on load
 
   return (
     <>
-      <div className="p-6 max-w-160 bg-white shadow-lg rounded-2xl">
+      {/* Container for the timeline */}
+      <div className="p-6 max-w-160 bg-sidebar shadow-lg rounded-2xl">
+
+        {/* Header section with title and "View All" button */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Recent Updates</h2>
           <button className="flex items-center space-x-1 font-medium text-blue-600 transition-colors hover:text-blue-800">
@@ -55,36 +61,40 @@ const AnnouncementTimeline = () => {
           </button>
         </div>
 
+        {/* Timeline content container */}
         <div className="relative">
+
+          {/* Loop through all announcements and render them */}
           {announcements.map((announcement, index) => {
-            const styles = getTypeStyles(announcement.type);
-            const isLast = index === announcements.length - 1;
+            const styles = getTypeStyles(announcement.type); // Get style based on type
+            const isLast = index === announcements.length - 1; // Check if last item in list
 
             return (
-              <div
-                key={announcement.id}
-                className="relative flex items-start group"
-              >
+              <div key={announcement.id} className="relative flex items-start group">
+                
+                {/* Vertical line between dots (except for last item) */}
                 {!isLast && (
-                  <div
-                    className={`absolute left-4 top-8 w-0.5 h-16 ${styles.line} transition-colors duration-300`}
-                  ></div>
+                  <div className={`absolute left-4 top-8 w-0.5 h-16 ${styles.line} transition-colors duration-300`} />
                 )}
 
+                {/* Dot for each timeline entry */}
                 <div
-                  className={`relative z-10 w-8 h-8 ${
-                    styles.dot
-                  } rounded-full flex items-center justify-center shadow-md ${
+                  className={`relative z-10 w-8 h-8 ${styles.dot} rounded-full flex items-center justify-center shadow-md ${
                     announcement.isCompleted ? "ring-4 ring-green-200" : ""
                   } transition-all duration-300 group-hover:scale-110`}
                 >
+
+                  {/* Inner white dot */}
                   <div className="w-3 h-3 bg-white rounded-full"></div>
                 </div>
 
+                {/* Right section (card with announcement content) */}
                 <div className="flex-1 pb-8 ml-6">
                   <div
                     className={`${styles.bg} rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-[1.01]`}
                   >
+
+                    {/* Title and type badge */}
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-gray-700">
                         {announcement.title}
@@ -96,16 +106,25 @@ const AnnouncementTimeline = () => {
                       </span>
                     </div>
 
+
+                    {/* Announcement description */}
                     <p className="mb-3 leading-relaxed text-gray-700">
                       {announcement.description}
                     </p>
 
+                    {/* Footer with time, location, and author */}
                     <div className="flex items-center justify-between text-sm text-gray-500">
+                     
+                      {/* Left side: time and location */}
                       <div className="flex items-center space-x-4">
+                       
+                        {/* Time */}
                         <div className="flex items-center space-x-1">
                           <Clock className="w-4 h-4" />
                           <span>{announcement.time}</span>
                         </div>
+
+                        {/* Location (only if present) */}
                         {announcement.location && (
                           <div className="flex items-center space-x-1">
                             <MapPin className="w-4 h-4" />
@@ -113,6 +132,8 @@ const AnnouncementTimeline = () => {
                           </div>
                         )}
                       </div>
+
+                      {/* Right side: author */}
                       <div className="flex items-center space-x-1">
                         <User className="w-4 h-4" />
                         <span>{announcement.author}</span>
@@ -127,6 +148,6 @@ const AnnouncementTimeline = () => {
       </div>
     </>
   );
-}
+};
 
 export default AnnouncementTimeline;

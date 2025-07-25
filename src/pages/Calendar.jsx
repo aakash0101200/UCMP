@@ -79,33 +79,33 @@ const Calendar = () => {
     //  <div className="container mx-auto px-4 sm:px-6 lg:px-8
     //                  flex justify-end items-center min-h-screen">
     
-    <div className="inline-block float mr-4 mb-4 min-h-auto relative rounded-xl bg-gray-100">
-      <div className="absolute mx-auto px-4 sm:px-6 lg:px-8
-                      flex justify-end items-center min-h-screen">
-        <div className="w-full sm:w-[700px] bg-white p-4 sm:p-6
-                        rounded-xl shadow-md">
+    <div className="inline-block mr-2 mb-2 min-h-min relative rounded-lg bg-gray-100 dark:bg-gray-800 max-w-xs sm:max-w-sm md:max-w-md">
+      <div className="relative mx-auto px-2 sm:px-0
+                      flex justify-center items-start ">
+        <div className="w-[340px] sm:w-[420px] md:w-[500px] bg-white dark:bg-gray-900 p-2 sm:p-4
+                        rounded-lg shadow dark:shadow-none">
           
           {/* Header with Month Picker */}
           <div className="flex flex-col sm:flex-row
-                          items-center justify-between mb-6 gap-4">
+                          items-center justify-between mb-4 gap-2 text-sm dark:text-gray-200">
             <div ref={monthPickerRef}
-                 className="relative inline-block text-left">
+                 className="relative inline-block">
               <button
                 onClick={() => setMonthPickerOpen(o => !o)}
-                className="px-4 py-2 border rounded-md
-                           flex items-center gap-2 hover:bg-gray-100"
+                className="px-2 py-1 border rounded
+                           flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs dark:border-gray-600 dark:bg-gray-800"
               >
-                Month <span className="text-gray-400">▼</span>
+                Month <span className="text-gray-400 dark:text-gray-500">▼</span>
               </button>
               {isMonthPickerOpen && (
-                <ul className="absolute right-0 mt-2 w-40 bg-white
-                               border rounded-md shadow-lg
-                               max-h-60 overflow-auto z-20">
+                <ul className="absolute right-0 mt-1 w-32 bg-white
+                               border rounded shadow-max-h-40
+                               max-h-40 overflow-auto z-20 text-xs">
                   {months.map((m, i) => (
                     <li
                       key={m}
                       onClick={() => handleMonthSelect(i)}
-                      className="px-3 py-2 hover:bg-gray-100
+                      className="px-2 py-1 hover:bg-gray-100
                                  cursor-pointer"
                     >
                       {m}
@@ -116,44 +116,44 @@ const Calendar = () => {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="w-full sm:w-auto px-4 py-2
+              className="w-full sm:w-auto px-2 py-1
                           bg-blue-600 text-white font-semibold
-                          rounded-md flex items-center justify-center gap-2
-                          hover:bg-blue-700"
+                          rounded flex items-center justify-center gap-1
+                          hover:bg-blue-700 text-xs"
             >
-              <Plus size={18} /> New Event
+              <Plus size={14} /> New Event
             </button>
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3 text-xs dark:text-gray-200">
             <button
               onClick={() => setCurrentDate(subMonths(currentDate, 1))}
-              className="p-2 rounded-full hover:bg-gray-100"
+              className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={16} />
             </button>
-            <h2 className="text-xl font-bold text-blue-700">
+            <h2 className="text-xl font-bold text-blue-700 dark:text-blue-300">
               {format(currentDate, 'MMMM yyyy')}
             </h2>
             <button
               onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-              className="p-2 rounded-full hover:bg-gray-100"
+              className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={16} className="dark:text-gray-200" />
             </button>
           </div>
 
           {/* Weekdays */}
           <div className="grid grid-cols-7 text-center
-                          font-semibold text-gray-600 border-b pb-2">
+                          font-semibold text-gray-600 dark:text-gray-400 border-b pb-1 text-xs">
             {weekdays.map(day => (
-              <div key={day} className="py-1">{day}</div>
+              <div key={day} className="py-0.5">{day}</div>
             ))}
           </div>
 
           {/* Calendar Grid */}
-          <div className="w-full min-h-[400px] aspect-[7/6]">
+          <div className="w-full max-h-[340px] aspect-[2/1]">
             <div className="grid grid-cols-7 grid-rows-6 w-full h-full">
               {days.map(day => {
                 const dayEvents = events.filter(
@@ -165,32 +165,33 @@ const Calendar = () => {
                   <div
                     key={day.toString()}
                     onClick={() => setSelectedDate(day)}
-                    className={`relative p-2 border-t border-r
-                      cursor-pointer transition-colors duration-200
+                    className={`relative p-1.5 border-t border-r
+                      cursor-pointer transition-colors duration-200 text-xs  aspect-square overflow-hidden
                       ${!isSameMonth(day, monthStart)
-                        ? 'bg-gray-50 text-gray-400'
-                        : 'bg-white hover:bg-blue-50'}
-                      ${isSelected ? 'bg-blue-100' : ''}
+                        ? 'bg-gray-50 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
+                        : 'bg-white hover:bg-blue-50 dark:bg-gray-900 dark:hover:bg-gray-800 dark:text-gray-200'}
+                      ${isSelected ? 'bg-blue-100 dark:bg-blue-900' : ''}
                       aspect-square overflow-hidden`}
                   >
                     <div className="absolute top-1 left-1">
-                      <span className={`text-sm font-medium
+                      <span className={`text-xm font-medium
                         ${isToday(day)
-                          ? 'bg-blue-600 text-white rounded-full h-7 w-7 flex items-center justify-center'
+                          ? 'bg-blue-600 text-white rounded-full h-5 w-5 flex items-center justify-center'
                           : ''}`}>
                         {format(day, 'd')}
                       </span>
                     </div>
-                    <div className="mt-8 space-y-1 overflow-y-auto max-h-16">
+
+                    <div className="mt-6 space-y-0.5 overflow-y-auto max-h-10 pr-1">
                       {dayEvents.map((event, i) => (
                         <div
                           key={i}
-                          className="flex items-center gap-2 text-xs
+                          className="flex items-center gap-1 text-[10px]
                                      bg-red-100 text-red-700
-                                     rounded-md px-2 py-1"
+                                     rounded-md px-1 py-0.5 dark:bg-red-900 dark:text-red-300"
                         >
-                          <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                          <span>{event.title}</span>
+                          <span className="w-1.5 h-1.5 bg-red-500 rounded-full dark:bg-red-400"></span>
+                          <span className="truncate">{event.title}</span>
                         </div>
                       ))}
                     </div>

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import API from '../../Services/announcements.js';
 
+
 // Import icons from lucide-react for visual UI elements
 import {
   Plus,        // "+" icon for Add button
@@ -136,7 +137,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-sidebar rounded-2xl p-5 m-4 ">
       {/* Title and Add button section */}
 
       <div className="flex justify-between items-center">
@@ -259,7 +260,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
         {announcements.map((a) => (
           <div
             key={a.announcementId}
-            className="border p-4 rounded shadow-sm bg-white dark:bg-neutral-950 flex justify-between items-start"
+            className="border p-4 rounded shadow-sm bg-sidebar flex justify-between items-start "
           >
             {/* Left side: announcement content */}
             <div>

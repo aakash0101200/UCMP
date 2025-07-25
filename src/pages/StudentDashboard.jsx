@@ -12,20 +12,27 @@ import TimetableWidget from "../components/Dashboard/TimetableWidget.jsx";
 export default function StudentDashboard() {
   return (
     <>
-    <h2 className="text-2xl font-bold mb-4">Student Dashboard</h2>
-    <div className="p-6 space-y-6">
-          {/* Top widgets */}
-          <div className="flex flex-col md:flex-row gap-6">
-            <AttendanceWidget />
-            <TimetableWidget /> 
-            {/* Insert LineChart component here if needed */}
-          </div>    
-      
+      <h2 className="text-2xl font-bold mb-4">Student Dashboard</h2>
+
+      <div className="p-6 space-y-6">
+        {/* Top widgets */}
+        <div className="flex flex-col md:flex-row gap-6">
+          <AttendanceWidget />
+          <TimetableWidget />
+
+          {/* Insert LineChart component here if needed */}
+        </div>
+        <div className="flex flex-col md:flex-row gap-6 border-t-4 border-t-red-500 border-r-4 border-r-blue-500 border-b-4 border-b-green-500 border-l-4 border-l-yellow-500 rounded-xl p-4">
+          <AnnouncementTimeline />
+          
+        </div>
+        <Calendar />
       </div>
-     <div className="flex h-screen">
-      <Calendar />
-      </div>
-     
+
+
+
+
+
     </>
 
 

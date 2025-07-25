@@ -11,7 +11,9 @@ const Home = () => {
     // It includes the HeroSection, FeatureCard, and Footer components
 
     return (
-        <div className="home-page">
+        <div className="bg-gradient-to-b 
+        from-[#fefefe] via-[#fdfbf2] to-[#fffbe9] 
+        min-h-screen">
           <div className="max-w-7xl mx-auto pt-10 px-10">
             <HeroSection/>
           </div>
