@@ -35,7 +35,7 @@ export default function DashboardLayout({
 
           <main className="flex-1 space-y-4 p-6 
                bg-gradient-to-b 
-               from-[#fefefe] via-[#fdfbf2] to-[#fffbe9] 
+               from-[#faf7f3] via-[#faf7f3] to-[#faf7f3] 
                dark:from-[#0d1117] dark:via-[#3c3c98a2] dark:to-[#1f0644]">
             {children}
           </main>

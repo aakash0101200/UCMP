@@ -16,24 +16,35 @@ import {
 } from 'date-fns';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import EventModal from './EventModal';
+import {calEvent} from "../utils/calEvent.js"
+// import CalendarLayout from '../components/Dashboard/CalendarLayout';
+
 
 const Calendar = () => {
   // Core calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState([
-    { date: '2025-07-10', title: 'Assignment Due' },
-    { date: '2025-07-31', title: 'Project Kick-off' },
-  ]);
+  const [events, setEvents] = useState(calEvent);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+
 
   // Month‐picker dropdown state
   const [isMonthPickerOpen, setMonthPickerOpen] = useState(false);
   const monthPickerRef = useRef(null);
+
   const months = [
     'January','February','March','April','May','June',
     'July','August','September','October','November','December'
   ];
+
+// Calculate interval for calendar grid (start from Monday)
+const monthStart = startOfMonth(currentDate);
+const monthEnd = endOfMonth(monthStart);
+const startDate = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday = 1
+const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+const days = eachDayOfInterval({ start: startDate, end: endDate });
+
+const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   // Close the month dropdown when clicking outside
   useEffect(() => {
@@ -49,13 +60,7 @@ const Calendar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Compute grid dates
-  const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(monthStart);
-  const startDate = startOfWeek(monthStart);
-  const endDate = endOfWeek(monthEnd);
-  const days = eachDayOfInterval({ start: startDate, end: endDate });
-  const weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
 
   // Handler: pick a new month
   const handleMonthSelect = (monthIndex) => {
@@ -153,7 +158,7 @@ const Calendar = () => {
           </div>
 
           {/* Calendar Grid */}
-          <div className="w-full max-h-[340px] aspect-[2/1]">
+          <div className="w-full max-h-[340px] aspect-[1/1]">
             <div className="grid grid-cols-7 grid-rows-6 w-full h-full">
               {days.map(day => {
                 const dayEvents = events.filter(

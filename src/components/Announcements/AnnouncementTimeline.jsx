@@ -54,7 +54,7 @@ const AnnouncementTimeline = () => {
 
         {/* Header section with title and "View All" button */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Recent Updates</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Recent Updates</h2>
           <button className="flex items-center space-x-1 font-medium text-blue-600 transition-colors hover:text-blue-800">
             <span>View All</span>
             <ArrowRight className="w-4 h-4" />

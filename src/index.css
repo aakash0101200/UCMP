@@ -5,6 +5,15 @@
 
 @import "tw-animate-css";
 
+@keyframes bounce {
+  0%, 100% { transform: translateY(0) translateX(-50%); }
+  50% { transform: translateY(-20px) translateX(-50%); }
+}
+
+.animate-bounce {
+  animation: bounce 2s infinite;
+}
+
 @custom-variant dark (.dark &);
 
 :root {
@@ -120,6 +129,27 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
 }
+
+.perspective {
+  perspective: 1000px;
+}
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 
 @layer base {
   * {

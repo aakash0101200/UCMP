@@ -34,7 +34,8 @@ const EventModal = ({ initialDate, onClose, onSave }) => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g., Team Meeting"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500   const [eventDate, setEventDate] = useState(initialDate);
+                      "
           />
         </div>
 
@@ -54,7 +55,7 @@ const EventModal = ({ initialDate, onClose, onSave }) => {
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
           >
             Cancel
           </button>
