@@ -50,7 +50,7 @@ const AnnouncementTimeline = () => {
   return (
     <>
       {/* Container for the timeline */}
-      <div className="p-6 max-w-160 bg-sidebar shadow-lg rounded-2xl">
+      <div className="p-6 max-w-160  shadow-lg  bg-sidebar rounded-2xl border  border-orange-500 dark:shadow-[0_0_40px_5px_rgba(255,115,0,0.4)]">
 
         {/* Header section with title and "View All" button */}
         <div className="flex items-center justify-between mb-6">

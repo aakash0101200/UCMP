@@ -12,20 +12,23 @@ import TimetableWidget from "../components/Dashboard/TimetableWidget.jsx";
 export default function StudentDashboard() {
   return (
     <>
-      <h2 className="text-2xl font-bold mb-4">Student Dashboard</h2>
+      <h2 className="mb-4 text-2xl font-bold">Student Dashboard</h2>
 
       <div className="p-6 space-y-6">
         {/* Top widgets */}
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col gap-6 md:flex-row">
           <AttendanceWidget />
           <TimetableWidget />
 
           {/* Insert LineChart component here if needed */}
         </div>
-        <div className="flex flex-col md:flex-row gap-6 border-t-1 border-t-red-500 border-r-1 border-r-blue-500 border-b-1 border-b-green-500 border-l-1 border-l-yellow-500 rounded-xl p-4">
+
+        {/* Announcements */}
+        <div className="my-10" >
           <AnnouncementTimeline />
-          
         </div>
+
+        
         <Calendar />
       </div>
 
@@ -44,23 +47,23 @@ export default function StudentDashboard() {
 // // This is the main container for the dashboard page's content
 //     <div>
 //       {/* Page Title */}
-//       <h1 className="text-3xl font-bold text-gray-800 mb-6">
+//       <h1 className="mb-6 text-3xl font-bold text-gray-800">
 //         Student Dashboard
 //       </h1>
 
 //       {/* GRID*/}
 
-//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+//       <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
 
 //         {/*SIDEBAR*/}
 
-//         <div className="lg:col-span-2 bg-white p-4 sm:p-6 rounded-xl shadow-md">
+//         <div className="p-4 bg-white shadow-md lg:col-span-2 sm:p-6 rounded-xl">
 //           <Sidebar />
 //         </div>
 
 //         {/*CALENDAR*/}
 
-//         <div className="lg:col-span-2 bg-white p-4 sm:p-6 rounded-xl shadow-md">
+//         <div className="p-4 bg-white shadow-md lg:col-span-2 sm:p-6 rounded-xl">
 //           <Calendar />
 //         </div>
 

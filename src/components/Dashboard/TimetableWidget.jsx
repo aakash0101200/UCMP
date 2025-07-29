@@ -48,8 +48,8 @@ const TimetableWidget = () => {
   const dataToShow = timetableData[dayToShow] || [];
 
   return (
-    <div className="bg-[#1f2937] text-white p-4 rounded-lg shadow-lg relative w-full max-w-[420px]">
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-[#1f2937] text-white p-4 rounded-lg  relative w-full max-w-[420px] border border-white shadow-[0_0_40px_5px_rgba(52,211,153,0.4)] ml-4 ">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">Timetable</h2>
 
         {/* Toggle Switch */}
@@ -67,7 +67,7 @@ const TimetableWidget = () => {
       {view === "Day" && (
         <div className="mb-4">
           <select
-            className="bg-gray-800 text-white px-3 py-1 rounded"
+            className="px-3 py-1 text-white bg-gray-800 rounded"
             value={selectedDay}
             onChange={(e) => setSelectedDay(e.target.value)}
           >
@@ -83,10 +83,10 @@ const TimetableWidget = () => {
         <table className="w-full text-sm table-fixed">
           <thead>
             <tr className="border-b border-gray-600">
-              <th className="px-3 py-2 text-left w-1/4">Time</th>
-              <th className="px-3 py-2 text-left w-1/3">Subject</th>
-              <th className="px-3 py-2 text-left w-1/6">Room</th>
-              <th className="px-3 py-2 text-left w-1/6">Teacher</th>
+              <th className="w-1/4 px-3 py-2 text-left">Time</th>
+              <th className="w-1/3 px-3 py-2 text-left">Subject</th>
+              <th className="w-1/6 px-3 py-2 text-left">Room</th>
+              <th className="w-1/6 px-3 py-2 text-left">Teacher</th>
             </tr>
           </thead>
           <tbody>
@@ -101,7 +101,7 @@ const TimetableWidget = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center py-4 text-gray-400">
+                <td colSpan="4" className="py-4 text-center text-gray-400">
                   No classes scheduled for {dayToShow}
                 </td>
               </tr>
@@ -113,24 +113,24 @@ const TimetableWidget = () => {
         <div className="weekly-overlay absolute top-16 left-0 w-full max-w-[420px] z-50 bg-[#1f2937] border border-gray-600 rounded-lg shadow-lg max-h-[400px] overflow-y-auto p-3">
           {Object.keys(timetableData).map((day, idx) => (
             <div key={idx} className="mb-4">
-              <h3 className="font-semibold text-blue-400 mt-2">{day}</h3>
+              <h3 className="mt-2 font-semibold text-blue-400">{day}</h3>
               {timetableData[day].length > 0 ? (
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left border-b border-gray-600">
-                      <th className="py-2 px-3">Time</th>
-                      <th className="py-2 px-3">Subject</th>
-                      <th className="py-2 px-3">Room</th>
-                      <th className="py-2 px-3">Teacher</th>
+                      <th className="px-3 py-2">Time</th>
+                      <th className="px-3 py-2">Subject</th>
+                      <th className="px-3 py-2">Room</th>
+                      <th className="px-3 py-2">Teacher</th>
                     </tr>
                   </thead>
                   <tbody>
                     {timetableData[day].map((entry, i) => (
                       <tr key={i} className="border-b border-gray-700">
-                        <td className="py-2 px-3">{entry.time}</td>
-                        <td className="py-2 px-3">{entry.subject}</td>
-                        <td className="py-2 px-3">{entry.room}</td>
-                        <td className="py-2 px-3">{entry.teacher}</td>
+                        <td className="px-3 py-2">{entry.time}</td>
+                        <td className="px-3 py-2">{entry.subject}</td>
+                        <td className="px-3 py-2">{entry.room}</td>
+                        <td className="px-3 py-2">{entry.teacher}</td>
                       </tr>
                     ))}
                   </tbody>

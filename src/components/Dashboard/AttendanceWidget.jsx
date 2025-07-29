@@ -17,11 +17,12 @@ export default function AttendanceWidget() {
     console.log(view);
     return (
         <>
-        <section className="bg-neutral-800 rounded-2xl shadow-md shadow-neutral-900 p-4 max-w-sm max-h-sm">
-            <div className="flex justify-between items-center text-gray-100 border-0 border-b border-neutral-700 pb-4 gap-1">
+        <section className="max-w-sm p-4  bg-neutral-800 rounded-2xl max-h-sm border border-amber-400 shadow-[0_0_40px_5px_rgba(251,191,36,0.4)]
+">
+            <div className="flex items-center justify-between gap-1 pb-4 text-gray-100 border-0 border-b border-neutral-700">
                 <h6 className="text-xs text-gray-200">Attendance Overview</h6>
                 <br />
-                <select value={view} onChange={(e) => setView(e.target.value)} className="bg-neutral-900 text-gray-200 text-xs px-1 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                <select value={view} onChange={(e) => setView(e.target.value)} className="px-1 py-1 text-xs text-gray-200 transition-all duration-200 rounded-full bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <option value="average" onClick={() => setView('average')}>Average</option>
                     <option value="subject" onClick={() => setView('subject')}>Subject</option>
                 </select>
@@ -93,7 +94,7 @@ function renderAverageAttendance(averagePercentage) {
                 />
             </div>
             {/* <div className="flex flex-col items-center mt-6">
-                <h2 className="text-lg text-gray-200 mb-2">Overall Attendance</h2>
+                <h2 className="mb-2 text-lg text-gray-200">Overall Attendance</h2>
                 <p className="text-sm text-gray-400">Average: {averagePercentage}%</p>
             </div> */}
         </div>
@@ -101,10 +102,10 @@ function renderAverageAttendance(averagePercentage) {
 }
 function renderSubjectAttendance() {
     return (
-        <div className="bg-neutral-800 text-xs">
+        <div className="text-xs bg-neutral-800">
             {subjectWiseAttendance.map((subject, index) => (
                 <div key={index} className="max-w-full">
-                    <div className="text-xs font-medium text-gray-200 my-1" >
+                    <div className="my-1 text-xs font-medium text-gray-200" >
                         {subject.name} - <span>{subject.attendedClasses}/{subject.totalClasses}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -153,8 +154,8 @@ function renderSubjectAttendance() {
 
 //     return (
 
-//         <section className='w-full max-w-sm bg-gray-950 text-gray-200 p-4 rounded-xl shadow-md font-sans m-4'>
-//             <div className="bg-green-500 hover:bg-red-500 text-white p-4">
+//         <section className='w-full max-w-sm p-4 m-4 font-sans text-gray-200 shadow-md bg-gray-950 rounded-xl'>
+//             <div className="p-4 text-white bg-green-500 hover:bg-red-500">
 //                 Test Widget
 //             </div>
 
@@ -179,7 +180,7 @@ function renderSubjectAttendance() {
 //                 </button>
 //             </div>
 
-//             <p className="text-sm text-gray-500 mb-4">Current view: {view}</p>
+//             <p className="mb-4 text-sm text-gray-500">Current view: {view}</p>
 
 //             {/* AnimatePresence adds exit animation support */}
 //             <AnimatePresence mode="wait">
@@ -229,7 +230,7 @@ function renderSubjectAttendance() {
 //                                     : '#ef4444', // red (bad)
 //                     })} />
 //             </div>
-//             <p className="mt-4 text-gray-700 text-sm font-medium">Overall Attendance</p>
+//             <p className="mt-4 text-sm font-medium text-gray-700">Overall Attendance</p>
 //         </div>
 //     );
 // }
@@ -242,7 +243,7 @@ function renderSubjectAttendance() {
 
 //             {subjectData.map((subject, index) => (
 //                 <div key={index}>
-//                     <div className="text-sm font-medium text-gray-800 mb-1">
+//                     <div className="mb-1 text-sm font-medium text-gray-800">
 //                         {subject.name}
 //                     </div>
 
