@@ -48,7 +48,7 @@ const TimetableWidget = () => {
   const dataToShow = timetableData[dayToShow] || [];
 
   return (
-    <div className="bg-[#1f2937] text-white p-4 rounded-lg  relative w-full max-w-[420px] border border-white shadow-[0_0_40px_5px_rgba(52,211,153,0.4)] ml-4 ">
+    <div className="bg-[#1f2937] text-white p-4 rounded-lg  relative w-full max-w-[420px] ml-4 ">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">Timetable</h2>
 

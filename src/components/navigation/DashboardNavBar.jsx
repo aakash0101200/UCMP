@@ -49,8 +49,8 @@ export default function DashboardNavBar({
 
   return (
     <>
-      <header className="sticky top-0 left-0 h-16.25 z-30 flex items-center w-full border-b bg-sidebar  ">
-        <div className="container flex h-16 items-center justify-between px-3">
+      <header className="sticky top-0 left-0 h-16.25 z-30 flex items-center w-full border-b bg-sidebar ">
+        <div className="container flex h-16 min-w-full items-center justify-between px-3">
 
           {/* Left Section */}
           <div className="flex items-center gap-4">
@@ -77,7 +77,7 @@ export default function DashboardNavBar({
           </div>
 
           {/* Center Section - Search (Desktop) */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
+          <div className="hidden md:flex flex-1 max-w-sm mx-8">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -91,7 +91,7 @@ export default function DashboardNavBar({
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-end gap-3">
             {/* Mobile Search Toggle */}
             <Button
               variant="ghost"
@@ -188,14 +188,14 @@ export default function DashboardNavBar({
 
         {/* Mobile Search Bar */}
         {showMobileSearch && (
-          <div className="border-t bg-background px-4 py-3 md:hidden">
+          <div className="border-t bg-background px-4 py-3 sm:hidden">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className=" left-3 top-1/2 h-4 w-4 translate-y-1/2 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                // onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4"
                 autoFocus
               />

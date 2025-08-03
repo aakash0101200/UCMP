@@ -26,25 +26,20 @@ import {
 // CSS variable widths
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "16rem";
+const SIDEBAR_WIDTH = "14rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "2.2rem";
 const SidebarContext = React.createContext();
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 
-// function useSidebar() {
-//   const context = React.useContext(SidebarContext)
-//   if (!context) {
-//     throw new Error("useSidebar must be used within a SidebarProvider.")
-//   }
-
-//   return context
-// }
 function useSidebar() {
-  const ctx = React.useContext(SidebarContext);
-  if (!ctx) throw new Error("useSidebar must be within SidebarProvider");
-  return ctx;
+  const context = React.useContext(SidebarContext)
+  if (!context) {
+    throw new Error("useSidebar must be used within a SidebarProvider.")
+  }
+
+  return context;
 }
 
 

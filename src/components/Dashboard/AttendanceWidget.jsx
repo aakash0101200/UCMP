@@ -17,8 +17,7 @@ export default function AttendanceWidget() {
     console.log(view);
     return (
         <>
-        <section className="max-w-sm p-4  bg-neutral-800 rounded-2xl max-h-sm border border-amber-400 shadow-[0_0_40px_5px_rgba(251,191,36,0.4)]
-">
+        <section className="max-w-sm p-4  bg-neutral-800 rounded-2xl max-h-sm ] ">
             <div className="flex items-center justify-between gap-1 pb-4 text-gray-100 border-0 border-b border-neutral-700">
                 <h6 className="text-xs text-gray-200">Attendance Overview</h6>
                 <br />
