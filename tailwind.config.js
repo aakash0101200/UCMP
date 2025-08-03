@@ -8,6 +8,9 @@ export default {
   
   theme: {
     extend: {
+      colors: {
+        aliceblue: '#f0f8ff', 
+      },
       animation: {
         'fade-in': 'fadeIn 200ms ease-out forwards'
       },

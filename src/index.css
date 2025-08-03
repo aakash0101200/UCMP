@@ -5,6 +5,20 @@
 
 @import "tw-animate-css";
 
+/* Global smooth scrolling support */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbars across all browsers for horizontal carousels */
+.no-scrollbar {
+  -ms-overflow-style: none;     /* IE and Edge */
+  scrollbar-width: none;        /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;                /* Chrome, Safari and Opera */
+}
+
 @keyframes bounce {
   0%, 100% { transform: translateY(0) translateX(-50%); }
   50% { transform: translateY(-20px) translateX(-50%); }
@@ -149,6 +163,18 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+.perspective {
+  perspective: 1000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
 
 
 @layer base {
@@ -159,3 +185,6 @@
     @apply bg-background text-foreground;
     }
 }
+
+
+

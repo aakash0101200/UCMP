@@ -5,6 +5,7 @@ import { ModeToggle } from '../Theme/ModeToggle';
 import { SidebarTrigger } from '../../components/ui/sidebar';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
+import { Link } from 'react-router-dom';
 
 
 
@@ -58,7 +59,11 @@ export default function DashboardNavBar({
 
             {/* Logo & Branding - Hidden on mobile when sidebar trigger is shown */}
             <div className="flex items-center gap-3">
-              <img src={logo} alt="UCMP" className="h-8 w-8" />
+
+              <Link to="/">
+                <img src={logo} alt="UCMP Logo" className="h-8 w-8 shrink-0 hover:opacity-80 transition duration-200 ease-in-out" />
+              </Link>
+
               <div className="hidden sm:flex flex-col leading-tight">
 
                 {/* <h1 className="font-semibold text-lg">UCMP</h1> */}

@@ -1,3 +1,5 @@
+//not in use
+
 // import React, { useState } from 'react';
 // import { Link, useLocation } from 'react-router-dom';
 // import { Menu, Search } from 'lucide-react';
@@ -131,100 +133,100 @@
 // }
 
 
-/* ────────────────────────────────────────────────────────────
-   DashboardNavBar.jsx  –  professional version
-──────────────────────────────────────────────────────────────── */
-import React, { useState } from 'react';
-import { Menu, Search, Bell } from 'lucide-react';
-import logo from '@/assets/logo.png';
-import { ModeToggle } from '@/components/Theme/ModeToggle';
-import { NotificationBell } from './NotificationBell';         // already built
-import { ProfileMenu } from './ProfileMenu';                   // already built
+// /* ────────────────────────────────────────────────────────────
+//    DashboardNavBar.jsx  –  professional version
+// ──────────────────────────────────────────────────────────────── */
+// import React, { useState } from 'react';
+// import { Menu, Search, Bell } from 'lucide-react';
+// import logo from '@/assets/logo.png';
+// import { ModeToggle } from '@/components/Theme/ModeToggle';
+// import { NotificationBell } from './NotificationBell';         // already built
+// import { ProfileMenu } from './ProfileMenu';                   // already built
 
-/**
- * @param {{
- *   onSidebarToggle: () => void;
- * }} props
- */
-export default function DashboardNavBar({ onSidebarToggle }) {
-  const [showSearch, setShowSearch] = useState(false);
+// /**
+//  * @param {{
+//  *   onSidebarToggle: () => void;
+//  * }} props
+//  */
+// export default function DashboardNavBar({ onSidebarToggle }) {
+//   const [showSearch, setShowSearch] = useState(false);
 
-  return (
-    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-lg border-b border-border">
-      <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-        {/* ─── Left section ─────────────────────────────── */}
-        <div className="flex items-center gap-2">
-          {/* Mobile burger */}
-          <button
-            className="lg:hidden p-2 rounded-md hover:bg-muted focus-visible:ring"
-            aria-label="Open sidebar"
-            onClick={onSidebarToggle}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
+//   return (
+//     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-lg border-b border-border">
+//       <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+//         {/* ─── Left section ─────────────────────────────── */}
+//         <div className="flex items-center gap-2">
+//           {/* Mobile burger */}
+//           <button
+//             className="lg:hidden p-2 rounded-md hover:bg-muted focus-visible:ring"
+//             aria-label="Open sidebar"
+//             onClick={onSidebarToggle}
+//           >
+//             <Menu className="h-6 w-6" />
+//           </button>
 
-          {/* Brand */}
-          <img src={logo} alt="logo" className="h-8 w-8" />
-          <span className="font-semibold text-lg hidden sm:inline-block">UCMP</span>
-        </div>
+//           {/* Brand */}
+//           <img src={logo} alt="logo" className="h-8 w-8" />
+//           <span className="font-semibold text-lg hidden sm:inline-block">UCMP</span>
+//         </div>
 
-        {/* ─── Center section (search) ──────────────────── */}
-        <div className="flex-1 justify-center hidden md:flex">
-          {showSearch ? (
-            <div className="relative w-full max-w-sm">
-              <input
-                autoFocus
-                type="text"
-                placeholder="Search…"
-                className="w-full rounded-md border bg-input pl-10 pr-3 py-2
-                           focus:outline-none focus:ring placeholder:text-muted-foreground"
-                onBlur={() => setShowSearch(false)}
-              />
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowSearch(true)}
-              className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted
-                         focus-visible:ring text-muted-foreground"
-              aria-label="Open search"
-            >
-              <Search className="h-5 w-5" />
-              <span className="hidden sm:inline">Search</span>
-            </button>
-          )}
-        </div>
+//         {/* ─── Center section (search) ──────────────────── */}
+//         <div className="flex-1 justify-center hidden md:flex">
+//           {showSearch ? (
+//             <div className="relative w-full max-w-sm">
+//               <input
+//                 autoFocus
+//                 type="text"
+//                 placeholder="Search…"
+//                 className="w-full rounded-md border bg-input pl-10 pr-3 py-2
+//                            focus:outline-none focus:ring placeholder:text-muted-foreground"
+//                 onBlur={() => setShowSearch(false)}
+//               />
+//               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+//             </div>
+//           ) : (
+//             <button
+//               onClick={() => setShowSearch(true)}
+//               className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted
+//                          focus-visible:ring text-muted-foreground"
+//               aria-label="Open search"
+//             >
+//               <Search className="h-5 w-5" />
+//               <span className="hidden sm:inline">Search</span>
+//             </button>
+//           )}
+//         </div>
 
-        {/* ─── Right section ────────────────────────────── */}
-        <div className="flex items-center gap-2">
-          {/* Inline search for mobile (shows icon only) */}
-          <button
-            onClick={() => setShowSearch(!showSearch)}
-            className="md:hidden p-2 rounded-md hover:bg-muted focus-visible:ring"
-            aria-label="Search"
-          >
-            <Search className="h-5 w-5" />
-          </button>
+//         {/* ─── Right section ────────────────────────────── */}
+//         <div className="flex items-center gap-2">
+//           {/* Inline search for mobile (shows icon only) */}
+//           <button
+//             onClick={() => setShowSearch(!showSearch)}
+//             className="md:hidden p-2 rounded-md hover:bg-muted focus-visible:ring"
+//             aria-label="Search"
+//           >
+//             <Search className="h-5 w-5" />
+//           </button>
 
-          <NotificationBell count={3} onClick={() => { /* open drawer */ }} />
-          <ModeToggle />
-          <ProfileMenu username="John Doe" onLogout={() => { /* logout */ }} />
-        </div>
-      </nav>
+//           <NotificationBell count={3} onClick={() => { /* open drawer */ }} />
+//           <ModeToggle />
+//           <ProfileMenu username="John Doe" onLogout={() => { /* logout */ }} />
+//         </div>
+//       </nav>
 
-      {/* ─── Expanding search bar for mobile ───────────────────────────── */}
-      {showSearch && (
-        <div className="md:hidden border-t border-border bg-background px-4 py-3">
-          <input
-            autoFocus
-            type="text"
-            placeholder="Search…"
-            className="w-full rounded-md border bg-input px-3 py-2
-                       focus:outline-none focus:ring placeholder:text-muted-foreground"
-            onBlur={() => setShowSearch(false)}
-          />
-        </div>
-      )}
-    </header>
-  );
-}
+//       {/* ─── Expanding search bar for mobile ───────────────────────────── */}
+//       {showSearch && (
+//         <div className="md:hidden border-t border-border bg-background px-4 py-3">
+//           <input
+//             autoFocus
+//             type="text"
+//             placeholder="Search…"
+//             className="w-full rounded-md border bg-input px-3 py-2
+//                        focus:outline-none focus:ring placeholder:text-muted-foreground"
+//             onBlur={() => setShowSearch(false)}
+//           />
+//         </div>
+//       )}
+//     </header>
+//   );
+// }

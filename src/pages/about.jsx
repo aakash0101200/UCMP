@@ -127,9 +127,9 @@ export default function About() {
       </section>
 
       {/* Call to Action */}
-      <section className="px-4 py-16 bg-light text-primary-foreground">
-        <div className="max-w-4xl mx-auto space-y-6 text-center text-black rounded-md bg-amber-200">
-          <h2 className="px-2 py-2 text-3xl font-bold text-black ">Join the UCMP Community</h2>
+      <section className=" py-16 bg-light text-primary-foreground">
+        <div className="max-w-4xl py-4 mx-auto space-y-6 text-center  rounded-md bg-muted/40 text-card-foreground shadow-sm">
+          <h2 className="px-2 py-2 text-3xl font-bold text-black dark:text-white ">Join the UCMP Community</h2>
           <p className="leading-relaxed">
             Whether you are a prospective student, researcher, or partner
             institution, we invite you to be part of our journey toward a
@@ -137,7 +137,7 @@ export default function About() {
           </p>
           <a
             href="/contact"
-            className="inline-block px-6 py-3 font-medium transition-colors border border-black rounded-md pb- bg-background text-foreground hover:bg-background/80"
+            className="inline-block px-6 py-3 font-medium transition-colors border border-black rounded-md pb- bg-gradient-to-r from-primary to-primary/80 text-primary-foreground  hover:bg-background/80"
           >
             Contact Admissions
           </a>

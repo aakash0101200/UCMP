@@ -19,6 +19,7 @@ import FacultyDashboard from './pages/FacultyDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
 import 'react-toastify/dist/ReactToastify.css';
+import ProfilePage from './components/Profile/ProfilePage';
 
 // Layout to choose between public vs dashboard shells
 function AppShell({ children }) {
@@ -86,6 +87,14 @@ export default function App() {
             element={
               <AppShell>
                 <RegisterPage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <AppShell>
+                <ProfilePage />
               </AppShell>
             }
           />

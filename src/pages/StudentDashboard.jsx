@@ -7,11 +7,13 @@ import AnnouncementTimeline from "../components/Announcements/AnnouncementTimeli
 import Calendar from "./Calendar";
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import TimetableWidget from "../components/Dashboard/TimetableWidget.jsx";
+import ProfileCard from "@/components/Profile/ProfileCard";
 
 
 export default function StudentDashboard() {
   return (
-    <>
+    <div className="scroll-style ">
+
       <h2 className="mb-4 text-2xl font-bold">Student Dashboard</h2>
 
       <div className="p-6 space-y-6">
@@ -30,13 +32,14 @@ export default function StudentDashboard() {
 
         
         <Calendar />
+        {/* <ProfileCard/> */}
       </div>
 
 
 
 
 
-    </>
+    </div>
 
 
   );
