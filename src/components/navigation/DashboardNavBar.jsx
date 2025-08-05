@@ -93,14 +93,14 @@ export default function DashboardNavBar({
           {/* Right Section */}
           <div className="flex items-end gap-3">
             {/* Mobile Search Toggle */}
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="md:hidden"
               onClick={() => setShowMobileSearch(!showMobileSearch)}
             >
               <Search className="h-5 w-5" />
-            </Button>
+            </Button> */}
 
             {/* Notifications */}
             <DropdownMenu>
@@ -187,7 +187,7 @@ export default function DashboardNavBar({
         </div>
 
         {/* Mobile Search Bar */}
-        {showMobileSearch && (
+        {/* {showMobileSearch && (
           <div className="border-t bg-background px-4 py-3 sm:hidden">
             <div className="relative">
               <Search className=" left-3 top-1/2 h-4 w-4 translate-y-1/2 text-muted-foreground" />
@@ -201,7 +201,7 @@ export default function DashboardNavBar({
               />
             </div>
           </div>
-        )}
+        )} */}
       </header>
     </>
   );

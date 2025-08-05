@@ -3,14 +3,19 @@ import API from './api'; // Import the base API configuration
 
 
 //login
-export function login(collegeId, password, role) {
+export async function login(collegeId, password, role) {
+  const response = await API.post('/login', {
+    collegeId,
+    password,
+    role: role.toUpperCase(),
+  });
 
-    //Backend expects an object with id, password, and role
-    return API.post('/login',{
-        collegeId,
-        password,
-        role: role.toUpperCase() // Ensure role is uppercase}
-    });
+  // Save token in localStorage
+  if (response.data && response.data.token) {
+    localStorage.setItem("token", response.data.token);
+  }
+
+  return response;
 }
 
 export function register(user) {
