@@ -4,6 +4,11 @@ import React from "react";
 // import Calendar from "./Calendar";
 import AttendanceWidget from "../components/Dashboard/AttendanceWidget";
 import AnnouncementTimeline from "../components/Announcements/AnnouncementTimeline";
+<<<<<<< HEAD
+=======
+import AssignmentPublisher from "../components/Announcements/AssignmentPuiblisher";
+
+>>>>>>> d40d1bf087ff64483813bcae49f49da8da64bf13
 import Calendar from "./Calendar";
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import TimetableWidget from "../components/Dashboard/TimetableWidget.jsx";
@@ -29,7 +34,11 @@ export default function StudentDashboard() {
         <div className="my-10" >
           <AnnouncementTimeline />
         </div>
+<<<<<<< HEAD
 
+=======
+         <AssignmentPublisher />
+>>>>>>> d40d1bf087ff64483813bcae49f49da8da64bf13
         
         <Calendar />
         
