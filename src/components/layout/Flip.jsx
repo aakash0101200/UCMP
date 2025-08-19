@@ -17,8 +17,8 @@ export default function Flip(feature) {
                 >
                     {/* Front Side */}
                     <div className="absolute w-full h-full 
-                         text-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center
-                           bg-black "
+                         text-neutral-600 rounded-xl shadow-md p-6 flex flex-col items-center justify-center
+                           bg-white/10 "
                     
                          >
                             
@@ -30,7 +30,7 @@ export default function Flip(feature) {
                             )}
 
                         </div>
-                        <h5 className="text-xl font-semibold text-center">{feature.title}</h5>
+                        <h5 className="text-xl text-black font-semibold text-center">{feature.title}</h5>
                         <p className="text-center">{feature.description}</p>
                         
                     </div>

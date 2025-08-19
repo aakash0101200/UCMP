@@ -9,7 +9,7 @@ const FeatureCard = ({ icon, title, description }) => {
       {/* Translucent wrapper */}
       <div className="absolute inset-0 bg-white/20 backdrop-blur-sm rounded-lg pointer-events-none"></div>
 
-      <div className="relative z-10 border-b border-neutral-800">
+      <div className="relative z-10 ">
 
         <div className="text-center p-8">
           <span className="bg-neutral-900/50 text-white rounded-lg

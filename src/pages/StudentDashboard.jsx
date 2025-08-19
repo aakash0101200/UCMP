@@ -4,11 +4,8 @@ import React from "react";
 // import Calendar from "./Calendar";
 import AttendanceWidget from "../components/Dashboard/AttendanceWidget";
 import AnnouncementTimeline from "../components/Announcements/AnnouncementTimeline";
-<<<<<<< HEAD
-=======
-import AssignmentPublisher from "../components/Announcements/AssignmentPuiblisher";
+import AssignmentPublisher from "../components/Announcements/AssignmentPublisher";
 
->>>>>>> d40d1bf087ff64483813bcae49f49da8da64bf13
 import Calendar from "./Calendar";
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import TimetableWidget from "../components/Dashboard/TimetableWidget.jsx";
@@ -24,9 +21,10 @@ export default function StudentDashboard() {
       <div className="p-6 space-y-6">
         {/* Top widgets */}
         <div className="flex flex-col gap-6 md:flex-row">
-          <AttendanceWidget />
-          <TimetableWidget />
-
+          {/* <AttendanceWidget />
+          <TimetableWidget /> */}
+          <ProfileCard/>
+          <Calendar />
           {/* Insert LineChart component here if needed */}
         </div>
 
@@ -34,14 +32,10 @@ export default function StudentDashboard() {
         <div className="my-10" >
           <AnnouncementTimeline />
         </div>
-<<<<<<< HEAD
+        <AssignmentPublisher />
 
-=======
-         <AssignmentPublisher />
->>>>>>> d40d1bf087ff64483813bcae49f49da8da64bf13
-        
-        <Calendar />
-        
+
+
         {/* <ProfileCard/> */}
       </div>
 

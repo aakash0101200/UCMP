@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { ModeToggle } from '../Theme/ModeToggle';
 import { Button } from '../ui/button';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/logo/bluelogo.png';
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -23,9 +23,9 @@ export default function LandingNavBar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img src={logo} alt="UCMP Logo" className="h-8 w-8" />
-            <span className="font-bold text-xl">UCMP</span>
+          <Link to="/" className="flex items-center -space-x-9">
+            <img src={logo} alt="JECRC Logo" className="h-20 w-38 mt-6" />
+            {/* <span className="font-bold text-[#1e40af] font-serif text-xl">JECRC Foundation</span> */}
           </Link>
 
           {/* Desktop Navigation */}

@@ -34,9 +34,7 @@ export default function DashboardLayout({
           {/* Page Content */}
 
           <main className="flex-1 space-y-4 p-6 
-               bg-gradient-to-b 
-               from-[#faf7f3] via-[#faf7f3] to-[#faf7f3] 
-               dark:from-[#0d1117] dark:via-[#3c3c98a2] dark:to-[#1f0644]">
+               bg-sidebar/70">
             {children}
           </main>
         </SidebarInset>

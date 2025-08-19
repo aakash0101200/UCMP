@@ -20,7 +20,7 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { Badge } from '../../components/ui/badge';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/logo/bluelogo.png';
 
 
 export default function DashboardNavBar({
@@ -61,7 +61,7 @@ export default function DashboardNavBar({
             <div className="flex items-center gap-3">
 
               <Link to="/">
-                <img src={logo} alt="UCMP Logo" className="h-8 w-8 shrink-0 hover:opacity-80 transition duration-200 ease-in-out" />
+                <img src={logo} alt="UCMP Logo" className="h-20 w-38 mt-6 shrink-0 hover:opacity-80 transition duration-200 ease-in-out" />
               </Link>
 
               <div className="hidden sm:flex flex-col leading-tight">

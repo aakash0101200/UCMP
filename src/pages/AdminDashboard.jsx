@@ -1,6 +1,7 @@
 import  { React, useEffect, useState } from 'react';
 import initialAnnouncements from '../components/Announcements/datafiles/announcementData';
 import AnnouncementAdmin from '../components/Announcements/AnnouncementAdmin';
+import AssignmentPublisher from "../components/Announcements/AssignmentPublisher";
 import API from '.././Services/announcements.js'
 
 
@@ -36,6 +37,7 @@ const AdminDashboard = () => {
   }
 
   return (
+    <>
     <div 
     className="p-6 max-w-4xl mx-auto border-t-4 border-t-red-500 border-r-4 border-r-blue-500 border-b-4 border-b-green-500 border-l-4 border-l-yellow-500"
     >
@@ -45,6 +47,8 @@ const AdminDashboard = () => {
       />
     
     </div>
+    <AssignmentPublisher />
+    </>
   );
 };
 

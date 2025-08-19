@@ -43,11 +43,11 @@ const ProfilePage = () => {
         disabled={!isEditMode || !isEditable}
         onChange={handleChange}
         placeholder={placeholder}
-        className={`px-3 py-2 border rounded ${width} focus:outline-none focus:ring-2 focus:ring-blue-400 ${!isEditMode || !isEditable ? 'bg-gray-200 dark:bg-neutral-900 cursor-not-allowed' : 'dark:bg-neutral-800'}`}
+        className={`px-3 py-2 border rounded ${width} focus:outline-none focus:ring-2 focus:ring-blue-400 ${!isEditMode || !isEditable ? 'bg-gray-200  dark:bg-neutral-900 cursor-not-allowed' : 'dark:bg-neutral-800'}`}
       />
       {/* Show placeholder for not provided only in view mode */}
       {(!student[name] && !isEditMode) && (
-        <span className="text-sm text-gray-400">{placeholder || 'Not Provided'}</span>
+        <span className="text-sm ml-2 text-red-500">{ placeholder + " * " || 'Not Provided'}</span>
       )}
     </div>
   );
