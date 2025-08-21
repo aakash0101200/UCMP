@@ -1,4 +1,4 @@
-
+import vid from '../../assets/education.mp4';
 
 const HeroSection = () => {
   return (
@@ -30,12 +30,12 @@ const HeroSection = () => {
       </div>
 
       <div className="flex mt-10 z-1 justify-center">
-        {/* <video 
+        <video 
           autoPlay 
           loop muted 
-          className=" rounded-lg w-1/2 shadow-lg border-gray-600 mx-2 my-8"
-          src="https://www.w3schools.com/html/mov_bbb.mp4"> 
-        </video> */}
+          className=" rounded-lg w-1/2 shadow-lg border-gray-600 mx-2 my-8 sm:w-3/4 md:w-1/2 lg:w-2/1"
+          src= {vid}> 
+        </video>
 
 {/* additions stuff at hero section like videos, animation, images etc...  */}
         {/* <video 

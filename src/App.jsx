@@ -14,8 +14,8 @@ import About from './pages/About';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import StudentDashboard from './pages/StudentDashboard';
-import FacultyDashboard from './pages/FacultyDashboard';
+import StudentDashboard from './pages/student/StudentDashboard';
+import FacultyDashboard from './pages/faculty/FacultyDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
 import 'react-toastify/dist/ReactToastify.css';
