@@ -6,6 +6,8 @@ import { SidebarTrigger } from '../../components/ui/sidebar';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Link } from 'react-router-dom';
+import blogo from '../../assets/logo/bluelogo.png';
+import wlogo from '../../assets/logo/whitelogo.png';
 
 
 
@@ -60,9 +62,24 @@ export default function DashboardNavBar({
             {/* Logo & Branding - Hidden on mobile when sidebar trigger is shown */}
             <div className="flex items-center gap-3">
 
-              <Link to="/">
+              {/* <Link to="/">
                 <img src={logo} alt="UCMP Logo" className="h-20 w-38 mt-6 shrink-0 hover:opacity-80 transition duration-200 ease-in-out" />
-              </Link>
+              </Link> */}
+              {/* Logo */}
+        <Link to="/student" className="relative flex items-center h-20 w-38 mt-6">
+          
+          <img
+            src={blogo}
+            alt="Blue Logo"
+            className="absolute top-0 left-0 h-20 w-auto transition-opacity duration-300 dark:opacity-0 opacity-100"
+          />
+          <img
+            src={wlogo}
+            alt="White Logo"
+            className="absolute top-0 left-10 h-14 w-auto transition-opacity duration-300 opacity-0 dark:opacity-100"
+          />
+        </Link>
+
 
               <div className="hidden sm:flex flex-col leading-tight">
 
