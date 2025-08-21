@@ -10,7 +10,7 @@ import Calendar from "./../Calendar";
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import TimetableWidget from "../../components/Dashboard/TimetableWidget.jsx";
 import ProfileCard from "../../components/Profile/ProfileCard";
-
+import BottomNavBar from "../../components/navigation/BottomNavBar";
 
 export default function StudentDashboard() {
   return (
@@ -40,7 +40,8 @@ export default function StudentDashboard() {
       </div>
 
 
-
+{/* Bottom navbar (mobile only) */}
+<BottomNavBar />
 
 
     </div>
