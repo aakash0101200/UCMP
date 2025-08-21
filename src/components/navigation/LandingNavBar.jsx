@@ -4,7 +4,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { ModeToggle } from '../Theme/ModeToggle';
 import { Button } from '../ui/button';
-import logo from '../../assets/logo/bluelogo.png';
+import blogo from '../../assets/logo/bluelogo.png';
+import wlogo from '../../assets/logo/whitelogo.png';
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -23,10 +24,25 @@ export default function LandingNavBar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center -space-x-9">
+          {/* <Link to="/" className="flex items-center -space-x-9">
             <img src={logo} alt="JECRC Logo" className="h-20 w-38 mt-6" />
-            {/* <span className="font-bold text-[#1e40af] font-serif text-xl">JECRC Foundation</span> */}
-          </Link>
+            <span className="font-bold text-[#1e40af] font-serif text-xl">JECRC Foundation</span>
+          </Link> */}
+
+           {/* Logo */}
+        <Link to="/" className="relative flex items-center h-20 w-38 mt-6">
+          
+          <img
+            src={blogo}
+            alt="Blue Logo"
+            className="absolute top-0 left-0 h-20 w-auto transition-opacity duration-300 dark:opacity-0 opacity-100"
+          />
+          <img
+            src={wlogo}
+            alt="White Logo"
+            className="absolute top-0 left-10 h-14 w-auto transition-opacity duration-300 opacity-0 dark:opacity-100"
+          />
+        </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
