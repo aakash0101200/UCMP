@@ -6,8 +6,6 @@ import AttendanceWidget from "../../components/Dashboard/AttendanceWidget";
 import AnnouncementTimeline from "../../components/Announcements/AnnouncementTimeline";
 import AssignmentPublisher from "../../components/Announcements/AssignmentPublisher";
 
-import AssignmentPublisher from "./AssignmentPublisher";
-
 import Calendar from "../Calendar";
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import TimetableWidget from "../../components/Dashboard/TimetableWidget.jsx";
@@ -17,14 +15,8 @@ import BottomNavBar from "../../components/navigation/BottomNavBar";
 export default function StudentDashboard() {
   return (
     <div className="scroll-style ">
-      <Route
-            path="/about"
-            element={
-              <AppShell>
-                <About />
-              </AppShell>
-            }
-          />
+  
+
       <h2 className="mb-4 text-2xl font-bold">Student Dashboard</h2>
 
       <div className="p-6 space-y-6">

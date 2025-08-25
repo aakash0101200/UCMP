@@ -3,7 +3,7 @@ import React from 'react';
 import { SidebarProvider, SidebarInset } from '../ui/sidebar';
 import { AppSidebar } from '../navigation/AppSidebar';
 import DashboardNavBar from '../navigation/DashboardNavBar';
-
+import { Outlet } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -64,6 +64,7 @@ export default function DashboardLayout({
           <main className="flex-1 space-y-4 p-6 
                bg-sidebar/70">
             {children}
+            <Outlet />
           </main>
         </SidebarInset>
       </div>

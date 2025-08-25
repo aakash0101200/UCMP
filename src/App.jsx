@@ -17,6 +17,7 @@ import RegisterPage from './pages/RegisterPage';
 import StudentDashboard from './pages/student/StudentDashboard';
 import FacultyDashboard from './pages/faculty/FacultyDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Assignment from './pages/student/AssignmentWrapper';
 
 import 'react-toastify/dist/ReactToastify.css';
 import ProfilePage from './components/Profile/ProfilePage';
@@ -99,14 +100,17 @@ export default function App() {
               </AppShell>
             }
           />
-
-
+  
+            
           {/* Dashboard routes */}
           <Route path="/student/*" element={
-            <DashboardLayout userRole="student">
-              <StudentDashboard />
-            </DashboardLayout>
-          } />
+            <DashboardLayout userRole="student" />}>
+
+            <Route index element={<StudentDashboard />} />
+              <Route path="assignment" element={<Assignment />} />
+              {/*Add moe ... */}
+          </Route>
+
           <Route path="/faculty/*" element={
             <DashboardLayout userRole="faculty">
               <FacultyDashboard />
@@ -116,7 +120,7 @@ export default function App() {
             <DashboardLayout userRole="admin">
               <AdminDashboard />
             </DashboardLayout>
-          } />
+          } />   
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
       </BrowserRouter>

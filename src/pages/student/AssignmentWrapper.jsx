@@ -1,8 +1,8 @@
 import React from "react";
 
-import AssignmentPublisher from "../../../components/Announcements/AssignmentPublisher";
+import AssignmentPublisher from "../../components/Announcements/AssignmentPublisher";
 
-import BottomNavBar from "../../../components/navigation/BottomNavBar";
+import BottomNavBar from "../../components/navigation/BottomNavBar";
 
 export default function AssignmentWrapper() {
     return (
