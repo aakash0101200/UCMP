@@ -39,58 +39,58 @@
 
 
 
-import React from "react";
-import { profile } from "../../Services/profile"
+// import React from "react";
+// import { profile } from "../../Services/profile"
 
-const ProfilePage = () => {
-  const user = profile[0];
+// const ProfilePage = () => {
+//   const user = profile[0];
 
-  return (
-    <div className="flex flex-col items-center mt-12">
-      <div className="flex items-center bg-[#222248] bg-opacity-95 rounded-2xl shadow-2xl p-10 min-w-[340px] max-w-lg border border-[#35358e]">
-        <div className="w-28 h-28 rounded-full bg-gradient-to-br from-cyan-400 to-violet-600 flex items-center justify-center text-4xl font-bold text-white mr-10 select-none">
-          {user.name[0]}
-        </div>
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-4">{user.name}</h2>
-          <div className="flex justify-between mb-2 text-gray-300">
-            <span className="font-medium w-36">College ID:</span>
-            <span className="text-right">{user.collegeId}</span>
-          </div>
-          <div className="flex justify-between mb-2 text-gray-300">
-            <span className="font-medium w-36">Branch:</span>
-            <span className="text-right">{user.branch}</span>
-          </div>
-          <div className="flex justify-between mb-2 text-gray-300">
-            <span className="font-medium w-36">Email:</span>
-            <span className="text-right">{user.email}</span>
-          </div>
-          <div className="flex justify-between mb-2 text-gray-300">
-            <span className="font-medium w-36">Date of Birth:</span>
-            <span className="text-right">{user.dob}</span>
-          </div>
-          <div className="flex justify-between mb-2 text-gray-300">
-            <span className="font-medium w-36">Year:</span>
-            <span className="text-right">{user.year}</span>
-          </div>
-          <div className="flex justify-between mb-2 text-gray-300">
-            <span className="font-medium w-36">Semester:</span>
-            <span className="text-right">{user.sem}</span>
-          </div>
-          <div className="flex justify-between mb-2 text-gray-300">
-            <span className="font-medium w-36">Contact:</span>
-            <span className="text-right">{user.contact}</span>
-          </div>
-        </div>
-      </div>
-      <button
-        className="mt-8 px-8 py-3 text-white rounded-xl bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-600 shadow-lg hover:from-cyan-600 hover:to-violet-700 transition text-base font-bold"
-      >
-        Edit Profile
-      </button>
-    </div>
-  );
-};
+//   return (
+//     <div className="flex flex-col items-center mt-12">
+//       <div className="flex items-center bg-[#222248] bg-opacity-95 rounded-2xl shadow-2xl p-10 min-w-[340px] max-w-lg border border-[#35358e]">
+//         <div className="w-28 h-28 rounded-full bg-gradient-to-br from-cyan-400 to-violet-600 flex items-center justify-center text-4xl font-bold text-white mr-10 select-none">
+//           {user.name[0]}
+//         </div>
+//         <div>
+//           <h2 className="text-2xl font-semibold text-white mb-4">{user.name}</h2>
+//           <div className="flex justify-between mb-2 text-gray-300">
+//             <span className="font-medium w-36">College ID:</span>
+//             <span className="text-right">{user.collegeId}</span>
+//           </div>
+//           <div className="flex justify-between mb-2 text-gray-300">
+//             <span className="font-medium w-36">Branch:</span>
+//             <span className="text-right">{user.branch}</span>
+//           </div>
+//           <div className="flex justify-between mb-2 text-gray-300">
+//             <span className="font-medium w-36">Email:</span>
+//             <span className="text-right">{user.email}</span>
+//           </div>
+//           <div className="flex justify-between mb-2 text-gray-300">
+//             <span className="font-medium w-36">Date of Birth:</span>
+//             <span className="text-right">{user.dob}</span>
+//           </div>
+//           <div className="flex justify-between mb-2 text-gray-300">
+//             <span className="font-medium w-36">Year:</span>
+//             <span className="text-right">{user.year}</span>
+//           </div>
+//           <div className="flex justify-between mb-2 text-gray-300">
+//             <span className="font-medium w-36">Semester:</span>
+//             <span className="text-right">{user.sem}</span>
+//           </div>
+//           <div className="flex justify-between mb-2 text-gray-300">
+//             <span className="font-medium w-36">Contact:</span>
+//             <span className="text-right">{user.contact}</span>
+//           </div>
+//         </div>
+//       </div>
+//       <button
+//         className="mt-8 px-8 py-3 text-white rounded-xl bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-600 shadow-lg hover:from-cyan-600 hover:to-violet-700 transition text-base font-bold"
+//       >
+//         Edit Profile
+//       </button>
+//     </div>
+//   );
+// };
 
-export default ProfilePage;
+// export default ProfilePage;
 

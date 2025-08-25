@@ -1,7 +1,5 @@
 import React from "react";
 
-import StudentDashboard from "./StudentDashboard";
-import { toast } from "react-toastify"; // Import toast for notifications
 import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 
 import { login } from "../Services/auth"; // Adjust the import path
@@ -21,51 +19,41 @@ export default function LoginPage() {
     role: 'student', // Default role set to 'student' send as lowercase, converted to uppercase in API call
   });
 
+  
+  // Using useNavigate hook for navigation 
+  const navigate = useNavigate(); 
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-
-
-  // Using useNavigate hook for navigation 
-  const navigate = useNavigate(); 
-
-
   // Function to handle form submission 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await login(
+     
+      const role = await login(
         formData.collegeId,
         formData.password,
         formData.role
       );
 
 
-      // assuming that backend responds with { token, use}
-      const { token, role } = response.data;
-
-      // Store the token in localStorage or context for authentication
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('role', role);
-
-        toast.success('Login successful! 🎉');
-        console.log('Login successful:', response.data);
-
-      setTimeout(() => navigate('/student'), 1500); // Navigate to the dashboard or home page after successful login
-
-    } catch (error) {
-      if(error.response && error.response.data && error.response.data.message) {
-        // Handle specific error responses from the backend
-
-        toast.error(`Login failed: ${error.response.data.message}`);
-      } else {
-        toast.error('Login error:', error);
-        
+      if(role){
+        switch(role.toLowerCase()){
+          case 'student':
+            navigate('/student');
+          case 'faculty':
+            navigate('/faculty');
+          case 'admin':
+            navigate('/admin');
+            break;
+          default:
+            navigate('/');
+        }
       }
-    }
-  };
+   };
 
 
   return (
@@ -114,7 +102,7 @@ export default function LoginPage() {
           type="submit"
           className="w-full py-2 text-white transition bg-blue-600 rounded hover:bg-blue-700"
         >
-          Submit
+          Login
         </button>
 
         <p className="mt-4 text-sm text-black text-center">
@@ -123,10 +111,7 @@ export default function LoginPage() {
             Register here
           </Link>
         </p>
-
       </form>
-      
     </div>
   );
 }
-

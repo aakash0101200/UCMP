@@ -1,14 +1,11 @@
-export const profile =[
-    {
-        
-        collegeId:"CS002",
-        name:"Aaditya",
-        branch:"CSE",
-        email:"abc@gmail.com",
-        dob:"28-03-2006",
-        year:"3",
-        sem:"5",
-        contact:9057540682
-        
-    }
-]
+import API from './api'
+
+//get
+export const getProfile = (collegeId) => {
+    return API.get(`/profile?collegeId=${collegeId}`);        
+};
+//update
+
+export const updateProfile =(collegeId, profileData) => {
+    return API.put(`/profile?collegeId=${collegeId}`, profileData);
+};

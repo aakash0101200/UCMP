@@ -9,7 +9,7 @@ import AssignmentPublisher from "../components/Announcements/AssignmentPublisher
 import Calendar from "./Calendar";
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import TimetableWidget from "../components/Dashboard/TimetableWidget.jsx";
-import ProfileCard from "@/components/Profile/ProfileCard";
+// import ProfileCard from "@/components/Profile/ProfileCard";
 import BottomNavBar from "../components/navigation/BottomNavBar";
 
 export default function StudentDashboard() {
@@ -23,7 +23,7 @@ export default function StudentDashboard() {
         <div className="flex flex-col gap-6 md:flex-row">
           {/* <AttendanceWidget />
           <TimetableWidget /> */}
-          <ProfileCard/>
+          {/* <ProfileCard/> */}
           <Calendar />
           {/* Insert LineChart component here if needed */}
         </div>
