@@ -10,11 +10,12 @@ import axios from 'axios';
 
 
 export default function DashboardLayout({
-  children}) {
+  children, collegeId, onLogout}) {
   const [user, setUser] = useState({
     name:'user',
     email:'user@example.com',
     role: 'student',
+    
     profilePictureUrl:''
   });
 
