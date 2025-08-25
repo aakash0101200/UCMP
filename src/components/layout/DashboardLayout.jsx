@@ -15,7 +15,6 @@ export default function DashboardLayout({
     name:'user',
     email:'user@example.com',
     role: 'student',
-    
     profilePictureUrl:''
   });
 

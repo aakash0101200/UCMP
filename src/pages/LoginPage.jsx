@@ -5,10 +5,8 @@ import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 import { login } from "../Services/auth"; // Adjust the import path
 import { useNavigate } from "react-router-dom";
 
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
 
 
 
@@ -19,10 +17,7 @@ export default function LoginPage() {
     role: 'student', // Default role set to 'student' send as lowercase, converted to uppercase in API call
   });
 
-  
-  // Using useNavigate hook for navigation 
-  const navigate = useNavigate(); 
-
+    const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,7 +27,7 @@ export default function LoginPage() {
   // Function to handle form submission 
   const handleSubmit = async (e) => {
     e.preventDefault();
-     
+    try{
       const role = await login(
         formData.collegeId,
         formData.password,
@@ -41,18 +36,24 @@ export default function LoginPage() {
 
 
       if(role){
-        switch(role.toLowerCase()){
+        switch(role){
           case 'student':
             navigate('/student');
+            break;
           case 'faculty':
             navigate('/faculty');
+            break;
           case 'admin':
             navigate('/admin');
             break;
           default:
             navigate('/');
         }
-      }
+      } 
+    }catch (err){
+      console.error("Login failed", err);
+    }
+      
    };
 
 

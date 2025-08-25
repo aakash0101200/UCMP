@@ -19,6 +19,7 @@ export async function login(collegeId, password, role) {
 
         localStorage.setItem('userName', profile.name);
         localStorage.setItem('userEmail', profile.email);
+        localStorage.setItem('role', response.data.role);
 
         toast.success(`Login successful! 🎉 welcome ${profile.name}`);
         return profile.role.toLowerCase(); //role for frontend routing

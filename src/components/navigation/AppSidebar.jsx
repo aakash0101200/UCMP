@@ -453,14 +453,16 @@ import {
 } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
+
+
 // Role-based menu configurations
 const menuConfigs = {
   student: [
     { title: 'Dashboard', to: '/student', icon: BarChart3 },
     { title: 'My Courses', to: '/student/courses', icon: BookOpen },
-    { title: 'Grades', to: '/student/grades', icon: FileText },
+    { title: 'Assignment', to: '/student/assignment', icon: FileText },
     { title: 'Schedule', to: '/student/schedule', icon: Calendar },
-    { title: 'Messages', to: '/student/messages', icon: MessageSquare },
+    { title: 'Updates', to: '/student/updates', icon: MessageSquare },
     { title: 'Attendance', to: '/student/attendance', icon: User},
   ],
   faculty: [

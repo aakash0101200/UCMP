@@ -6,43 +6,41 @@ import AttendanceWidget from "../../components/Dashboard/AttendanceWidget";
 import AnnouncementTimeline from "../../components/Announcements/AnnouncementTimeline";
 import AssignmentPublisher from "../../components/Announcements/AssignmentPublisher";
 
-import Calendar from "./../Calendar";
-import DashboardLayout from '../../components/layout/DashboardLayout';
+import AssignmentPublisher from "./AssignmentPublisher";
+
+import Calendar from "../Calendar";
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import TimetableWidget from "../../components/Dashboard/TimetableWidget.jsx";
-import ProfileCard from "../../components/Profile/ProfileCard";
+// import ProfileCard from "@/components/Profile/ProfileCard";
 import BottomNavBar from "../../components/navigation/BottomNavBar";
 
 export default function StudentDashboard() {
   return (
     <div className="scroll-style ">
-
+      <Route
+            path="/about"
+            element={
+              <AppShell>
+                <About />
+              </AppShell>
+            }
+          />
       <h2 className="mb-4 text-2xl font-bold">Student Dashboard</h2>
 
       <div className="p-6 space-y-6">
-        {/* Top widgets */}
-        <div className="flex flex-col gap-6 md:flex-row">
-          {/* <AttendanceWidget />
-          <TimetableWidget /> */}
-          <ProfileCard/>
+        <div className="flex justify-center gap-3 ">
           <Calendar />
-          {/* Insert LineChart component here if needed */}
+          <AssignmentPublisher classname="w-full" />
+
+
+
         </div>
-
-        {/* Announcements */}
-        <div className="my-10" >
-          <AnnouncementTimeline />
-        </div>
-        <AssignmentPublisher />
-
-
-
-        {/* <ProfileCard/> */}
       </div>
 
 
-{/* Bottom navbar (mobile only) */}
-<BottomNavBar />
 
+      {/* Bottom navbar (mobile only) */}
+      <BottomNavBar />
 
     </div>
 

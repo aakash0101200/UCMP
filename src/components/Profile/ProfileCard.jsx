@@ -92,5 +92,5 @@ export default ProfileCard;
 //   );
 // };
 
-// export default ProfilePage;
+// export default ProfileCard;
 

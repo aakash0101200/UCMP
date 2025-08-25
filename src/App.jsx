@@ -10,7 +10,7 @@ import DashboardNavBar from './components/navigation/DashboardNavBar';
 import DashboardLayout from './components/layout/DashboardLayout';
 
 import Home from './pages/Home';
-import About from './pages/About';
+import About from './pages/about';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -66,6 +66,7 @@ export default function App() {
               </AppShell>
             }
           />
+          
           <Route
             path="/contact"
             element={

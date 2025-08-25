@@ -45,9 +45,9 @@ const Home = () => {
         <HeroSection />
       </div>
 
-      <div className=" my-8">
+      {/* <div className=" my-8">
         <ImageCarousel/>
-      </div>
+      </div> */}
 
       {/* Feature Card below*/}
       <div className="px-10 pt-10 mx-auto max-w-7xl">
