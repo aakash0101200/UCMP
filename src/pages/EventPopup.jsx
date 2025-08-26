@@ -2,9 +2,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-// import TimePicker from "react-time-picker";
-import { TimePicker } from "@asphalt-react/time-picker";
-import "react-time-picker/dist/TimePicker.css";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { MobileTimePicker } from "@mui/x-date-pickers";
+import {TimePicker} from "@mui/x-date-pickers/TimePicker"
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from "dayjs";
+import { TextField, Box } from "@mui/material";
 import "react-clock/dist/Clock.css";
 
 const backendUrl = import.meta.env.VITE_API_URL;
@@ -12,7 +16,7 @@ const backendUrl = import.meta.env.VITE_API_URL;
 const EventPopup = ({ date, onClose, refreshEvents }) => {
   const [currentEvent, setCurrentEvent] = useState(null);
   const [title, setTitle] = useState("");
-  const [time, setTime] = useState("08:00");
+  const [time, setTime] = useState("08:00", "HH:mm"); //keep as day.js
   const [eventId, setEventId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -36,7 +40,7 @@ const EventPopup = ({ date, onClose, refreshEvents }) => {
     setCurrentEvent(null);
     setEventId("");
     setTitle("");
-    setTime("08:00");
+    setTime("08:00", "HH:mm");
     setError("");
   };
 
@@ -59,7 +63,7 @@ const EventPopup = ({ date, onClose, refreshEvents }) => {
           setCurrentEvent(eventData);
           setEventId(eventData.id || eventData._id);
           setTitle(eventData.title || "");
-          setTime(eventData.time || "08:00");
+          setTime(eventData.time ? dayjs(eventData.time, "HH:mm") : dayjs("08:00", "HH:mm"));
         } else {
           resetForm();
         }
@@ -80,7 +84,7 @@ const EventPopup = ({ date, onClose, refreshEvents }) => {
 
   const handleCreateOrUpdate = async () => {
     try {
-      const eventData = { title, time, date: formattedDate };
+      const eventData = { title, time: time.format("HH:mm"), date: formattedDate };
       const headers = getAuthHeaders();
 
       if (eventId) {
@@ -168,22 +172,19 @@ const EventPopup = ({ date, onClose, refreshEvents }) => {
               </div>
 
               <div className="mb-6">
-                <input type="time"
-                  value={time}
-                  onChange={e => setTime(e.target.value)}
-                  className="w-full rounded-xl bg-transparent border border-[var(--bg-ter)] px-4 py-2 txt placeholder:txt-dim focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-                />
-                <TimePicker
-                  size="s"
-                  value={time}
-                  onChange={setTime}
-                  militaryTime={false}  // set to true for 24-hour format
-                  minuteStep={1}
-                  native={true}
-                  
-                  className="custom-class min-w-full rounded-xl p-2 border border-[var(--bg-ter)] bg-white text-black dark:text-white"
-                  
-                   />
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <MobileTimePicker
+                    label="Select Time"
+                    value={time}
+                    onChange={(newValue) => setTime(newValue)}
+                    ampm={false}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true, className: "rounded-x1 border border-[var(--bg-ter)] bg-white dark:bg-black/30",
+                      },
+                    }}                    
+                  />
+                </LocalizationProvider>
               </div>
 
               {/* Buttons */}
