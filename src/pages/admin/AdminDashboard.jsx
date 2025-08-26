@@ -1,8 +1,8 @@
 import  { React, useEffect, useState } from 'react';
-import initialAnnouncements from '../components/Announcements/datafiles/announcementData';
-import AnnouncementAdmin from '../components/Announcements/AnnouncementAdmin';
-import AssignmentPublisher from "../components/Announcements/AssignmentPublisher";
-import API from '.././Services/announcements.js'
+import initialAnnouncements from '@/components/Announcements/datafiles/announcementData';
+import AnnouncementAdmin from '@/components/Announcements/AnnouncementAdmin';
+import AssignmentPublisher from '@/components/Announcements/AssignmentPublisher.jsx';
+import API from '@/Services/announcements';
 
 
 const AdminDashboard = () => {

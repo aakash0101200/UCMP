@@ -5,7 +5,7 @@ import FeatureCard from "../../components/layout/FeatureCard";
 import Footer from "../../components/layout/Footer";
 import ImageCarousel from '../../components/layout/ImageCarousel';
 import { DotPattern } from "./../../components/magicui/dot-pattern"
-import { cn } from "../lib/utils";
+import { cn } from "../../lib/utils";
 
 import LightRays from "./../LightRays";
 

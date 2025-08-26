@@ -66,18 +66,13 @@ export default function DashboardNavBar({
                 <img src={logo} alt="UCMP Logo" className="h-20 w-38 mt-6 shrink-0 hover:opacity-80 transition duration-200 ease-in-out" />
               </Link> */}
               {/* Logo */}
-        <Link to="/student" className="relative flex items-center h-20 w-38 mt-6">
-          
+              <Link to="/" className="relative flex items-center h-20 w-38 mt-6">
           <img
-            src={blogo}
-            alt="Blue Logo"
-            className="absolute top-0 left-0 h-20 w-auto transition-opacity duration-300 dark:opacity-0 opacity-100"
-          />
-          <img
-            src={wlogo}
-            alt="White Logo"
-            className="absolute top-0 left-10 h-14 w-auto transition-opacity duration-300 opacity-0 dark:opacity-100"
-          />
+          src={blogo}
+          alt="Logo"
+          className="h-20 w-auto transition duration-300 
+               dark:invert dark:brightness-0"
+         />
         </Link>
 
 
@@ -180,7 +175,7 @@ export default function DashboardNavBar({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <a href="/profile" className="flex items-center gap-2">
+                  <a href="/student/profile" className="flex items-center gap-2">
                     <User className="h-4 w-4" />
                     Profile
                   </a>
