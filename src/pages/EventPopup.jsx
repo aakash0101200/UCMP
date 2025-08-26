@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import TimePicker from "react-time-picker";
+// import TimePicker from "react-time-picker";
+import { TimePicker } from "@asphalt-react/time-picker";
 import "react-time-picker/dist/TimePicker.css";
 import "react-clock/dist/Clock.css";
 
@@ -121,7 +122,7 @@ const EventPopup = ({ date, onClose, refreshEvents }) => {
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="relative w-96 bg-sec rounded-3xl p-8 shadow-2xl shadow-gray-900 border border-[var(--bg-ter)]"
+          className="relative w-96 bg-sec rounded-3xl p-8 shadow-2xl bg-black/5 backdrop-blur-2xl shadow-gray-900 border border-[var(--bg-ter)]"
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -167,13 +168,22 @@ const EventPopup = ({ date, onClose, refreshEvents }) => {
               </div>
 
               <div className="mb-6">
-                <TimePicker
-                  onChange={setTime}
+                <input type="time"
                   value={time}
-                  disableClock={true}
-                  clearIcon={null}
-                  className="w-full rounded-xl border border-[var(--bg-ter)] bg-transparent text-white p-2 focus:ring-2 focus:ring-purple-500 transition"
+                  onChange={e => setTime(e.target.value)}
+                  className="w-full rounded-xl bg-transparent border border-[var(--bg-ter)] px-4 py-2 txt placeholder:txt-dim focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                 />
+                <TimePicker
+                  size="s"
+                  value={time}
+                  onChange={setTime}
+                  militaryTime={false}  // set to true for 24-hour format
+                  minuteStep={1}
+                  native={true}
+                  
+                  className="custom-class min-w-full rounded-xl p-2 border border-[var(--bg-ter)] bg-white text-black dark:text-white"
+                  
+                   />
               </div>
 
               {/* Buttons */}
