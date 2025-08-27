@@ -176,17 +176,6 @@ html {
   transform: rotateY(180deg);
 }
 
-.asphalt-time-picker__popover{
-  width:100%;
-  background-color: aqua;
-}
-
-.custom-class{
-  --surface-color: red;
-  --text-color: black;
-}
-
-
 
 @layer base {
   * {
@@ -196,5 +185,6 @@ html {
     @apply bg-background text-foreground;
     }
 }
+
 
 
