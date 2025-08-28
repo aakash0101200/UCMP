@@ -1,9 +1,13 @@
 import { Icon } from "lucide-react";
 import { features } from "../../utils/features";
+<<<<<<< HEAD
 import Flip from "./Flip"
 import { useRef } from "react";
 import { useState } from "react";
 
+=======
+import { BrainCircuit } from "lucide-react";
+>>>>>>> 10ff22f718084ca727c40d5a1fd9e6078e15b14d
 
 const FeatureCard = ({ icon, title, description }) => {
 const divRef = useRef(null);
@@ -36,6 +40,7 @@ const [opacity, setOpacity] = useState(0);
   // The component is styled with Tailwind CSS classes for a modern look
   // The component is responsive and adjusts the layout based on screen size
   return (
+<<<<<<< HEAD
   <div ref={divRef}
     onMouseMove={handleMouseMove}
     onFocus={handleFocus}
@@ -52,12 +57,12 @@ const [opacity, setOpacity] = useState(0);
       <div className="absolute inset-0 bg-white/20 backdrop-blur-sm rounded-lg pointer-events-none"></div>
 
       <div className="relative z-10 border-b border-neutral-800">
+=======
+    <div className="relative z-10  min-h-[800px] ">
+      
+>>>>>>> 10ff22f718084ca727c40d5a1fd9e6078e15b14d
 
         <div className="text-center p-8">
-          <span className="bg-neutral-900/50 text-white rounded-lg
-            text-sm font-medium mt-8 p-2  uppercase">
-            Feature
-          </span>
           <h2 className="text-3xl sm:text-5xl lg:text-6xl mt-10 lg:mt-20 tracking wide">
             Transforming {" "}
             <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
@@ -67,13 +72,36 @@ const [opacity, setOpacity] = useState(0);
           </h2>
         </div>
 
-        <div className="flex flex-wrap justify-around items-center mt-10 lg:mt-20">
-            {features.map((feature) => <Flip key={feature.id} {...feature}/>)}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 rounded-2xl p-6">
+          {features.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <div className="bg-white/5 border-2 p-4 shadow-2xl rounded-3xl ">
+                <div className="flex justify-center mt-4 mb-2">
+                  <div className="flex justify-center items-center w-15 h-15 mb-2 mx-auto bg-black/10 dark:bg-white/10 rounded-full ">
+                    <Icon className="w-8 h-8" />
+                  </div>
+
+
+                </div>
+                <h5 className="text-xl text-black dark:text-white font-semibold text-center">{feature.title}</h5>
+                <p className="text-center text-neutral-800 dark:text-neutral-200 p-1 mx-5 mb-2">{feature.description}</p>
+
+              </div>
+            )
+          }
+
+          )}
         </div>
       </div>
 
+<<<<<<< HEAD
     </div>
 </div>
+=======
+    
+
+>>>>>>> 10ff22f718084ca727c40d5a1fd9e6078e15b14d
 
   );
 };

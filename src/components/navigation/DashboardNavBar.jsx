@@ -6,6 +6,8 @@ import { SidebarTrigger } from '../../components/ui/sidebar';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Link } from 'react-router-dom';
+import blogo from '../../assets/logo/bluelogo.png';
+import wlogo from '../../assets/logo/whitelogo.png';
 
 
 
@@ -20,7 +22,7 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { Badge } from '../../components/ui/badge';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/logo/bluelogo.png';
 
 
 export default function DashboardNavBar({
@@ -49,8 +51,8 @@ export default function DashboardNavBar({
 
   return (
     <>
-      <header className="sticky top-0 left-0 h-16.25 z-30 flex items-center w-full border-b bg-sidebar  ">
-        <div className="container flex h-16 items-center justify-between px-3">
+      <header className="sticky top-0 left-0 h-16.25 z-30 flex items-center w-full border-b bg-sidebar ">
+        <div className="container flex h-16 min-w-full items-center justify-between px-3">
 
           {/* Left Section */}
           <div className="flex items-center gap-4">
@@ -60,9 +62,19 @@ export default function DashboardNavBar({
             {/* Logo & Branding - Hidden on mobile when sidebar trigger is shown */}
             <div className="flex items-center gap-3">
 
-              <Link to="/">
-                <img src={logo} alt="UCMP Logo" className="h-8 w-8 shrink-0 hover:opacity-80 transition duration-200 ease-in-out" />
-              </Link>
+              {/* <Link to="/">
+                <img src={logo} alt="UCMP Logo" className="h-20 w-38 mt-6 shrink-0 hover:opacity-80 transition duration-200 ease-in-out" />
+              </Link> */}
+              {/* Logo */}
+              <Link to="/" className="relative flex items-center h-20 w-38 mt-6">
+          <img
+          src={blogo}
+          alt="Logo"
+          className="h-20 w-auto transition duration-300 
+               dark:invert dark:brightness-0"
+         />
+        </Link>
+
 
               <div className="hidden sm:flex flex-col leading-tight">
 
@@ -77,7 +89,7 @@ export default function DashboardNavBar({
           </div>
 
           {/* Center Section - Search (Desktop) */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
+          <div className="hidden md:flex flex-1 max-w-sm mx-8">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -91,16 +103,16 @@ export default function DashboardNavBar({
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-end gap-3">
             {/* Mobile Search Toggle */}
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="md:hidden"
               onClick={() => setShowMobileSearch(!showMobileSearch)}
             >
               <Search className="h-5 w-5" />
-            </Button>
+            </Button> */}
 
             {/* Notifications */}
             <DropdownMenu>
@@ -163,7 +175,7 @@ export default function DashboardNavBar({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <a href="/profile" className="flex items-center gap-2">
+                  <a href="/student/profile" className="flex items-center gap-2">
                     <User className="h-4 w-4" />
                     Profile
                   </a>
@@ -187,21 +199,21 @@ export default function DashboardNavBar({
         </div>
 
         {/* Mobile Search Bar */}
-        {showMobileSearch && (
-          <div className="border-t bg-background px-4 py-3 md:hidden">
+        {/* {showMobileSearch && (
+          <div className="border-t bg-background px-4 py-3 sm:hidden">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className=" left-3 top-1/2 h-4 w-4 translate-y-1/2 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                // onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4"
                 autoFocus
               />
             </div>
           </div>
-        )}
+        )} */}
       </header>
     </>
   );

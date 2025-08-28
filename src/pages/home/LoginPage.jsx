@@ -1,10 +1,10 @@
 import React from "react";
 
-import StudentDashboard from "./StudentDashboard";
+import StudentDashboard from "./../student/StudentDashboard";
 import { toast } from "react-toastify"; // Import toast for notifications
 import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 
-import { login } from "../Services/auth"; // Adjust the import path
+import { login } from "../../Services/auth"; // Adjust the import path
 import { useNavigate } from "react-router-dom";
 
 

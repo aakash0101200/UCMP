@@ -9,14 +9,25 @@ import LandingNavBar from './components/navigation/LandingNavBar';
 import DashboardNavBar from './components/navigation/DashboardNavBar';
 import DashboardLayout from './components/layout/DashboardLayout';
 
-import Home from './pages/Home';
-import About from './pages/About';
-import ContactPage from './pages/ContactPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import StudentDashboard from './pages/StudentDashboard';
-import FacultyDashboard from './pages/FacultyDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+import Home from './pages/home/Home';
+
+import About from './pages/home/about';
+import ContactPage from './pages/home/ContactPage';
+import LoginPage from './pages/home/LoginPage';
+import RegisterPage from './pages/home/RegisterPage';
+
+import StudentDashboard from './pages/student/StudentDashboard';
+
+import Assignment from './pages/student/AssignmentPage';
+import Attendance from './pages/student/AttendancePage';
+import Courses from './pages/student/MyCoursesPage';
+import Schedule from './pages/student/SchedulePage';
+import Updates from './pages/student/UpdatesPage';
+
+
+import FacultyDashboard from './pages/faculty/FacultyDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
+
 
 import 'react-toastify/dist/ReactToastify.css';
 import ProfilePage from './components/Profile/ProfilePage';
@@ -66,6 +77,7 @@ export default function App() {
               </AppShell>
             }
           />
+          
           <Route
             path="/contact"
             element={
@@ -90,22 +102,41 @@ export default function App() {
               </AppShell>
             }
           />
-          <Route
+          {/* <Route
             path="/profile"
             element={
               <AppShell>
                 <ProfilePage />
               </AppShell>
             }
-          />
+          /> */}
 
 
+                
+  
+            
+         
+         
+         
+         
+         
           {/* Dashboard routes */}
-          <Route path="/student/*" element={
-            <DashboardLayout userRole="student">
-              <StudentDashboard />
-            </DashboardLayout>
-          } />
+          <Route path="/student/*" element={<DashboardLayout userRole="student" />}>
+          
+              <Route path="profile" element={<ProfilePage />} /> 
+            
+              <Route index element={<StudentDashboard />} />
+              <Route path="assignment" element={<Assignment />} />
+              <Route path="attendance" element={<Attendance/>} />
+              <Route path="courses" element={<Courses/>} />
+              <Route path="schedule" element={<Schedule/>} />
+              <Route path="updates" element={<Updates/>} /> 
+
+              <Route path="profile" element={<ProfilePage />} /> 
+              {/*Add more ... */}
+          </Route>
+          
+
           <Route path="/faculty/*" element={
             <DashboardLayout userRole="faculty">
               <FacultyDashboard />
@@ -115,7 +146,7 @@ export default function App() {
             <DashboardLayout userRole="admin">
               <AdminDashboard />
             </DashboardLayout>
-          } />
+          } />   
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
       </BrowserRouter>

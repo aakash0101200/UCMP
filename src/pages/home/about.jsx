@@ -3,7 +3,10 @@
    UCMP “About” page – responsive, theme-aware, accessible
 ─────────────────────────────────────────────────────────── */
 import React from 'react';
-import { GraduationCap, UsersRound, Globe2 } from 'lucide-react';
+import { GraduationCap, UsersRound, Globe2, } from 'lucide-react';
+import  c from '../../assets/about/JecrcChairman.jpg';
+import  vc from '../../assets/about/Victorgambhir.jpeg';
+import  p from '../../assets/about/Chandna.jpg';
 
 export default function About() {
   return (
@@ -95,17 +98,17 @@ export default function About() {
             {
               name: 'Dr. Prof. Victor Gambhir',
               role: 'Vice-Chancellor',
-              img: 'https://api.dicebear.com/7.x/initials/svg?seed=VG',
+              img: vc,
             },
             {
               name: 'Dr. Vinay Kumar Chandna',
               role: 'Principal',
-              img: 'https://api.dicebear.com/7.x/initials/svg?seed=VC',
+              img: p,
             },
             {
               name: 'O.P. Agarwal',
               role: 'Chairperson',
-              img: 'https://api.dicebear.com/7.x/initials/svg?seed=O',
+              img: c,
             },
           ].map(({ name, role, img }) => (
             <article
