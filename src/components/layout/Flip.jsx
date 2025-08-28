@@ -1,16 +1,14 @@
 import { Icon } from "lucide-react"
 import { useState } from "react"
 import "../../index.css"
+import { useRef } from "react";
+
 export default function Flip(feature) {
 
-    
-    return (
+    return(
 
         <div className="w-full sm:w-1/2 lg:w-1/4 p-4">
-            <div
-                className="perspective"
-                
-            >
+            
                 <div
                     className={`relative w-full h-100 transition-transform duration-700 preserve-3d 
                         }`}
@@ -38,7 +36,8 @@ export default function Flip(feature) {
                     
                     
                 </div>
-            </div>
+            
         </div>
+        
     )
 }
