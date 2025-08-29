@@ -45,13 +45,9 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-<<<<<<< HEAD
     "framer-motion": "^12.23.6",
     "lottie-react": "^2.4.1",
-=======
     "dayjs": "^1.11.13",
-    "framer-motion": "^12.23.12",
->>>>>>> 10ff22f718084ca727c40d5a1fd9e6078e15b14d
     "lucide-react": "^0.525.0",
     "moment-timezone": "^0.5.48",
     "motion": "^12.23.12",
