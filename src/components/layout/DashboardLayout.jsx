@@ -10,8 +10,8 @@ import { useLocation } from 'react-router-dom';
 
 
 export default function DashboardLayout({ // future work is to find a way to determine the collegeId dynamically, since it's currently being passed as a prop
-  children, collegeId, onLogout}) {
-
+  children,  onLogout}) {
+  const collegeId = localStorage.getItem('collegeId');
   const location = useLocation();
   const routeToRole = {
     'student': 'student',

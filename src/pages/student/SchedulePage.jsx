@@ -1,7 +1,7 @@
 import React from "react";
 
 import BottomNavBar from "@/components/navigation/BottomNavBar";
-
+import ScheduleTable from "../../components/ScheduleTable"
 export default function SchedulePage() {
   return (
     <div className="scroll-style ">
@@ -11,8 +11,8 @@ export default function SchedulePage() {
 
 
 
-    
-<BottomNavBar />
+      <ScheduleTable />
+      <BottomNavBar />
 
 
     </div>

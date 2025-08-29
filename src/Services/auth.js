@@ -6,20 +6,19 @@ import { toast } from 'react-toastify';
 export async function login(collegeId, password, role) {
   try{const response = await API.post('/login', {
       collegeId,
-      password,
-      role: role.toUpperCase(),
+      password
       });
-      console.log(response);
+      // console.log(response);
 
       if (response.data && response.data.token && response.data.profile) {
         const {token, profile} = response.data;
       
-        localStorage.setItem("authToken", token);
+        localStorage.setItem("token", token);
         localStorage.setItem('role', profile.role.toLowerCase());
-
+        localStorage.setItem('collegeId', profile.collegeId);
         localStorage.setItem('userName', profile.name);
         localStorage.setItem('userEmail', profile.email);
-        localStorage.setItem('role', response.data.role);
+        // localStorage.setItem('role', response.data.role);
 
         toast.success(`Login successful! 🎉 welcome ${profile.name}`);
         return profile.role.toLowerCase(); //role for frontend routing
@@ -36,8 +35,10 @@ export async function login(collegeId, password, role) {
       return null;
     }
 }
+
+
 export const logout = () => {
-  localStorage.removeItem('authTocken');
+  localStorage.removeItem('token');
   localStorage.removeItem('role');
   localStorage.removeItem('userName');
   localStorage.removeItem('userEmail')
@@ -51,7 +52,6 @@ export function register(user) {
         email: user.email,
         role: user.role?.toUpperCase()
     };
-    return API.post('/register', user);
+    return API.post('/register', data);
 }
 
-//
