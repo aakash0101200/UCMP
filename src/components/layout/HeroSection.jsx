@@ -1,4 +1,4 @@
-
+import vid from '../../assets/education.mp4';
 
 const HeroSection = () => {
   return (
@@ -13,7 +13,7 @@ const HeroSection = () => {
          Welcome to Campus
       </h2>
       <h1 className="z-1  sm:text-6xl lg:text-7xl font-bold text-center mb-5 tracking-wide">
-          Unified Academic <span className="text-indigo-500">Management</span>
+          Unified Academic <span className="text-indigo-600">Management</span>
       </h1>
       <p className="z-1 text-lg sm:text-xl lg:text-2xl text-center text-neutral-800 dark:text-neutral-400 mb-6 max-w-4xl">
        Streamline academic workflows, track attendance, manage assignments,<br/> and stay connected with your 
@@ -23,7 +23,7 @@ const HeroSection = () => {
 
         <button 
           
-          className="bg-indigo-500  px-4 py-3 z-1 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+          className="bg-indigo-600 text-white px-4 py-3 z-1 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
 
             Begin Your Journey!
           </button>
@@ -33,17 +33,17 @@ const HeroSection = () => {
         <video 
           autoPlay 
           loop muted 
-          className=" rounded-lg w-1/2 shadow-lg border-gray-600 mx-2 my-8"
-          src="https://www.w3schools.com/html/mov_bbb.mp4"> 
+          className=" rounded-lg w-1/2 shadow-lg border-gray-600 mx-2 my-8 sm:w-3/4 md:w-1/2 lg:w-2/1"
+          src= {vid}> 
         </video>
 
 {/* additions stuff at hero section like videos, animation, images etc...  */}
-        <video 
+        {/* <video 
           autoPlay 
           loop muted 
           className=" rounded-lg w-1/2 shadow-lg border-gray-600 mx-2 my-8"
           src="https://www.w3schools.com/html/mov_bbb.mp4"> 
-        </video>
+        </video> */}
 
 
       </div>

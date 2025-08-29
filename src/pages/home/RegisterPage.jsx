@@ -3,7 +3,7 @@ import { toast } from "react-toastify"; // For success and error popups
 import 'react-toastify/dist/ReactToastify.css';
 
 import { useNavigate, Link } from "react-router-dom";
-import { register } from "../Services/auth"; // Use the existing register() function from auth.js
+import { register } from "../../Services/auth"; // Use the existing register() function from auth.js
 
 export default function RegisterPage() {
   const navigate = useNavigate(); // Hook to redirect users

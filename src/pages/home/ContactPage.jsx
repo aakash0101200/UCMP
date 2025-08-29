@@ -3,7 +3,7 @@
    UCMP “Contact Us” page – responsive, theme-aware, accessible
 ─────────────────────────────────────────────────────────── */
 import React, { useState } from 'react';
-import { MapPin, Mail, Phone } from 'lucide-react';
+import { MapPin, Mail, Phone, Globe, Clock } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 export default function ContactPage() {
@@ -139,9 +139,9 @@ export default function ContactPage() {
             <div>
               <h3 className="font-semibold">Campus Address</h3>
               <p className="text-muted-foreground">
-                123 University Avenue<br />
-                Cityville, ST 12345<br />
-                Country
+              Jaipur Engineering College & Research Centre (JECRC)<br />
+              Shri Ram ki Nangal, via Sitapura RIICO, Opp. EPIP Gate, Tonk Road<br />
+              Jaipur – 302022, Rajasthan, India
               </p>
             </div>
           </div>
@@ -151,8 +151,8 @@ export default function ContactPage() {
             <div>
               <h3 className="font-semibold">Email</h3>
               <p className="text-muted-foreground">
-                <a href="mailto:info@ucmp.edu" className="hover:underline">
-                  info@ucmp.edu
+                <a href="mailto:info@jecrcmail.com" className="hover:underline">
+                info@jecrcmail.com
                 </a>
               </p>
             </div>
@@ -163,12 +163,51 @@ export default function ContactPage() {
             <div>
               <h3 className="font-semibold">Phone</h3>
               <p className="text-muted-foreground">
-                <a href="tel:+1234567890" className="hover:underline">
-                  +1 (234) 567-890
+                <a href="tel: +911412770120" className="hover:underline">
+                +91-141-2770120
+                </a>
+                <br />
+                <a href="tel: +911412770232" className="hover:underline">
+                +91-141-2770232
+                </a>
+                 <br />
+                {/* +91-141-2770294 <br />
+                +91-9982682917  <br />
+                +91-9982682331  <br />
+                +91-9251039858  <br />
+                +91-9214699647  <br /> */}
+               
+
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <Globe className="h-6 w-6 text-primary" />
+            <div>
+              <h3 className="font-semibold">Website:</h3>
+              <p className="text-muted-foreground">
+                <a href="https://jecrcfoundation.com/" target="_blank" className="hover:underline">
+                jecrcfoundation.com
                 </a>
               </p>
             </div>
           </div>
+
+          <div className="flex items-start gap-4">
+            <Clock className="h-6 w-6 text-primary" />
+            <div>
+              <h3 className="font-semibold"> Visiting Hours:</h3>
+              <p className="text-muted-foreground">
+                8:30 a.m. to 3:30 p.m. <br />(Monday-Saturday)
+              </p>
+            </div>
+          </div>
+          
+
+
+
+
         </div>
       </div>
     </div>

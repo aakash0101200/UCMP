@@ -11,6 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@asphalt-react/time-picker": "^2.8.0",
     "@daypilot/daypilot-lite-react": "^4.2.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
@@ -21,10 +22,12 @@
     "@fullcalendar/timegrid": "^6.1.18",
     "@heroicons/react": "^2.2.0",
     "@lottiefiles/dotlottie-react": "^0.14.4",
-    "@mui/icons-material": "^7.2.0",
-    "@mui/material": "^7.2.0",
+    "@mui/icons-material": "^7.3.1",
+    "@mui/material": "^7.3.1",
+    "@mui/x-date-pickers": "^8.10.2",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
     "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-label": "^2.1.7",
@@ -42,20 +45,31 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+<<<<<<< HEAD
     "framer-motion": "^12.23.6",
+    "lottie-react": "^2.4.1",
+=======
+    "dayjs": "^1.11.13",
+    "framer-motion": "^12.23.12",
+>>>>>>> 10ff22f718084ca727c40d5a1fd9e6078e15b14d
     "lucide-react": "^0.525.0",
     "moment-timezone": "^0.5.48",
     "motion": "^12.23.12",
+    "ogl": "^1.0.11",
     "react": "^19.1.0",
     "react-calendar": "^6.0.0",
     "react-circular-progressbar": "^2.2.0",
+    "react-clock": "^6.0.0",
     "react-day-picker": "^9.8.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
     "react-modal": "^3.16.3",
-    "react-router-dom": "^7.6.3",
+    "react-router-dom": "^7.7.1",
+    "react-time-picker": "^8.0.2",
     "react-toastify": "^11.0.5",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "tailwind-variants": "^2.1.0",
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",

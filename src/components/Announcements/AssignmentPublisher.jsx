@@ -13,7 +13,7 @@ import { FileText, Upload, Calendar, Send, Plus, X, Clock } from "lucide-react";
  * ✅ Plain JavaScript for easier integration
  * ✅ API hooks ready for future integration
  */
-export default function AssignmentPublisher({ compact = false }) {
+export default function AssignmentPublisher({ classname ,compact = false }) {
   // Track whether we are creating a new assignment
   const [isCreating, setIsCreating] = useState(false);
 
@@ -124,7 +124,7 @@ export default function AssignmentPublisher({ compact = false }) {
   // Compact mode (summary only)
   if (compact && !isCreating) {
     return (
-      <div className="p-6 bg-white border border-gray-100 shadow-lg dark:bg-gray-800 rounded-2xl dark:border-gray-700">
+      <div className={` p-6 bg-white border border-gray-100 shadow-lg dark:bg-gray-800 rounded-2xl dark:border-gray-700 `}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -172,7 +172,7 @@ export default function AssignmentPublisher({ compact = false }) {
 
   // Full mode (form + recent list)
   return (
-    <div className="p-6 bg-white border border-gray-100 shadow-lg dark:bg-gray-800 rounded-2xl dark:border-gray-700">
+    <div className="p-6 w-full bg-white border border-gray-100 shadow-lg dark:bg-gray-800 rounded-2xl dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
           <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
