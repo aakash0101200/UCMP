@@ -1,104 +1,95 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { login } from "../../Services/auth"; // adjust path if needed
+import { login } from "../../Services/auth";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    collegeId: "",
-    password: "",
-  });
+function LoginPage() {
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const [formData, setFormData] = useState({ collegeId: "", password: "" });
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [showRoleModal, setShowRoleModal] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const res = await login(formData.collegeId, formData.password);
 
-    try {
-      const role = await login(formData.collegeId, formData.password);
+    if (!res) return;
 
-      if (role) {
-        // Redirect based on role returned from backend
-        if (role === "student") {
-          navigate("/student");
-        } else if (role === "faculty") {
-          navigate("/faculty");
-        } else if (role === "admin") {
-          navigate("/admin");
-        } else {
-          toast.error("Unknown role. Please contact support.");
-        }
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      toast.error("Something went wrong. Try again.");
+    if (typeof res === "string") {
+      // Single role
+      navigateBasedOnRole(res);
+    } else if (res.multiple) {
+      // Multiple roles
+      setRoleOptions(res.roles);
+      setShowRoleModal(true);
     }
   };
 
+  const navigateBasedOnRole = (role) => {
+    localStorage.setItem("role", role);
+    if (role === "student") navigate("/student");
+    else if (role === "faculty") navigate("/faculty");
+    else if (role === "admin") navigate("/admin");
+    else navigate("/");
+  };
+
+  const handleRoleSelect = (role) => {
+    toast.success(`Role selected: ${role}`);
+    navigateBasedOnRole(role.toLowerCase());
+    setShowRoleModal(false);
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800">
-          Login to Dashboard
-        </h2>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <form
+        className="p-6 bg-white rounded-lg shadow-lg w-96"
+        onSubmit={handleSubmit}
+      >
+        <h2 className="text-xl font-bold mb-4">Login</h2>
+        <input
+          type="text"
+          placeholder="College ID"
+          value={formData.collegeId}
+          onChange={(e) =>
+            setFormData({ ...formData, collegeId: e.target.value })
+          }
+          className="w-full mb-3 p-2 border rounded"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
+          className="w-full mb-3 p-2 border rounded"
+        />
+        <button
+          type="submit"
+          className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Login
+        </button>
+      </form>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* College ID */}
-          <div>
-            <label
-              htmlFor="collegeId"
-              className="block text-sm font-medium text-gray-700"
-            >
-              College ID
-            </label>
-            <input
-              type="text"
-              name="collegeId"
-              id="collegeId"
-              value={formData.collegeId}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
+      {showRoleModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h3 className="text-lg font-semibold mb-4">Select Your Role</h3>
+            {roleOptions.map((role) => (
+              <button
+                key={role}
+                onClick={() => handleRoleSelect(role)}
+                className="w-full mb-2 p-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                {role}
+              </button>
+            ))}
           </div>
-
-          {/* Password */}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full py-2 px-4 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+        </div>
+      )}
     </div>
   );
-};
+}
 
 export default LoginPage;
