@@ -1,12 +1,11 @@
 import axios from 'axios';
 
-// Base URL for the API
+// api.js for Vite
 const API = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:8081/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8081/api',
+  headers: { 'Content-Type': 'application/json' },
 });
+
 
 
 /**
