@@ -71,7 +71,11 @@ export function register(user) {
     password: user.password,
     name: user.name,
     email: user.email,
-    role: user.role?.toUpperCase(),
+    roles: user.roles?user.roles.map(r => r.toUpperCase()):[],
   };
-  return API.post('/auth/register', data);
+  try{
+    return API.post('/auth/register', data);
+  } catch(error) {
+    console.error(error.response?.data);
+  }
 }
