@@ -1,55 +1,61 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify"; // For success and error popups
-import 'react-toastify/dist/ReactToastify.css';
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, Link } from "react-router-dom";
-import { register } from "../../Services/auth"; // Use the existing register() function from auth.js
+import { register } from "../../Services/auth";
 
 export default function RegisterPage() {
-  const navigate = useNavigate(); // Hook to redirect users
+  const navigate = useNavigate();
 
-  // Initial form state
+  // Default role so backend never gets null/empty
   const [formData, setFormData] = useState({
-    name: '',
-    collegeId: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'STUDENT', // Default selected role
+    name: "",
+    collegeId: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    roles: ["STUDENT"], // matches RoleName enum
   });
 
-  // Handle input changes and update formData state
+  // Handle input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, multiple, options } = e.target;
+
+    if (name === "roles") {
+      if (multiple) {
+        // Multi-select: collect all selected values
+        const selectedValues = Array.from(options)
+          .filter((opt) => opt.selected)
+          .map((opt) => opt.value);
+        setFormData((prev) => ({ ...prev, roles: selectedValues }));
+      } else {
+        // Single select: wrap value in array
+        setFormData((prev) => ({ ...prev, roles: [value] }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form reload
+    e.preventDefault();
 
-    // Simple client-side validation
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match!");
       return;
     }
 
     try {
-      // Prepare data with role in uppercase
       const dataToSend = {
         ...formData,
-        role: formData.role.toUpperCase(),
+        roles: formData.roles.map((r) => r.toUpperCase()), // ensure uppercase for enum
       };
 
-      // Send data to backend via auth.js function
-      const response = await register(dataToSend);
-
-      // Show success toast and navigate to login
+      await register(dataToSend);
       toast.success("Registration successful! 🎉");
       setTimeout(() => navigate("/login"), 1500);
-
     } catch (error) {
-      // Handle API errors
       if (error.response?.data?.message) {
         toast.error(`Registration failed: ${error.response.data.message}`);
       } else {
@@ -65,10 +71,11 @@ export default function RegisterPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm p-8 text-black bg-white shadow-md rounded-4xl"
       >
-        {/* Heading */}
-        <h2 className="mb-6 text-2xl font-bold text-center text-blue-900">Register</h2>
+        <h2 className="mb-6 text-2xl font-bold text-center text-blue-900">
+          Register
+        </h2>
 
-        {/* Name Input */}
+        {/* Name */}
         <label className="block mb-2 text-sm font-medium text-black">Name</label>
         <input
           type="text"
@@ -80,8 +87,10 @@ export default function RegisterPage() {
           className="w-full px-3 py-2 mb-4 bg-gray-200 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* College ID Input */}
-        <label className="block mb-2 text-sm font-medium text-black">College ID</label>
+        {/* College ID */}
+        <label className="block mb-2 text-sm font-medium text-black">
+          College ID
+        </label>
         <input
           type="text"
           name="collegeId"
@@ -92,7 +101,7 @@ export default function RegisterPage() {
           className="w-full px-3 py-2 mb-4 bg-gray-200 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Email Input */}
+        {/* Email */}
         <label className="block mb-2 text-sm font-medium text-black">Email</label>
         <input
           type="email"
@@ -104,8 +113,10 @@ export default function RegisterPage() {
           className="w-full px-3 py-2 mb-4 bg-gray-200 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Password Input */}
-        <label className="block mb-2 text-sm font-medium text-black">Password</label>
+        {/* Password */}
+        <label className="block mb-2 text-sm font-medium text-black">
+          Password
+        </label>
         <input
           type="password"
           name="password"
@@ -116,8 +127,10 @@ export default function RegisterPage() {
           className="w-full px-3 py-2 mb-4 bg-gray-200 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Confirm Password Input */}
-        <label className="block mb-2 text-sm font-medium text-black">Confirm Password</label>
+        {/* Confirm Password */}
+        <label className="block mb-2 text-sm font-medium text-black">
+          Confirm Password
+        </label>
         <input
           type="password"
           name="confirmPassword"
@@ -128,12 +141,15 @@ export default function RegisterPage() {
           className="w-full px-3 py-2 mb-4 bg-gray-200 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Role Dropdown */}
-        <label className="block mb-2 text-sm font-medium text-black">Role</label>
+        {/* Multi-Select Role Dropdown */}
+        <label className="block mb-2 text-sm font-medium text-black">
+          Roles (Select one or more)
+        </label>
         <select
-          name="role"
-          value={formData.role}
+          name="roles"
+          value={formData.roles}
           onChange={handleChange}
+          multiple
           className="w-full px-3 py-2 mb-6 bg-gray-200 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="STUDENT">Student</option>
@@ -141,7 +157,7 @@ export default function RegisterPage() {
           <option value="ADMIN">Admin</option>
         </select>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <button
           type="submit"
           className="w-full py-2 text-white transition bg-blue-600 rounded hover:bg-blue-700"
@@ -149,9 +165,9 @@ export default function RegisterPage() {
           Register
         </button>
 
-        {/* Navigation to Login */}
+        {/* Navigation */}
         <p className="mt-4 text-sm text-center text-black">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link to="/login" className="text-blue-600 hover:underline">
             Login here
           </Link>

@@ -1,14 +1,14 @@
 // components/navigation/DashboardNavBar.jsx
 import React, { useState } from 'react';
-import { Search, Bell, Settings, User } from 'lucide-react';
+import { useNavigate, Link } from "react-router-dom";
+
+import { Search, Bell, Settings, User, ChevronDown, LogOut } from 'lucide-react';
 import { ModeToggle } from '../Theme/ModeToggle';
 import { SidebarTrigger } from '../../components/ui/sidebar';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Link } from 'react-router-dom';
 import blogo from '../../assets/logo/bluelogo.png';
-import wlogo from '../../assets/logo/whitelogo.png';
-
+import {logout, getAllRoles, getActiveRole, setActiveRole } from "../../Services/auth";
 
 
 import {
@@ -26,14 +26,17 @@ import logo from '../../assets/logo/bluelogo.png';
 
 
 export default function DashboardNavBar({
-  userRole = 'student',
-  userName = 'User',
-  userEmail = 'user@example.com',
+  // userRole = 'student',
+  // userName = 'User',
+  // userEmail = 'user@example.com',
   notificationCount = 0,
-  onLogout
+  profile, onLogout, onRoleSwitch
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileSearch, setShowMobileSearch] = useState('false');
+
+  const allRoles = getAllRoles();
+  const activeRole = getActiveRole();
 
   const getRoleTitle = (role) => {
     const titles = {
@@ -43,54 +46,56 @@ export default function DashboardNavBar({
     };
     return titles[role] || 'Dashboard';
   };
+
+  const navigate = useNavigate();
+  
+
+  const handleRoleSwitch = (newRole) => {
+    setActiveRole(newRole); // Update active role in localStorage
+    onRoleSwitch(newRole); // Notify parent component of the change
+  };
+
   //    const toggleSearch = () => setSearchOpen(!searchOpen);
 
   const handleLogout = () => {
-    onLogout?.();
+    logout();
+    onLogout();
+    navigate("/login");
   };
+  if (!profile || !activeRole) {
+    return null; 
+  }
+const userName = typeof profile.name === 'string'
+  ? profile.name.split(' ')[0]
+  : 'User';
+
 
   return (
     <>
-      <header className="sticky top-0 left-0 h-16.25 z-30 flex items-center w-full border-b bg-sidebar ">
-        <div className="container flex h-16 min-w-full items-center justify-between px-3">
+      <header className="sticky top-0 left-0 z-30 w-full border-b bg-sidebar h-16 flex items-center">
+        <div className="flex w-full items-center justify-between px-4 gap-4">
 
-          {/* Left Section */}
-          <div className="flex items-center gap-4">
-            {/* Sidebar Trigger */}
+          {/* Left Section: Logo + Branding */}
+          <div className="flex items-center gap-4 min-w-max">
             <SidebarTrigger className="md:hidden" />
 
-            {/* Logo & Branding - Hidden on mobile when sidebar trigger is shown */}
-            <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center">
+              <img
+                src={blogo}
+                alt="Logo"
+                className="h-10 w-auto transition duration-300 dark:invert dark:brightness-0"
+              />
+            </Link>
 
-              {/* <Link to="/">
-                <img src={logo} alt="UCMP Logo" className="h-20 w-38 mt-6 shrink-0 hover:opacity-80 transition duration-200 ease-in-out" />
-              </Link> */}
-              {/* Logo */}
-              <Link to="/" className="relative flex items-center h-20 w-38 mt-6">
-          <img
-          src={blogo}
-          alt="Logo"
-          className="h-20 w-auto transition duration-300 
-               dark:invert dark:brightness-0"
-         />
-        </Link>
-
-
-              <div className="hidden sm:flex flex-col leading-tight">
-
-                {/* <h1 className="font-semibold text-lg">UCMP</h1> */}
-                <span className="font-semibold">{userName.split(' ')[0]}</span>
-
-                <p className="text-xs text-muted-foreground">
-                  {getRoleTitle(userRole)}
-                </p>
-              </div>
+            <div className="hidden sm:flex flex-col leading-tight">
+              <span className="font-semibold text-sm">{userName}</span>
+              <p className="text-xs text-muted-foreground">{getRoleTitle(activeRole)}</p>
             </div>
           </div>
 
-          {/* Center Section - Search (Desktop) */}
-          <div className="hidden md:flex flex-1 max-w-sm mx-8">
-            <div className="relative w-full">
+          {/* Center Section: Search */}
+          <div className="hidden md:flex flex-1 justify-center">
+            <div className="relative w-full max-w-md">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="search"
@@ -102,17 +107,8 @@ export default function DashboardNavBar({
             </div>
           </div>
 
-          {/* Right Section */}
-          <div className="flex items-end gap-3">
-            {/* Mobile Search Toggle */}
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setShowMobileSearch(!showMobileSearch)}
-            >
-              <Search className="h-5 w-5" />
-            </Button> */}
+          {/* Right Section: Icons + Profile */}
+          <div className="flex items-center gap-3 min-w-max">
 
             {/* Notifications */}
             <DropdownMenu>
@@ -120,11 +116,7 @@ export default function DashboardNavBar({
                 <Button variant="ghost" size="icon" className="relative">
                   <Bell className="h-5 w-5" />
                   {notificationCount > 0 && (
-                    <Badge
-                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs flex justify-center "
-                      variant="destructive"
-
-                    >
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs flex justify-center" variant="destructive">
                       {notificationCount > 99 ? '99+' : notificationCount}
                     </Badge>
                   )}
@@ -134,87 +126,66 @@ export default function DashboardNavBar({
                 <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {notificationCount === 0 ? (
-                  <DropdownMenuItem className="text-muted-foreground">
-                    No new notifications
-                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-muted-foreground">No new notifications</DropdownMenuItem>
                 ) : (
-                  <DropdownMenuItem>
-                    You have {notificationCount} new notifications
-                  </DropdownMenuItem>
+                  <DropdownMenuItem>You have {notificationCount} new notifications</DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
 
             {/* Theme Toggle */}
-            <ModeToggle />
+            <div className="hidden sm:block">
+              <ModeToggle />
+            </div>
 
-
-            {/* User Profile Menu */}
+            {/* Profile Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Button variant="ghost" className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="" alt={userName} />
+                    <AvatarImage src={profile.profilePictureUrl || ''} alt={profile.name} />
                     <AvatarFallback>
-                      {userName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      {profile.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
+                  <span className="hidden sm:inline-block font-medium capitalize">{activeRole.toLowerCase()}</span>
+                  <ChevronDown className="h-4 w-4 hidden md:inline-block" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1.5">
-                    <p className="text-sm font-medium leading-none">{userName}</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {userEmail}
-                    </p>
-                    <Badge variant="outline" className="w-fit text-xs capitalize">
-                      {userRole}
-                    </Badge>
+                    <p className="text-sm font-medium leading-none">{profile.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{profile.email}</p>
+                    <Badge variant="outline" className="w-fit text-xs capitalize">{activeRole.toLowerCase()}</Badge>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <a href="/student/profile" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Profile
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="/settings" className="flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    Settings
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-red-600 focus:text-red-600 "
-                >
-                  Log out
+                {allRoles.length > 1 && (
+                  <>
+                    <DropdownMenuLabel>Switch Role</DropdownMenuLabel>
+                    {allRoles.map((role) => (
+                      <DropdownMenuItem
+                        key={role}
+                        onClick={() => handleRoleSwitch(role)}
+                        className={`cursor-pointer capitalize ${activeRole.toLowerCase() === role.toLowerCase() ? "font-bold text-blue-600" : ""}`}
+                      >
+                        {role.toLowerCase()}
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
-
-        {/* Mobile Search Bar */}
-        {/* {showMobileSearch && (
-          <div className="border-t bg-background px-4 py-3 sm:hidden">
-            <div className="relative">
-              <Search className=" left-3 top-1/2 h-4 w-4 translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search..."
-                value={searchQuery}
-                // onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4"
-                autoFocus
-              />
-            </div>
-          </div>
-        )} */}
       </header>
+
     </>
   );
 }

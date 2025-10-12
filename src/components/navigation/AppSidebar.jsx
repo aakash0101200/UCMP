@@ -100,6 +100,7 @@ export function AppSidebar({ userRole = 'student', userName = 'User' }) {
           
          {/* Fix: Wrap SidebarTrigger in a flex container for proper vertical alignment */}
 
+
           <SidebarTrigger className="absolute right-4 top-1/2 -translate-y-1/2" />
         </div>
       </SidebarHeader>
