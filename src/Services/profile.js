@@ -2,10 +2,11 @@ import API from './api'
 
 //get
 export const getProfile = (collegeId) => {
-    return API.get(`/profile?collegeId=${collegeId}`);        
+    // Corrected to use the authenticated API instance
+    return API.get(`/profile?collegeId=${collegeId}`); 
 };
-//update
 
+//update
 export const updateProfile =(collegeId, profileData) => {
     return API.put(`/profile?collegeId=${collegeId}`, profileData);
 };

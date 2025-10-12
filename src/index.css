@@ -186,5 +186,116 @@ html {
     }
 }
 
+/* ======================= */
+/* Login Page Animations CSS */
+/* ======================= */
+
+/* Dark mode gradient animation */
+@keyframes gradientDark {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Light mode gradient animation */
+@keyframes gradientLight {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Default / dark mode animation */
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientDark 15s ease infinite;
+}
+
+/* Light mode override */
+@media (prefers-color-scheme: light) {
+  .animate-gradient {
+    animation: gradientLight 10s ease infinite;
+  }
+}
+
+/* ======================= */
+/* Floating Login Box Animation */
+/* ======================= */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); } /* full float for large screens */
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Reduce float on medium/shorter screens (laptop/tablet) */
+@media (max-height: 850px) {
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+    transform: translateY(0px); /* prevents cutting off top/bottom */
+  }
+}
+
+/* ======================= */
+/* Shimmer Effect (Button) */
+/* ======================= */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
+/* ======================= */
+/* Glitch Text Effect (Heading) */
+/* ======================= */
+@keyframes glitch {
+  0% {
+      text-shadow: 2px 2px 0 cyan, -2px -2px 0 magenta;
+      transform: translate(0);
+    }
+  50% {
+    text-shadow: -2px -2px 0 cyan, 2px 2px 0 magenta;
+    transform: translate(2px, -2px);
+  }
+  
+  100% {
+    text-shadow: 2px 2px 0 cyan, -2px -2px 0 magenta;
+    transform: translate(0);
+  }
+}
+.animate-glitch {
+  animation: glitch 1s infinite;
+}
+
+
+
+
+
+/* @keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px #22d3ee, -2px -2px #3b82f6; }
+  50% { text-shadow: -2px -2px #22d3ee, 2px 2px #3b82f6; }
+  100% { text-shadow: 2px 2px #22d3ee, -2px -2px #3b82f6; }
+}
+.animate-glitch {
+  animation: glitch 2s;
+} */
 
 
