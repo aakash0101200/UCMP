@@ -5,7 +5,7 @@
 import React from 'react';
 import { GraduationCap, UsersRound, Globe2, } from 'lucide-react';
 import  c from '../../assets/about/JecrcChairman.jpg';
-import  vc from '../../assets/about/Victorgambhir.jpeg';
+import  vc from '../../assets/about/VictorGambhir.jpeg';
 import  p from '../../assets/about/Chandna.jpg';
 
 export default function About() {
