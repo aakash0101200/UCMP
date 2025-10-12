@@ -230,7 +230,7 @@ import React, { useState, useEffect } from "react";
 import { parseISO } from "date-fns";
 import axios from "axios";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import EventPopup from "./eventPopup";
+import EventPopup from "./EventPopup";
 import { motion } from "framer-motion";
 import { fetchMonthlyEvents } from "@/Services/eventService";
 
