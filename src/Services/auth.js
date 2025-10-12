@@ -31,12 +31,15 @@ export async function login(collegeId, password) {
       toast.error(`Login failed: Invalid response from server`);
       return null;
     }
-  } catch (error) {
-    console.error("Login error:", error);
-    const backendMessage = error.response?.data?.message || error.message;
-    toast.error(`Login failed: ${backendMessage}`);
-    return null;
-  }
+  }catch (error) {
+  console.error("Login error:", error); // full object
+  console.error("Login error message:", error.message); // readable string
+  console.error("Login error response:", error.response?.data); // backend payload
+
+  const backendMessage = error.response?.data?.message || error.message || "Unknown error";
+  toast.error(`Login failed: ${backendMessage}`);
+  return null;
+}
 }
 
 // Fixed logout function to selectively clear localStorage items
