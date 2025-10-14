@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, Link } from "react-router-dom";
 import { register } from "../../Services/auth";
-import { Sun, Moon } from "lucide-react"; // Install: npm install lucide-react
+import { Sun, Moon } from "lucide-react";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -24,6 +24,7 @@ export default function RegisterPage() {
   });
 
   const [currentStep, setCurrentStep] = useState(1);
+  const [errors, setErrors] = useState({});
 
   // Initialize dark mode from localStorage
   useEffect(() => {
@@ -52,66 +53,217 @@ export default function RegisterPage() {
     }
   };
 
+  // Email validation regex
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Password strength validation
+  const isValidPassword = (password) => {
+    return password.length >= 8 && /[A-Za-z]/.test(password) && /[0-9]/.test(password);
+  };
+
+  // Validate individual fields
+  const validateField = (name, value) => {
+    const newErrors = { ...errors };
+
+    switch (name) {
+      case 'name':
+        if (!value.trim()) {
+          newErrors.name = 'Name is required';
+        } else if (value.trim().length < 2) {
+          newErrors.name = 'Name must be at least 2 characters';
+        } else {
+          delete newErrors.name;
+        }
+        break;
+
+      case 'collegeId':
+        if (!value.trim()) {
+          newErrors.collegeId = 'College ID is required';
+        } else if (value.trim().length < 3) {
+          newErrors.collegeId = 'College ID must be at least 3 characters';
+        } else {
+          delete newErrors.collegeId;
+        }
+        break;
+
+      case 'email':
+        if (!value.trim()) {
+          newErrors.email = 'Email is required';
+        } else if (!isValidEmail(value)) {
+          newErrors.email = 'Please enter a valid email address';
+        } else {
+          delete newErrors.email;
+        }
+        break;
+
+      case 'password':
+        if (!value) {
+          newErrors.password = 'Password is required';
+        } else if (!isValidPassword(value)) {
+          newErrors.password = 'Password must be at least 8 characters with letters and numbers';
+        } else {
+          delete newErrors.password;
+        }
+        break;
+
+      case 'confirmPassword':
+        if (!value) {
+          newErrors.confirmPassword = 'Please confirm your password';
+        } else if (value !== formData.password) {
+          newErrors.confirmPassword = 'Passwords do not match';
+        } else {
+          delete newErrors.confirmPassword;
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    setErrors(newErrors);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Validate field on change
+    validateField(name, value);
   };
 
   const handleRoleChange = (e) => {
-    setFormData((prev) => ({ ...prev, roles: [e.target.value] }));
+    const newRole = e.target.value;
+    setFormData((prev) => ({ ...prev, roles: [newRole] }));
   };
 
   const nextStep = () => {
-    if (currentStep < 3) setCurrentStep(currentStep + 1);
+    if (validateCurrentStep()) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
   const prevStep = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
+  // Validate current step before proceeding
+  const validateCurrentStep = () => {
+    let isValid = true;
+    const newErrors = { ...errors };
+
+    if (currentStep === 1) {
+      // Validate basic information
+      if (!formData.name.trim()) {
+        newErrors.name = 'Name is required';
+        isValid = false;
+      }
+      if (!formData.collegeId.trim()) {
+        newErrors.collegeId = 'College ID is required';
+        isValid = false;
+      }
+      if (!formData.email.trim()) {
+        newErrors.email = 'Email is required';
+        isValid = false;
+      } else if (!isValidEmail(formData.email)) {
+        newErrors.email = 'Please enter a valid email address';
+        isValid = false;
+      }
+    }
+
+    if (currentStep === 2) {
+      // Validate security information
+      if (!formData.password) {
+        newErrors.password = 'Password is required';
+        isValid = false;
+      } else if (!isValidPassword(formData.password)) {
+        newErrors.password = 'Password must be at least 8 characters with letters and numbers';
+        isValid = false;
+      }
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = 'Please confirm your password';
+        isValid = false;
+      } else if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+        isValid = false;
+      }
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match!");
+    // Final validation before submission
+    if (!validateCurrentStep()) {
+      toast.error("Please fix the validation errors before submitting");
       return;
     }
 
-    try {
-      const dataToSend = {
-        name: formData.name,
-        collegeId: formData.collegeId,
-        email: formData.email,
-        password: formData.password,
-        roles: formData.roles.map((r) => r.toUpperCase()),
-        rollNumber: formData.rollNumber || undefined,
-        year: formData.year ? parseInt(formData.year) : undefined,
-        branch: formData.branch || undefined,
-        department: formData.department || undefined,
-        designation: formData.designation || undefined,
-      };
+    // Validate roles
+    const validRoles = ["STUDENT", "FACULTY", "ADMIN"];
+    const roles = formData.roles
+      .map(r => r.toUpperCase())
+      .filter(r => validRoles.includes(r));
 
+    if (roles.length === 0) {
+      toast.error("Please select a valid role");
+      return;
+    }
+
+    // Prepare data for submission
+    const dataToSend = {
+      name: formData.name.trim(),
+      collegeId: formData.collegeId.trim(),
+      email: formData.email.trim().toLowerCase(),
+      password: formData.password,
+      roles,
+      rollNumber: formData.rollNumber.trim() || null,
+      year: formData.year ? parseInt(formData.year) : null,
+      branch: formData.branch.trim() || null,
+      department: formData.department.trim() || null,
+      designation: formData.designation.trim() || null,
+    };
+
+    // Remove null values to avoid backend issues
+    Object.keys(dataToSend).forEach(key => {
+      if (dataToSend[key] === null || dataToSend[key] === '') {
+        delete dataToSend[key];
+      }
+    });
+
+    try {
+      console.log("Sending registration data:", dataToSend); // Debug log
       await register(dataToSend);
       toast.success("Registration successful! 🎉");
       setTimeout(() => navigate("/login"), 1500);
     } catch (error) {
-      if (error.response?.data?.message) {
-        toast.error(`Registration failed: ${error.response.data.message}`);
-      } else {
-        toast.error("Something went wrong during registration.");
+      console.error("Full registration error:", error);
+      
+      let backendMessage = "An unexpected error occurred";
+      
+      if (error.response?.data) {
+        if (typeof error.response.data === 'string') {
+          backendMessage = error.response.data;
+        } else if (error.response.data.message) {
+          backendMessage = error.response.data.message;
+        } else if (error.response.data.errors) {
+          // Handle validation errors
+          const validationErrors = error.response.data.errors;
+          backendMessage = Object.values(validationErrors).join(', ');
+        } else {
+          backendMessage = JSON.stringify(error.response.data);
+        }
+      } else if (error.message) {
+        backendMessage = error.message;
       }
-      console.error("Registration error:", error);
-    }
-  };
 
-  const validateStep = () => {
-    if (currentStep === 1) {
-      return formData.name && formData.collegeId && formData.email;
+      toast.error(`Registration failed: ${backendMessage}`);
     }
-    if (currentStep === 2) {
-      return formData.password && formData.confirmPassword && formData.password === formData.confirmPassword;
-    }
-    return true;
   };
 
   return (
@@ -180,8 +332,11 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       required
                       placeholder="Enter your full name"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        errors.name ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
+                      }`}
                     />
+                    {errors.name && <p className="text-sm text-red-500 dark:text-red-400 mt-1">{errors.name}</p>}
                   </div>
 
                   <div>
@@ -195,8 +350,11 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       required
                       placeholder="Enter your college ID"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        errors.collegeId ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
+                      }`}
                     />
+                    {errors.collegeId && <p className="text-sm text-red-500 dark:text-red-400 mt-1">{errors.collegeId}</p>}
                   </div>
 
                   <div className="md:col-span-2">
@@ -210,13 +368,16 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       required
                       placeholder="Enter your email address"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        errors.email ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
+                      }`}
                     />
+                    {errors.email && <p className="text-sm text-red-500 dark:text-red-400 mt-1">{errors.email}</p>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300">
-                      Role
+                      Role *
                     </label>
                     <select
                       name="role"
@@ -252,11 +413,16 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       required
                       placeholder="Create a strong password"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        errors.password ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
+                      }`}
                     />
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      Minimum 8 characters with letters and numbers
-                    </p>
+                    {errors.password && <p className="text-sm text-red-500 dark:text-red-400 mt-1">{errors.password}</p>}
+                    {!errors.password && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Minimum 8 characters with letters and numbers
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -270,11 +436,11 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       required
                       placeholder="Confirm your password"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        errors.confirmPassword ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
+                      }`}
                     />
-                    {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                      <p className="text-sm text-red-500 dark:text-red-400 mt-1">Passwords do not match</p>
-                    )}
+                    {errors.confirmPassword && <p className="text-sm text-red-500 dark:text-red-400 mt-1">{errors.confirmPassword}</p>}
                   </div>
                 </div>
               </div>
@@ -384,8 +550,7 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={nextStep}
-                    disabled={!validateStep()}
-                    className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg"
+                    className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium shadow-lg"
                   >
                     Next
                   </button>
