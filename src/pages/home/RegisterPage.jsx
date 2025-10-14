@@ -190,6 +190,14 @@ export default function RegisterPage() {
         isValid = false;
       }
     }
+    if (currentStep === 3) {
+      if (!formData.rollNumber.trim()) {
+        newErrors.rollNumber = 'Roll Number is required';
+        isValid = false;
+      } else {
+        delete newErrors.rollNumber;
+      }
+    }
 
     setErrors(newErrors);
     return isValid;
@@ -201,6 +209,12 @@ export default function RegisterPage() {
     // Final validation before submission
     if (!validateCurrentStep()) {
       toast.error("Please fix the validation errors before submitting");
+      return;
+    }
+
+    // Ensure rollNumber is provided
+    if (!formData.rollNumber.trim()) {
+      toast.error("Roll number is required");
       return;
     }
 
@@ -217,24 +231,25 @@ export default function RegisterPage() {
 
     // Prepare data for submission
     const dataToSend = {
-      name: formData.name.trim(),
-      collegeId: formData.collegeId.trim(),
-      email: formData.email.trim().toLowerCase(),
-      password: formData.password,
-      roles,
-      rollNumber: formData.rollNumber.trim() || null,
-      year: formData.year ? parseInt(formData.year) : null,
-      branch: formData.branch.trim() || null,
-      department: formData.department.trim() || null,
-      designation: formData.designation.trim() || null,
-    };
+    name: formData.name.trim(),
+    collegeId: formData.collegeId.trim(),
+    email: formData.email.trim().toLowerCase(),
+    password: formData.password,
+    roles,
+    rollNumber: formData.rollNumber.trim(), // <-- always required now
+    year: formData.year ? parseInt(formData.year) : null,
+    branch: formData.branch?.trim() || null,
+    department: formData.department?.trim() || null,
+    designation: formData.designation?.trim() || null,
+  };
 
-    // Remove null values to avoid backend issues
-    Object.keys(dataToSend).forEach(key => {
-      if (dataToSend[key] === null || dataToSend[key] === '') {
-        delete dataToSend[key];
-      }
-    });
+  // Remove only truly optional nulls
+  Object.keys(dataToSend).forEach(key => {
+    if (dataToSend[key] === null || dataToSend[key] === '') {
+      delete dataToSend[key];
+    }
+  });
+
 
     try {
       console.log("Sending registration data:", dataToSend); // Debug log
@@ -467,16 +482,22 @@ export default function RegisterPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300">
-                      Roll Number
+                      Roll Number *
                     </label>
                     <input
                       type="text"
                       name="rollNumber"
                       value={formData.rollNumber}
                       onChange={handleChange}
+                      required
                       placeholder="Enter roll number"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        errors.rollNumber ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
+                      }`}
                     />
+                    {errors.rollNumber && (
+                      <p className="text-sm text-red-500 dark:text-red-400 mt-1">{errors.rollNumber}</p>
+                    )}
                   </div>
 
                   <div>
