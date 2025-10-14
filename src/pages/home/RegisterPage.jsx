@@ -241,29 +241,40 @@ export default function RegisterPage() {
       await register(dataToSend);
       toast.success("Registration successful! 🎉");
       setTimeout(() => navigate("/login"), 1500);
-    } catch (error) {
-      console.error("Full registration error:", error);
-      
-      let backendMessage = "An unexpected error occurred";
-      
-      if (error.response?.data) {
-        if (typeof error.response.data === 'string') {
-          backendMessage = error.response.data;
-        } else if (error.response.data.message) {
-          backendMessage = error.response.data.message;
-        } else if (error.response.data.errors) {
-          // Handle validation errors
-          const validationErrors = error.response.data.errors;
-          backendMessage = Object.values(validationErrors).join(', ');
-        } else {
-          backendMessage = JSON.stringify(error.response.data);
-        }
-      } else if (error.message) {
-        backendMessage = error.message;
-      }
-
+    } 
+    
+    catch (error) {
+      console.error("Registration error response:", error.response.data);
+      const backendMessage =
+        error.response.data.message ||
+        JSON.stringify(error.response.data) ||
+        error.message;
       toast.error(`Registration failed: ${backendMessage}`);
     }
+
+    // catch (error) {
+    //   console.error("Full registration error:", error);
+      
+    //   let backendMessage = "An unexpected error occurred";
+      
+    //   if (error.response?.data) {
+    //     if (typeof error.response.data === 'string') {
+    //       backendMessage = error.response.data;
+    //     } else if (error.response.data.message) {
+    //       backendMessage = error.response.data.message;
+    //     } else if (error.response.data.errors) {
+    //       // Handle validation errors
+    //       const validationErrors = error.response.data.errors;
+    //       backendMessage = Object.values(validationErrors).join(', ');
+    //     } else {
+    //       backendMessage = JSON.stringify(error.response.data);
+    //     }
+    //   } else if (error.message) {
+    //     backendMessage = error.message;
+    //   }
+
+    //   toast.error(`Registration failed: ${backendMessage}`);
+    // }
   };
 
   return (
