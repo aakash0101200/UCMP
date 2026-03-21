@@ -39,20 +39,6 @@ export default function RegisterPage() {
     }
   }, []);
 
-  // Toggle dark mode
-  const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
-
   // Email validation regex
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -204,6 +190,7 @@ export default function RegisterPage() {
   };
 
   const handleSubmit = async (e) => {
+    
     e.preventDefault();
 
     // Final validation before submission
@@ -491,8 +478,8 @@ export default function RegisterPage() {
                       onChange={handleChange}
                       required
                       placeholder="Enter roll number"
-                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                        errors.rollNumber ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
+                      className={`w-full px-4 py-3 border rounded-lg ${
+                        errors.rollNumber ? 'border-red-500' : 'border-gray-300'
                       }`}
                     />
                     {errors.rollNumber && (
