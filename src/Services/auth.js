@@ -75,6 +75,11 @@ export function register(user) {
     name: user.name,
     email: user.email,
     roles: user.roles?user.roles.map(r => r.toUpperCase()):[],
+    rollNumber: user.rollNumber || null,
+    year: user.year || null, 
+    branch: user.branch || null,
+    department: user.department || null,
+    designation: user.designation || null,
   };
   try{
     return API.post('/auth/register', data);
