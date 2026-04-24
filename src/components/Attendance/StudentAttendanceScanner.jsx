@@ -1,46 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import API from '../../Services/api';
 
 export default function StudentAttendanceScanner() {
     const [code, setCode] = useState('');
-    const [status, setStatus] = useState(null); // 'loading', 'success', 'error'
+    const [status, setStatus] = useState('idle'); // idle, loading, success, error
     const [message, setMessage] = useState('');
-
-    const sessionId = 1; // Assuming session id 1 matches the faculty's created session for this demo
+    const [activeSession, setActiveSession] = useState(null);
+    
+    useEffect(() => {
+        const fetchActiveSession = async () => {
+            try {
+                // This endpoint should return the current active session for the student
+                const response = await API.get('/attendance/active-session', {
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                setActiveSession(response.data); 
+            } catch (err) {
+                console.error("No active session found for your section.");
+            }
+        };
+        fetchActiveSession();
+    }, []);
 
     const handleMarkAttendance = () => {
-        if (code.length < 6) {
-             setMessage("Please enter the full 6-digit code");
-             return;
-        }
-
+        if (!activeSession) return setMessage("No active session found for your class.");
+        if (code.length !== 6) return setMessage("Please enter the 6-digit code.");
+        
         setStatus('loading');
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                try {
-                    const response = await API.post(`/attendance/mark`, { 
-                        sessionId: sessionId, code: code, latitude: lat, longitude: lon 
-                    });
-                    
-                    setStatus('success');
-                    setMessage("Attendance marked successfully! Location verified.");
-                } catch (error) {
-                    setStatus('error');
-                    // Get explicit error message from backend
-                    const explicitError = error.response?.data || "Failed to mark attendance. Backend may be rejecting it.";
-                    setMessage(explicitError);
-                    console.error("API Error", error);
-                }
-            }, (error) => {
+
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                const { latitude: lat, longitude: lon } = pos.coords;
+                
+                await API.post(`/attendance/mark`, { 
+                    sessionId: activeSession.id, 
+                    code: code, 
+                    latitude: lat, 
+                    longitude: lon 
+                });
+
+                setStatus('success');
+                setMessage("Attendance marked successfully!");
+            } catch (error) {
                 setStatus('error');
-                setMessage("Please allow location access to mark attendance.");
-            });
-        } else {
+                // Backend might return "Invalid Code", "Too far away", or "Session Expired"
+                setMessage(error.response?.data?.message || "Failed to mark attendance.");
+            }
+        }, (err) => {
             setStatus('error');
-            setMessage("Geolocation is not supported by your browser.");
-        }
+            setMessage("Location access denied. Please enable GPS.");
+        }, { enableHighAccuracy: true });
     };
 
     return (
