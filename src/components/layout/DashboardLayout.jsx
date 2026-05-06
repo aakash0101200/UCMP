@@ -68,6 +68,7 @@ export default function DashboardLayout({children, onLogout }) {
         <AppSidebar
           userName={profile.name}
           userRole={activeRole}
+          onLogout={onLogout}
         />
 
         <SidebarInset className="flex-1">

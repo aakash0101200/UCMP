@@ -1,6 +1,7 @@
 // components/navigation/AppSidebar.jsx
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { logout } from '../../Services/auth';
 import {
   Sidebar,
   SidebarHeader,
@@ -62,8 +63,9 @@ const menuConfigs = {
   ]
 };
 
-export function AppSidebar({ userRole = 'student', userName = 'User' }) {
+export function AppSidebar({ userRole = 'student', userName = 'User', onLogout }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
   const menuItems = menuConfigs[userRole] || menuConfigs.student;
@@ -78,10 +80,9 @@ export function AppSidebar({ userRole = 'student', userName = 'User' }) {
   };
 
   const handleLogout = () => {
-
-    // Add your logout logic here
-
-    console.log('Logout clicked');
+    logout();
+    if (onLogout) onLogout();
+    navigate('/login');
   };
 
   return (

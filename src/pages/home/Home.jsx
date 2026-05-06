@@ -7,50 +7,33 @@ import ImageCarousel from '../../components/layout/ImageCarousel';
 import { DotPattern } from "./../../components/magicui/dot-pattern"
 import { cn } from "../../lib/utils";
 
-import LightRays from "./../LightRays";
-
-
-
-
 const Home = () => {
-
 
   // Home component serves as the main page of the application
   // It includes the HeroSection, FeatureCard, and Footer components
 
   return (
-    <div className="bg-white dark:bg-black">
-      <LightRays
-        raysOrigin="top-center"
-        raysColor="#ffffff"
-        raysSpeed={1.5}
-        lightSpread={0.8}
-        rayLength={80}
-        followMouse={true}
-        mouseInfluence={0.1}
-        noiseAmount={0.1}
-        distortion={0.05}
-        className="custom-rays z-0 not-dark:hidden not-sm:hidden"
-      />
-
+    <div className="bg-white dark:bg-neutral-950 relative overflow-hidden min-h-screen">
+      {/* Elegant Ambient Background Glow instead of disco lights */}
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-500/10 dark:bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
       <DotPattern
         className={cn(
-          " absolute z-0 inset-0 [mask-image:radial-gradient(50vw_circle_at_center,white,transparent)] dark:[mask-image:radial-gradient(50vw_circle_at_center,black,transparent)]"
+          " absolute z-0 inset-0 [mask-image:radial-gradient(60vw_circle_at_top,white,transparent)] dark:[mask-image:radial-gradient(60vw_circle_at_top,black,transparent)] opacity-60"
         )}
         glow={true}
       />
-      <div className="px-10 pt-10 mx-auto max-w-7xl">
+      <div className="px-10 pt-10 mx-auto max-w-7xl relative z-10">
 
         <HeroSection />
       </div>
 
-      <div className=" my-8">
+      <div className=" my-8 relative z-10">
         <ImageCarousel/>
       </div>
 
       {/* Feature Card below*/}
-      <div className="px-10 pt-10 mx-auto max-w-7xl">
+      <div className="px-10 pt-10 mx-auto max-w-7xl relative z-10">
         <FeatureCard />
       </div>
 
@@ -58,7 +41,5 @@ const Home = () => {
     </div>
   );
 };
-
-
 
 export default Home;

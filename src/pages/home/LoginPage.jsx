@@ -353,7 +353,7 @@ import { login } from "../../Services/auth"; // adjust path if needed
 import { toast } from "react-toastify";
 import i1 from "../../assets/Scroll/i1.webp"; // New image import
 
-const LoginPage = () => {
+const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({
     collegeId: "",
     password: "",
@@ -375,7 +375,9 @@ const LoginPage = () => {
       const role = await login(formData.collegeId, formData.password);
 
       if (role) {
-        // Your existing logic for redirection
+        // Notify App.jsx that user is now authenticated
+        if (onLogin) onLogin();
+
         localStorage.setItem("role", role);
         if (role === "STUDENT") {
           navigate("/student");
