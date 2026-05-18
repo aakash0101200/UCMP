@@ -9,7 +9,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        aliceblue: '#f0f8ff', 
+        aliceblue: '#f0f8ff',
+        'login-bg': 'var(--login-bg)',
+        'login-panel': 'var(--login-panel)',
+        'login-panel-fg': 'var(--login-panel-fg)',
+        'login-panel-muted': 'var(--login-panel-muted)',
+        'login-fg': 'var(--login-fg)',
+        'login-muted': 'var(--login-muted)',
+        'login-border': 'var(--login-border)',
+        'login-input': 'var(--login-input)',
+        'login-icon': 'var(--login-icon)',
+        'login-accent': 'var(--login-accent)',
+        'login-accent-hover': 'var(--login-accent-hover)',
       },
       animation: {
         'fade-in': 'fadeIn 200ms ease-out forwards'
