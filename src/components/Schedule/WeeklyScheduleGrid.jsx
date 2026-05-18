@@ -1,0 +1,370 @@
+import React, { useState, useEffect } from 'react';
+import { getSectionSchedule, getFacultySchedule } from '../../Services/timetable';
+import { getProfile } from '../../Services/profile';
+import { getActiveRole } from '../../Services/auth';
+import { Clock, MapPin, User, BookOpen, AlertCircle, Loader2, LayoutGrid, List } from 'lucide-react';
+
+const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+const DAY_SHORT = { MONDAY: 'Mon', TUESDAY: 'Tue', WEDNESDAY: 'Wed', THURSDAY: 'Thu', FRIDAY: 'Fri', SATURDAY: 'Sat' };
+const TIME_SLOTS = [
+  '09:00', '10:00', '11:00', '12:00',
+  '13:00', // Lunch
+  '14:00', '15:00', '16:00'
+];
+
+const SUBJECT_COLORS = [
+  { bg: 'bg-indigo-500/15 dark:bg-indigo-500/25', border: 'border-indigo-500/40', text: 'text-indigo-700 dark:text-indigo-300', dot: 'bg-indigo-500' },
+  { bg: 'bg-emerald-500/15 dark:bg-emerald-500/25', border: 'border-emerald-500/40', text: 'text-emerald-700 dark:text-emerald-300', dot: 'bg-emerald-500' },
+  { bg: 'bg-amber-500/15 dark:bg-amber-500/25', border: 'border-amber-500/40', text: 'text-amber-700 dark:text-amber-300', dot: 'bg-amber-500' },
+  { bg: 'bg-rose-500/15 dark:bg-rose-500/25', border: 'border-rose-500/40', text: 'text-rose-700 dark:text-rose-300', dot: 'bg-rose-500' },
+  { bg: 'bg-cyan-500/15 dark:bg-cyan-500/25', border: 'border-cyan-500/40', text: 'text-cyan-700 dark:text-cyan-300', dot: 'bg-cyan-500' },
+  { bg: 'bg-violet-500/15 dark:bg-violet-500/25', border: 'border-violet-500/40', text: 'text-violet-700 dark:text-violet-300', dot: 'bg-violet-500' },
+  { bg: 'bg-orange-500/15 dark:bg-orange-500/25', border: 'border-orange-500/40', text: 'text-orange-700 dark:text-orange-300', dot: 'bg-orange-500' },
+  { bg: 'bg-pink-500/15 dark:bg-pink-500/25', border: 'border-pink-500/40', text: 'text-pink-700 dark:text-pink-300', dot: 'bg-pink-500' },
+];
+
+function getSubjectColor(subjectCode, colorMap) {
+  if (!colorMap.has(subjectCode)) {
+    colorMap.set(subjectCode, SUBJECT_COLORS[colorMap.size % SUBJECT_COLORS.length]);
+  }
+  return colorMap.get(subjectCode);
+}
+
+function getCurrentDay() {
+  return ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'][new Date().getDay()];
+}
+
+function isCurrentSlot(day, timeStr) {
+  const now = new Date();
+  if (day !== getCurrentDay()) return false;
+  return now.getHours() === parseInt(timeStr.split(':')[0]);
+}
+
+// Hook: detect mobile screen
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < breakpoint);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, [breakpoint]);
+  return isMobile;
+}
+
+export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
+  const isMobile = useIsMobile();
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [viewMode, setViewMode] = useState(isMobile ? 'list' : 'grid');
+  const [mobileDay, setMobileDay] = useState(getCurrentDay()); // Mobile: show one day at a time
+  const role = getActiveRole();
+
+  // Auto-switch to list on mobile
+  useEffect(() => {
+    if (isMobile && viewMode === 'grid') setViewMode('list');
+  }, [isMobile]);
+
+  useEffect(() => {
+    async function fetchSchedule() {
+      setLoading(true);
+      setError(null);
+      try {
+        const collegeId = localStorage.getItem('collegeId');
+        const profileRes = await getProfile(collegeId);
+        const profile = profileRes.data;
+
+        let res;
+        if (role === 'STUDENT' && profile.student?.sectionId) {
+          res = await getSectionSchedule(profile.student.sectionId, term);
+        } else if (role === 'FACULTY' && profile.faculty?.facultyId) {
+          res = await getFacultySchedule(profile.faculty.facultyId, term);
+        } else {
+          setError('No schedule data available for your role.');
+          setLoading(false);
+          return;
+        }
+        setEntries(res.data || []);
+      } catch (err) {
+        console.error('Failed to load schedule:', err);
+        setError('Failed to load schedule. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSchedule();
+  }, [role, term]);
+
+  // Build lookup: "MONDAY|09:00" → entry
+  // Backend sends startTime as "09:00:00" (with seconds), normalize to "09:00"
+  const scheduleMap = {};
+  const colorMap = new Map();
+  entries.forEach((e) => {
+    const normalizedTime = e.startTime?.substring(0, 5);
+    const key = `${e.day}|${normalizedTime}`;
+    scheduleMap[key] = e;
+  });
+
+  const today = getCurrentDay();
+
+  // ─── Loading / Error / Empty states ────────────────────────────────
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+        <span className="ml-3 text-muted-foreground">Loading schedule...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+        <AlertCircle className="h-10 w-10 text-rose-500 mb-3" />
+        <p className="text-muted-foreground text-sm">{error}</p>
+      </div>
+    );
+  }
+
+  if (entries.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+        <BookOpen className="h-10 w-10 text-muted-foreground/50 mb-3" />
+        <p className="text-lg font-medium text-muted-foreground">No schedule found</p>
+        <p className="text-sm text-muted-foreground/70 mt-1">
+          Timetable for term <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{term}</span> hasn't been generated yet.
+        </p>
+      </div>
+    );
+  }
+
+  // ─── Render ────────────────────────────────────────────────────────
+  return (
+    <div className="space-y-4">
+      {/* Header — stacks on mobile */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold tracking-tight">
+            {role === 'STUDENT' ? 'My Class Schedule' : 'My Teaching Schedule'}
+          </h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Term: <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{term}</span>
+            <span className="ml-2 sm:ml-3">{entries.length} classes/week</span>
+          </p>
+        </div>
+        {/* View toggle — hide grid option on mobile */}
+        <div className="flex gap-1 bg-muted rounded-lg p-1 self-start sm:self-auto">
+          {!isMobile && (
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-3 py-1.5 text-xs rounded-md transition-all flex items-center gap-1.5
+                ${viewMode === 'grid' ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" /> Grid
+            </button>
+          )}
+          <button
+            onClick={() => setViewMode('list')}
+            className={`px-3 py-1.5 text-xs rounded-md transition-all flex items-center gap-1.5
+              ${viewMode === 'list' ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            <List className="h-3.5 w-3.5" /> List
+          </button>
+        </div>
+      </div>
+
+      {/* ─── MOBILE DAY PICKER (only in list mode on mobile) ──────────── */}
+      {isMobile && viewMode === 'list' && (
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+          <button
+            onClick={() => setMobileDay('ALL')}
+            className={`flex-shrink-0 px-3 py-1.5 text-xs rounded-full transition-all
+              ${mobileDay === 'ALL' ? 'bg-indigo-500 text-white font-medium shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+          >
+            All
+          </button>
+          {DAYS.map(day => {
+            const hasClasses = entries.some(e => e.day === day);
+            return (
+              <button
+                key={day}
+                onClick={() => setMobileDay(day)}
+                className={`flex-shrink-0 px-3 py-1.5 text-xs rounded-full transition-all relative
+                  ${mobileDay === day
+                    ? 'bg-indigo-500 text-white font-medium shadow-sm'
+                    : day === today
+                      ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-medium'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'}
+                  ${!hasClasses ? 'opacity-50' : ''}`}
+              >
+                {DAY_SHORT[day]}
+                {day === today && mobileDay !== day && (
+                  <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {viewMode === 'grid' ? (
+        /* ─── GRID VIEW (tablet+desktop) ───────────────────────────────── */
+        <div className="overflow-x-auto rounded-xl border border-border/50 bg-background">
+          <table className="w-full border-collapse min-w-[700px]">
+            <thead>
+              <tr>
+                <th className="w-16 lg:w-20 px-2 lg:px-3 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider text-left border-b border-border/50 sticky left-0 bg-background z-10">
+                  <Clock className="h-3.5 w-3.5 inline mr-1" />Time
+                </th>
+                {DAYS.map((day) => (
+                  <th
+                    key={day}
+                    className={`px-1 lg:px-2 py-3 text-xs font-medium uppercase tracking-wider text-center border-b border-border/50 transition-colors
+                      ${day === today ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-muted-foreground'}`}
+                  >
+                    {DAY_SHORT[day]}
+                    {day === today && <span className="block text-[10px] font-normal">Today</span>}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {TIME_SLOTS.map((time) => {
+                const isLunch = time === '13:00';
+                return (
+                  <tr key={time} className={isLunch ? 'bg-muted/30' : ''}>
+                    <td className="px-2 lg:px-3 py-1 text-xs font-mono text-muted-foreground border-r border-border/30 whitespace-nowrap sticky left-0 bg-background z-10">
+                      {time}
+                    </td>
+                    {DAYS.map((day) => {
+                      if (isLunch) {
+                        return day === 'MONDAY' ? (
+                          <td key={day} colSpan={6} className="text-center py-2 text-xs text-muted-foreground italic">
+                            🍽️ Lunch Break
+                          </td>
+                        ) : null;
+                      }
+                      const entry = scheduleMap[`${day}|${time}`];
+                      const isCurrent = isCurrentSlot(day, time);
+                      if (!entry) {
+                        return (
+                          <td key={day} className={`p-0.5 lg:p-1 border border-border/20 ${day === today ? 'bg-indigo-500/5' : ''}`}>
+                            <div className="h-14 lg:h-16" />
+                          </td>
+                        );
+                      }
+                      const colors = getSubjectColor(entry.subjectCode, colorMap);
+                      return (
+                        <td key={day} className="p-0.5 lg:p-1 border border-border/20">
+                          <div className={`relative rounded-lg p-1.5 lg:p-2 h-14 lg:h-16 ${colors.bg} border ${colors.border} transition-all hover:scale-[1.02] cursor-default overflow-hidden
+                            ${isCurrent ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-background' : ''}`}
+                          >
+                            {isCurrent && (
+                              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+                            )}
+                            <p className={`text-[10px] lg:text-xs font-semibold truncate ${colors.text}`}>
+                              {entry.subjectCode}
+                            </p>
+                            <p className="text-[9px] lg:text-[10px] text-muted-foreground truncate mt-0.5">
+                              {entry.subjectName}
+                            </p>
+                            <div className="flex items-center gap-1 lg:gap-2 mt-0.5 lg:mt-1">
+                              <span className="text-[9px] lg:text-[10px] text-muted-foreground flex items-center gap-0.5">
+                                <MapPin className="h-2 w-2 lg:h-2.5 lg:w-2.5 flex-shrink-0" /><span className="truncate">{entry.roomName}</span>
+                              </span>
+                              {role === 'STUDENT' && (
+                                <span className="text-[9px] lg:text-[10px] text-muted-foreground items-center gap-0.5 hidden xl:flex">
+                                  <User className="h-2.5 w-2.5 flex-shrink-0" />{entry.facultyName?.split(' ')[0]}
+                                </span>
+                              )}
+                              {role === 'FACULTY' && (
+                                <span className="text-[9px] lg:text-[10px] text-muted-foreground items-center gap-0.5 hidden xl:flex">
+                                  {entry.sectionName}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        /* ─── LIST VIEW (all screens) ──────────────────────────────────── */
+        <div className="space-y-4">
+          {DAYS
+            .filter(day => {
+              if (isMobile && mobileDay !== 'ALL') return day === mobileDay;
+              return entries.some(e => e.day === day);
+            })
+            .map((day) => {
+              const dayEntries = entries
+                .filter(e => e.day === day)
+                .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+              if (dayEntries.length === 0 && isMobile && mobileDay === day) {
+                return (
+                  <div key={day} className="text-center py-8">
+                    <p className="text-sm text-muted-foreground">No classes on {DAY_SHORT[day]}</p>
+                  </div>
+                );
+              }
+              if (dayEntries.length === 0) return null;
+
+              return (
+                <div key={day}>
+                  <h3 className={`text-sm font-semibold mb-2 ${day === today ? 'text-indigo-600 dark:text-indigo-400' : 'text-muted-foreground'}`}>
+                    {day === today ? `📍 ${DAY_SHORT[day]} — Today` : DAY_SHORT[day]}
+                  </h3>
+                  <div className="space-y-2">
+                    {dayEntries.map((entry) => {
+                      const colors = getSubjectColor(entry.subjectCode, colorMap);
+                      const startNorm = entry.startTime?.substring(0, 5);
+                      const endNorm = entry.endTime?.substring(0, 5);
+                      return (
+                        <div key={entry.id} className={`flex items-center gap-3 sm:gap-4 rounded-xl p-2.5 sm:p-3 ${colors.bg} border ${colors.border}`}>
+                          <div className="text-center min-w-[50px] sm:min-w-[60px]">
+                            <p className="text-xs font-mono font-bold">{startNorm}</p>
+                            <p className="text-[10px] text-muted-foreground">{endNorm}</p>
+                          </div>
+                          <div className={`w-1 h-10 rounded-full flex-shrink-0 ${colors.dot}`} />
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-semibold truncate ${colors.text}`}>{entry.subjectName}</p>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <MapPin className="h-3 w-3 flex-shrink-0" />{entry.roomName}
+                              </span>
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <User className="h-3 w-3 flex-shrink-0" />{role === 'STUDENT' ? entry.facultyName : entry.sectionName}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded hidden sm:block">
+                            {entry.subjectCode}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      )}
+
+      {/* Subject Legend */}
+      <div className="flex flex-wrap gap-2 sm:gap-3 pt-2 border-t border-border/30">
+        {[...colorMap.entries()].map(([code, colors]) => (
+          <div key={code} className="flex items-center gap-1.5">
+            <span className={`h-2.5 w-2.5 rounded-full ${colors.dot}`} />
+            <span className="text-xs text-muted-foreground">{code}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

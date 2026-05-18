@@ -3,85 +3,90 @@ import API from '../../Services/api';
 import LiveAttendanceList from './LiveAttendanceList';
 
 export default function FacultyAttendanceSession() {
-    const [sessionActive, setSessionActive] = useState(false);
-    const [currentCode, setCurrentCode] = useState('');
-    const [countdown, setCountdown] = useState(15);
-    const [sessionId, setSessionId] = useState(null);
+    const [sessionActive, setSessionActive]     = useState(false);
+    const [currentCode, setCurrentCode]         = useState('');
+    const [countdown, setCountdown]             = useState(15);
+    const [sessionId, setSessionId]             = useState(null);
 
-    // NEW: State for sections
-    const [sections, setSections] = useState([]);
+    // Section + subject selection
+    const [sections, setSections]               = useState([]);
+    const [subjects, setSubjects]               = useState([]);
     const [selectedSectionId, setSelectedSectionId] = useState('');
+    const [selectedSubjectId, setSelectedSubjectId] = useState('');
 
-    // NEW: Fetch assigned sections on mount
+    // Fetch faculty's assigned sections on mount
     useEffect(() => {
-        const fetchSections = async () => {
-            try {
-                const response = await API.get(`/faculty/my-sections`);
-                setSections(response.data);
-                if (response.data.length > 0) {
-                    setSelectedSectionId(response.data[0].id); // Auto-select the first one
-                }
-            } catch (error) {
-                console.error("Failed to fetch sections:", error);
-            }
-        };
-        fetchSections();
+        API.get('/faculty/my-sections')
+            .then(r => {
+                setSections(r.data);
+                if (r.data.length > 0) setSelectedSectionId(r.data[0].id);
+            })
+            .catch(err => console.error('Failed to fetch sections:', err));
     }, []);
+
+    // When section changes, fetch subjects assigned to faculty for that section
+    useEffect(() => {
+        if (!selectedSectionId) { setSubjects([]); return; }
+        API.get('/timetable/assignments')
+            .then(r => {
+                // Filter assignments for the selected section
+                const filtered = (r.data || []).filter(
+                    a => String(a.sectionId) === String(selectedSectionId)
+                );
+                setSubjects(filtered);
+                setSelectedSubjectId(filtered.length > 0 ? filtered[0].subjectId : '');
+            })
+            .catch(() => {
+                // Fallback: fetch all subjects if assignment endpoint unavailable
+                API.get('/subjects').then(r => {
+                    setSubjects(r.data.map(s => ({ subjectId: s.id, subjectName: s.name, subjectCode: s.code })));
+                    setSelectedSubjectId(r.data.length > 0 ? r.data[0].id : '');
+                }).catch(() => setSubjects([]));
+            });
+    }, [selectedSectionId]);
 
     // Start session
     const startSession = async () => {
-        if (!selectedSectionId) {
-            alert("Please select a section before starting.");
-            return;
-        }
+        if (!selectedSectionId) { alert('Please select a section first.'); return; }
 
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+        navigator.geolocation.getCurrentPosition(
+            async ({ coords: { latitude: lat, longitude: lon } }) => {
                 try {
-                    const response = await API.post(`/attendance/start`, {
-                        sectionId: selectedSectionId, latitude: lat, longitude: lon, radiusInMeters: 50.0
+                    const res = await API.post('/attendance/start', {
+                        sectionId:      selectedSectionId,
+                        subjectId:      selectedSubjectId || null,   // ← subject tag
+                        latitude:       lat,
+                        longitude:      lon,
+                        radiusInMeters: 50.0,
                     });
-                    const data = response.data;
-                    setSessionId(data.id);
+                    setSessionId(res.data.id);
                     setSessionActive(true);
-                    fetchCode(data.id);
-                } catch (error) {
-                    console.error("Start Session Error:", error);
-                    alert("Error starting session. Check backend or faculty permissions.");
+                    fetchCode(res.data.id);
+                } catch (err) {
+                    console.error('Start Session Error:', err);
+                    alert('Error starting session. Check backend or faculty permissions.');
                 }
-            }, (error) => {
-                alert("Please allow location to start the attendance session.");
-            });
-        } else {
-            alert("Geolocation IS NOT available in your browser");
-        }
+            },
+            () => alert('Please allow location access to start the attendance session.')
+        );
     };
 
     const fetchCode = async (sId) => {
         try {
-            const response = await API.get(`/attendance/session/${sId}/code`);
-            if (response.status === 200) {
-                setCurrentCode(response.data.toString());
-            } else {
-                console.error("Failed to fetch code. Status:", response.status);
-            }
-            setCountdown(15);
-        } catch (error) {
-            console.error("Network error fetching code", error);
+            const res = await API.get(`/attendance/session/${sId}/code`);
+            if (res.status === 200) setCurrentCode(res.data.toString());
+        } catch (err) {
+            console.error('Network error fetching code:', err);
         }
+        setCountdown(15);
     };
 
     useEffect(() => {
         let interval;
         if (sessionActive && sessionId) {
             interval = setInterval(() => {
-                setCountdown((prev) => {
-                    if (prev <= 1) {
-                        fetchCode(sessionId);
-                        return 15;
-                    }
+                setCountdown(prev => {
+                    if (prev <= 1) { fetchCode(sessionId); return 15; }
                     return prev - 1;
                 });
             }, 1000);
@@ -90,12 +95,16 @@ export default function FacultyAttendanceSession() {
     }, [sessionActive, sessionId]);
 
     const stopSession = async () => {
-        if (sessionId) {
-            await API.post(`/attendance/session/${sessionId}/end`).catch(() => { });
-        }
+        if (sessionId) await API.post(`/attendance/session/${sessionId}/end`).catch(() => {});
         setSessionActive(false);
         setSessionId(null);
+        setCurrentCode('');
     };
+
+    // Find current subject label
+    const currentSubject = subjects.find(s =>
+        String(s.subjectId) === String(selectedSubjectId)
+    );
 
     return (
         <div className="p-6 mt-4 mb-4 bg-neutral-900 rounded-2xl border border-neutral-700 shadow-lg">
@@ -103,19 +112,47 @@ export default function FacultyAttendanceSession() {
 
             {!sessionActive ? (
                 <div className="flex flex-col gap-4 max-w-md">
-                    {/* NEW: Dropdown for Section Selection */}
-                    <select
-                        value={selectedSectionId}
-                        onChange={(e) => setSelectedSectionId(e.target.value)}
-                        className="w-full px-4 py-3 bg-neutral-950 text-white rounded-xl border border-neutral-700 focus:outline-none focus:border-indigo-500"
-                    >
-                        <option value="" disabled>Select a Section</option>
-                        {sections.map((section) => (
-                            <option key={section.id} value={section.id}>
-                                {section.sectionName}
+                    {/* Section selector */}
+                    <div>
+                        <label className="block text-xs text-neutral-400 mb-1 font-medium uppercase tracking-wider">
+                            Section
+                        </label>
+                        <select
+                            value={selectedSectionId}
+                            onChange={e => setSelectedSectionId(e.target.value)}
+                            className="w-full px-4 py-3 bg-neutral-950 text-white rounded-xl border border-neutral-700 focus:outline-none focus:border-indigo-500"
+                        >
+                            <option value="" disabled>Select a Section</option>
+                            {sections.map(s => (
+                                <option key={s.id} value={s.id}>{s.sectionName}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Subject selector — the critical addition */}
+                    <div>
+                        <label className="block text-xs text-neutral-400 mb-1 font-medium uppercase tracking-wider">
+                            Subject being taught
+                        </label>
+                        <select
+                            value={selectedSubjectId}
+                            onChange={e => setSelectedSubjectId(e.target.value)}
+                            disabled={subjects.length === 0}
+                            className="w-full px-4 py-3 bg-neutral-950 text-white rounded-xl border border-neutral-700 focus:outline-none focus:border-indigo-500 disabled:opacity-50"
+                        >
+                            <option value="" disabled>
+                                {subjects.length === 0 ? 'No subjects found for this section' : 'Select a Subject'}
                             </option>
-                        ))}
-                    </select>
+                            {subjects.map(s => (
+                                <option key={s.subjectId} value={s.subjectId}>
+                                    {s.subjectCode ? `${s.subjectCode} — ${s.subjectName}` : s.subjectName}
+                                </option>
+                            ))}
+                        </select>
+                        <p className="mt-1 text-xs text-neutral-500">
+                            Each session is tagged to this subject for accurate per-subject attendance stats.
+                        </p>
+                    </div>
 
                     <button
                         onClick={startSession}
@@ -127,12 +164,19 @@ export default function FacultyAttendanceSession() {
                 </div>
             ) : (
                 <div className="flex flex-col items-center py-6">
-                    <p className="text-gray-400 mb-4 font-medium uppercase tracking-wider text-sm">Project this code to the class</p>
+                    {currentSubject && (
+                        <div className="mb-4 px-4 py-2 bg-indigo-950/40 border border-indigo-500/30 rounded-xl text-sm text-indigo-300 font-medium">
+                            📚 {currentSubject.subjectCode} — {currentSubject.subjectName}
+                        </div>
+                    )}
+                    <p className="text-gray-400 mb-4 font-medium uppercase tracking-wider text-sm">
+                        Project this code to the class
+                    </p>
                     <div className="text-7xl font-mono text-white tracking-widest bg-neutral-950 px-10 py-6 rounded-2xl border border-neutral-700 shadow-inner">
                         {currentCode ? currentCode.split('').join(' ') : '------'}
                     </div>
                     <div className="mt-8 flex items-center gap-3 bg-indigo-950/30 px-6 py-3 rounded-full border border-indigo-500/30">
-                        <div className="w-5 h-5 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
+                        <div className="w-5 h-5 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin" />
                         <span className="text-indigo-400 font-medium tracking-wide">Refreshes in {countdown} sec</span>
                     </div>
                     <button
@@ -142,7 +186,7 @@ export default function FacultyAttendanceSession() {
                         End Session
                     </button>
                     <div className="w-full mt-10">
-                         <LiveAttendanceList sessionId={sessionId} />
+                        <LiveAttendanceList sessionId={sessionId} />
                     </div>
                 </div>
             )}

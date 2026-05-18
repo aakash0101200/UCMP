@@ -1,16 +1,12 @@
-// src/pages/FacultyDashboard.jsx
 import React from 'react';
-import DashboardLayout from "../../components/layout/DashboardLayout";
-import AssignmentPublisher from '../../components/Announcements/AssignmentPublisher';
-import FacultyAttendanceSession from '../../components/Attendance/FacultyAttendanceSession';
+import WeeklyScheduleGrid from '../../components/Schedule/WeeklyScheduleGrid';
 
 export default function FacultyDashboard() {
   return (
-    <>
-      <h2 className="text-2xl font-bold mb-4">Faculty Dashboard</h2>
-      <FacultyAttendanceSession />
-      {/* Your faculty-specific content */}
-      <AssignmentPublisher/>
-    </>
+    <div className="scroll-style space-y-6">
+      <h2 className="text-2xl font-bold">Faculty Dashboard</h2>
+      {/* Quick overview of today's schedule */}
+      <WeeklyScheduleGrid term="2026-27-ODD" />
+    </div>
   );
 }

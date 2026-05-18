@@ -58,6 +58,7 @@ const menuConfigs = {
     { title: 'Dashboard', to: '/admin', icon: BarChart3 },
     { title: 'Users', to: '/admin/users', icon: Users },
     { title: 'Courses', to: '/admin/courses', icon: BookOpen },
+    { title: 'Timetable', to: '/admin/timetable', icon: Calendar },
     { title: 'Reports', to: '/admin/reports', icon: FileText },
     { title: 'System', to: '/admin/system', icon: Shield },
   ]

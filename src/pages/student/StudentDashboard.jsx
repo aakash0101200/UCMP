@@ -1,81 +1,19 @@
 import React from "react";
-
-// Import the widgets that will be displayed on this page
-// import Calendar from "./Calendar";
-import AttendanceWidget from "../../components/Dashboard/AttendanceWidget";
-import AnnouncementTimeline from "../../components/Announcements/AnnouncementTimeline";
-import AssignmentPublisher from "../../components/Announcements/AssignmentPublisher";
-
 import Calendar from "../Calendar";
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import TimetableWidget from "../../components/Dashboard/TimetableWidget.jsx";
-// import ProfileCard from "@/components/Profile/ProfileCard";
 import BottomNavBar from "../../components/navigation/BottomNavBar";
 
 export default function StudentDashboard() {
   return (
-    <div className="scroll-style ">
-  
-
+    <div className="scroll-style">
       <h2 className="mb-4 text-2xl font-bold">Student Dashboard</h2>
 
       <div className="p-6 space-y-6">
-        <div className="flex justify-center gap-3 ">
+        <div className="flex justify-center gap-3">
           <Calendar />
-          <AssignmentPublisher classname="w-full" />
-
-
-
         </div>
       </div>
 
-
-
-      {/* Bottom navbar (mobile only) */}
       <BottomNavBar />
-
     </div>
-
-
   );
 }
-
-
-
-// // This is the main container for the dashboard page's content
-//     <div>
-//       {/* Page Title */}
-//       <h1 className="mb-6 text-3xl font-bold text-gray-800">
-//         Student Dashboard
-//       </h1>
-
-//       {/* GRID*/}
-
-//       <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
-
-//         {/*SIDEBAR*/}
-
-//         <div className="p-4 bg-white shadow-md lg:col-span-2 sm:p-6 rounded-xl">
-//           <Sidebar />
-//         </div>
-
-//         {/*CALENDAR*/}
-
-//         <div className="p-4 bg-white shadow-md lg:col-span-2 sm:p-6 rounded-xl">
-//           <Calendar />
-//         </div>
-
-//         {/*Attendance & Announcement */}
-
-//         <div className="space-y-6">
-
-//           <AttendanceWidget />
-//           <AnnouncementTimeline />
-
-//           {/* You can add more widgets here and they will stack vertically */}
-
-//         </div>
-
-//       </div>
-
-//     </div>
