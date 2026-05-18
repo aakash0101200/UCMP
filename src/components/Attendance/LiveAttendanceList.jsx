@@ -18,20 +18,20 @@ export default function LiveAttendanceList({ sessionId }) {
 
         fetchRecords();
         const interval = setInterval(fetchRecords, 5000); // Polls every 5 seconds
-        
+
         return () => clearInterval(interval);
     }, [sessionId]);
 
     return (
-        <div className="mt-6 p-4 border rounded shadow-sm bg-white">
-            <h3 className="text-lg font-bold mb-4">Live Attendance</h3>
-            
+        <div className="mt-6 p-4 border rounded shadow-sm bg-background-foreground">
+            <h3 className="text-black-700 font-bold mb-4">Live Attendance</h3>
+
             {records.length === 0 ? (
                 <p className="text-gray-500">No students have joined yet.</p>
             ) : (
                 <ul className="space-y-2">
                     {records.map((record, index) => (
-                        <li key={index} className="flex justify-between p-2 bg-gray-50 rounded">
+                        <li key={index} className="flex justify-between p-2 bg-gray-50 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-700/30 rounded text-slate-800 dark:text-slate-200">
                             <span className="font-medium">
                                 {record.name || 'Unknown Name'} ({record.collegeId})
                             </span>

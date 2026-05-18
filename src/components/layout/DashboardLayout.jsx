@@ -67,7 +67,7 @@ export default function DashboardLayout({children, onLogout }) {
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar
           userName={profile.name}
-          userRole={activeRole}
+          userRole={activeRole?.toLowerCase()}
           onLogout={onLogout}
         />
 

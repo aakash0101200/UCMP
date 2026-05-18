@@ -1,22 +1,12 @@
 import React from "react";
-
 import BottomNavBar from "@/components/navigation/BottomNavBar";
-import ScheduleTable from "../../components/ScheduleTable"
+import WeeklyScheduleGrid from "../../components/Schedule/WeeklyScheduleGrid";
+
 export default function SchedulePage() {
   return (
-    <div className="scroll-style ">
-
-      <h2 className="mb-4 text-2xl font-bold">Schedule: </h2>
-     
-
-
-
-      <ScheduleTable />
+    <div className="scroll-style">
+      <WeeklyScheduleGrid term="2026-27-ODD" />
       <BottomNavBar />
-
-
     </div>
-
-
   );
 }

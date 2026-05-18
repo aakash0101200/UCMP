@@ -23,20 +23,24 @@ import Courses from './pages/student/MyCoursesPage';
 import Schedule from './pages/student/SchedulePage';
 import Updates from './pages/student/UpdatesPage';
 
-
 import FacultyDashboard from './pages/faculty/FacultyDashboard';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import FacultySchedulePage from './pages/faculty/FacultySchedulePage';
+import FacultyStudentsPage from './pages/faculty/FacultyStudentsPage';
+import FacultyCoursesPage from './pages/faculty/FacultyCoursesPage';
+import FacultyGradebookPage from './pages/faculty/FacultyGradebookPage';
 
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminTimetablePage from './pages/admin/AdminTimetablePage';
 
 import 'react-toastify/dist/ReactToastify.css';
 import ProfilePage from './components/Profile/ProfilePage';
 
 // Layout to choose between public vs dashboard shells
 function AppShell({ children }) {
-    // useLocation must be inside BrowserRouter
+  // useLocation must be inside BrowserRouter
 
   const { pathname } = useLocation();
-  const isDashboard = 
+  const isDashboard =
     pathname.startsWith('/student') ||
     pathname.startsWith('/faculty') ||
     pathname.startsWith('/admin');
@@ -80,7 +84,7 @@ export default function App() {
         <Routes>
           {/* Public routes */}
 
-           <Route
+          <Route
             path="/"
             element={
               <AppShell>
@@ -96,7 +100,7 @@ export default function App() {
               </AppShell>
             }
           />
-          
+
           <Route
             path="/contact"
             element={
@@ -108,7 +112,7 @@ export default function App() {
           <Route
             path="/login"
             element={
-              isAuthenticated 
+              isAuthenticated
                 ? <Navigate to={`/${(localStorage.getItem("activeRole") || "student").toLowerCase()}`} replace />
                 : <AppShell><LoginPage onLogin={handleLogin} /></AppShell>
             }
@@ -122,40 +126,49 @@ export default function App() {
             }
           />
 
-          {/* Dashboard routes — all protected with onLogout */}
-          <Route path="/student/*" element={
-            isAuthenticated 
+          {/* ─── STUDENT routes (nested with Outlet) ─────────────────── */}
+          <Route path="/student" element={
+            isAuthenticated
               ? <DashboardLayout userRole="student" onLogout={handleLogout} />
               : <Navigate to="/login" replace />
           }>
-              <Route path="profile" element={<ProfilePage />} /> 
-              <Route index element={<StudentDashboard />} />
-              <Route path="assignment" element={<Assignment />} />
-              <Route path="attendance" element={<Attendance/>} />
-              <Route path="courses" element={<Courses/>} />
-              <Route path="schedule" element={<Schedule/>} />
-              <Route path="updates" element={<Updates/>} /> 
-              {/*Add more ... */}
+            <Route index element={<StudentDashboard />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="assignment" element={<Assignment />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="courses" element={<Courses />} />
+            <Route path="schedule" element={<Schedule />} />
+            <Route path="updates" element={<Updates />} />
           </Route>
-          
 
-          <Route path="/faculty/*" element={
-            isAuthenticated 
-              ? <DashboardLayout userRole="faculty" onLogout={handleLogout}>
-                  <FacultyDashboard />
-                </DashboardLayout>
+          {/* ─── FACULTY routes (nested with Outlet — same pattern as student) ── */}
+          <Route path="/faculty" element={
+            isAuthenticated
+              ? <DashboardLayout userRole="faculty" onLogout={handleLogout} />
               : <Navigate to="/login" replace />
-          } />
-          <Route path="/admin/*" element={
-            isAuthenticated 
-              ? <DashboardLayout userRole="admin" onLogout={handleLogout}>
-                  <AdminDashboard />
-                </DashboardLayout>
+          }>
+            <Route index element={<FacultyDashboard />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="courses" element={<FacultyCoursesPage />} />
+            <Route path="students" element={<FacultyStudentsPage />} />
+            <Route path="gradebook" element={<FacultyGradebookPage />} />
+            <Route path="schedule" element={<FacultySchedulePage />} />
+          </Route>
+
+          {/* ─── ADMIN routes ────────────────────────────────────────── */}
+          <Route path="/admin" element={
+            isAuthenticated
+              ? <DashboardLayout userRole="admin" onLogout={handleLogout} />
               : <Navigate to="/login" replace />
-          } />   
+          }>
+            <Route index element={<AdminDashboard />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="timetable" element={<AdminTimetablePage />} />
+          </Route>
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
       </BrowserRouter>
     </ThemeProvider>
   );
 }
+
