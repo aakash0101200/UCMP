@@ -5,7 +5,7 @@ import LiveAttendanceList from './LiveAttendanceList';
 export default function FacultyAttendanceSession() {
     const [sessionActive, setSessionActive]     = useState(false);
     const [currentCode, setCurrentCode]         = useState('');
-    const [countdown, setCountdown]             = useState(15);
+    const [countdown, setCountdown]             = useState(30);
     const [sessionId, setSessionId]             = useState(null);
 
     // Section + subject selection
@@ -78,7 +78,7 @@ export default function FacultyAttendanceSession() {
         } catch (err) {
             console.error('Network error fetching code:', err);
         }
-        setCountdown(15);
+        setCountdown(30);
     };
 
     useEffect(() => {
@@ -86,7 +86,7 @@ export default function FacultyAttendanceSession() {
         if (sessionActive && sessionId) {
             interval = setInterval(() => {
                 setCountdown(prev => {
-                    if (prev <= 1) { fetchCode(sessionId); return 15; }
+                    if (prev <= 1) { fetchCode(sessionId); return 30; }
                     return prev - 1;
                 });
             }, 1000);
