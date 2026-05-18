@@ -48,7 +48,7 @@ const LoginPage = ({ onLogin }) => {
         <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-login-accent opacity-5 translate-y-1/3 -translate-x-1/4" />
 
         {/* Branding */}
-        <div className="relative z-10 p-10">
+        <div className="relative z-10 p-10" style={{ paddingTop: '13px', paddingBottom: '0px' }}>
           <div className="flex items-center gap-3">
             {/* Logo mark */}
             <div className="w-9 h-9 rounded-lg bg-login-accent flex items-center justify-center shadow-sm">
@@ -74,7 +74,7 @@ const LoginPage = ({ onLogin }) => {
         </div>
 
         {/* Illustration */}
-        <div className="relative z-10 flex flex-1 items-center justify-center px-12 pb-10">
+        <div className="relative z-10 flex flex-1 items-center justify-center px-16 pb-20" style={{ paddingRight: '64px' }}>
           <img
             src={i1}
             alt="Campus management portal illustration"
@@ -83,20 +83,20 @@ const LoginPage = ({ onLogin }) => {
         </div>
 
         {/* Tagline */}
-        <div className="relative z-10 px-10 pb-10">
-          <p className="text-2xl font-bold leading-snug text-login-panel-fg text-balance">
+        <div className="relative z-10 px-10" style={{ marginTop: '20px', marginBottom: '-135px', paddingTop: '-38px', paddingBottom: '-31px' }}>
+          <p className="text-2xl font-bold leading-snug text-login-panel-fg text-balance" style={{ marginBottom: '65px', paddingBottom: '-26px' }}>
             Your campus,
             <br />
             all in one place.
           </p>
-          <p className="mt-2 text-sm text-login-panel-muted leading-relaxed">
+          <p className="mt-2 text-sm text-login-panel-muted leading-relaxed" style={{ marginBottom: '144px', paddingTop: '3px', paddingBottom: '3px', paddingLeft: '-2px' }}>
             Manage academics, attendance, schedules and more — seamlessly.
           </p>
         </div>
       </div>
 
       {/* ── RIGHT PANEL: Login Form ── */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 sm:px-12 lg:px-16">
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-0 sm:px-12 lg:px-16" style={{ paddingTop: '33px' }}>
         {/* Mobile logo */}
         <div className="flex lg:hidden items-center gap-2 mb-8">
           <div className="w-8 h-8 rounded-lg bg-login-accent flex items-center justify-center">
@@ -167,7 +167,8 @@ const LoginPage = ({ onLogin }) => {
                   required
                   autoComplete="username"
                   placeholder="e.g. CSE2024001"
-                  className="login-input pl-10"
+                  className="login-input"
+                  style={{ paddingLeft: '41px' }}
                 />
               </div>
             </div>
@@ -214,7 +215,8 @@ const LoginPage = ({ onLogin }) => {
                   required
                   autoComplete="current-password"
                   placeholder="Enter your password"
-                  className="login-input pl-10 pr-10"
+                  className="login-input pr-10"
+                  style={{ paddingLeft: '40px' }}
                 />
                 <button
                   type="button"
