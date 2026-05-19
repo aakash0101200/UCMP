@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { ThemeProvider } from './components/Theme/theme-provider';
@@ -167,6 +167,7 @@ export default function App() {
           </Route>
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
+        <SpeedInsights />
       </BrowserRouter>
     </ThemeProvider>
   );
