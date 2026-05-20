@@ -27,12 +27,10 @@ export default function FacultyAttendanceSession() {
     // When section changes, fetch subjects assigned to faculty for that section
     useEffect(() => {
         if (!selectedSectionId) { setSubjects([]); return; }
-        API.get('/timetable/assignments')
+        API.get(`/timetable/assignment/section/${selectedSectionId}?term=2026-27-ODD`)
             .then(r => {
-                // Filter assignments for the selected section
-                const filtered = (r.data || []).filter(
-                    a => String(a.sectionId) === String(selectedSectionId)
-                );
+                // Since this returns assignments specifically for the selected section, we just use the data
+                const filtered = r.data || [];
                 setSubjects(filtered);
                 setSelectedSubjectId(filtered.length > 0 ? filtered[0].subjectId : '');
             })

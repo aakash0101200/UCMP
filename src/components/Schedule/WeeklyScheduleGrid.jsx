@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getSectionSchedule, getFacultySchedule } from '../../Services/timetable';
+import { getSectionSchedule, getFacultySchedule, cancelClass } from '../../Services/timetable';
 import { getProfile } from '../../Services/profile';
 import { getActiveRole } from '../../Services/auth';
-import { Clock, MapPin, User, BookOpen, AlertCircle, Loader2, LayoutGrid, List } from 'lucide-react';
+import { Clock, MapPin, User, BookOpen, AlertCircle, Loader2, LayoutGrid, List, AlertTriangle, X } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 const DAY_SHORT = { MONDAY: 'Mon', TUESDAY: 'Tue', WEDNESDAY: 'Wed', THURSDAY: 'Thu', FRIDAY: 'Fri', SATURDAY: 'Sat' };
@@ -59,6 +60,39 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
   const [viewMode, setViewMode] = useState(isMobile ? 'list' : 'grid');
   const [mobileDay, setMobileDay] = useState(getCurrentDay()); // Mobile: show one day at a time
   const role = getActiveRole();
+
+  // Cancellation Modal States
+  const [selectedEntryForCancel, setSelectedEntryForCancel] = useState(null);
+  const [cancellationDate, setCancellationDate] = useState(new Date().toISOString().substring(0, 10));
+  const [cancellationReason, setCancellationReason] = useState('');
+  const [isSubmittingCancel, setIsSubmittingCancel] = useState(false);
+
+  const handleOpenCancelModal = (entry) => {
+    if (role !== 'FACULTY') return;
+    setSelectedEntryForCancel(entry);
+    setCancellationDate(new Date().toISOString().substring(0, 10));
+    setCancellationReason('');
+  };
+
+  const handleCancelSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedEntryForCancel) return;
+    setIsSubmittingCancel(true);
+    try {
+      await cancelClass(selectedEntryForCancel.id, {
+        cancellationDate,
+        reason: cancellationReason
+      });
+      toast.success(`Class successfully cancelled for ${cancellationDate}`);
+      setSelectedEntryForCancel(null);
+    } catch (err) {
+      console.error(err);
+      const errMsg = err.response?.data || "Failed to cancel class";
+      toast.error(typeof errMsg === 'string' ? errMsg : "Failed to cancel class");
+    } finally {
+      setIsSubmittingCancel(false);
+    }
+  };
 
   // Auto-switch to list on mobile
   useEffect(() => {
@@ -256,8 +290,11 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
                       const colors = getSubjectColor(entry.subjectCode, colorMap);
                       return (
                         <td key={day} className="p-0.5 lg:p-1 border border-border/20">
-                          <div className={`relative rounded-lg p-1.5 lg:p-2 h-14 lg:h-16 ${colors.bg} border ${colors.border} transition-all hover:scale-[1.02] cursor-default overflow-hidden
-                            ${isCurrent ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-background' : ''}`}
+                          <div 
+                            onClick={() => handleOpenCancelModal(entry)}
+                            className={`relative rounded-lg p-1.5 lg:p-2 h-14 lg:h-16 ${colors.bg} border ${colors.border} transition-all hover:scale-[1.02] overflow-hidden
+                              ${role === 'FACULTY' ? 'cursor-pointer hover:border-red-500/50' : 'cursor-default'}
+                              ${isCurrent ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-background' : ''}`}
                           >
                             {isCurrent && (
                               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
@@ -326,7 +363,12 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
                       const startNorm = entry.startTime?.substring(0, 5);
                       const endNorm = entry.endTime?.substring(0, 5);
                       return (
-                        <div key={entry.id} className={`flex items-center gap-3 sm:gap-4 rounded-xl p-2.5 sm:p-3 ${colors.bg} border ${colors.border}`}>
+                        <div 
+                          key={entry.id} 
+                          onClick={() => handleOpenCancelModal(entry)}
+                          className={`flex items-center gap-3 sm:gap-4 rounded-xl p-2.5 sm:p-3 ${colors.bg} border ${colors.border} transition-all
+                            ${role === 'FACULTY' ? 'cursor-pointer hover:border-red-500/50 hover:scale-[1.01]' : ''}`}
+                        >
                           <div className="text-center min-w-[50px] sm:min-w-[60px]">
                             <p className="text-xs font-mono font-bold">{startNorm}</p>
                             <p className="text-[10px] text-muted-foreground">{endNorm}</p>
@@ -365,6 +407,95 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
           </div>
         ))}
       </div>
+
+      {/* Cancellation Modal */}
+      {selectedEntryForCancel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-2xl animate-in fade-in zoom-in-95 text-left">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-2 text-red-400">
+                <AlertTriangle className="w-5 h-5" />
+                <h3 className="text-lg font-bold text-white">Cancel Class Exception</h3>
+              </div>
+              <button
+                onClick={() => setSelectedEntryForCancel(null)}
+                className="text-neutral-500 hover:text-white transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 mb-6 p-4 bg-neutral-950/60 rounded-xl border border-neutral-850">
+              <div>
+                <span className="text-[10px] text-neutral-500 uppercase font-semibold">Class</span>
+                <p className="text-sm font-bold text-white">{selectedEntryForCancel.subjectName} ({selectedEntryForCancel.subjectCode})</p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <span className="text-[10px] text-neutral-500 uppercase font-semibold">Section</span>
+                  <p className="text-xs text-neutral-300">{selectedEntryForCancel.sectionName}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-neutral-500 uppercase font-semibold">Time</span>
+                  <p className="text-xs text-neutral-300 font-mono">{selectedEntryForCancel.startTime?.substring(0, 5)} - {selectedEntryForCancel.endTime?.substring(0, 5)}</p>
+                </div>
+              </div>
+            </div>
+
+            <form onSubmit={handleCancelSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-neutral-400 mb-1">Cancellation Date</label>
+                <input
+                  type="date"
+                  required
+                  value={cancellationDate}
+                  onChange={e => setCancellationDate(e.target.value)}
+                  className="w-full px-3 py-2 text-sm bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none focus:border-red-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-400 mb-1">Reason for Cancellation</label>
+                <textarea
+                  required
+                  placeholder="e.g. Faculty on official duty, guest lecture scheduled..."
+                  value={cancellationReason}
+                  onChange={e => setCancellationReason(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 text-sm bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:border-red-500 resize-none"
+                />
+              </div>
+
+              <div className="p-3 bg-red-950/20 border border-red-900/30 rounded-xl text-[11px] text-red-400 leading-relaxed">
+                <strong>Attention:</strong> Submitting this cancellation will immediately cancel this day's class, update status, and broadcast alert notifications to all enrolled students.
+              </div>
+
+              <div className="flex gap-3 justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedEntryForCancel(null)}
+                  className="px-4 py-2 bg-neutral-950 border border-neutral-850 hover:bg-neutral-900 text-neutral-400 hover:text-white rounded-xl text-xs font-bold transition-all"
+                >
+                  Keep Scheduled
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingCancel}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {isSubmittingCancel ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Cancelling...
+                    </>
+                  ) : (
+                    "Confirm Cancellation"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

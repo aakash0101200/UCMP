@@ -11,6 +11,7 @@ import {
   getAttendanceSummary, getAttendanceHistory,
   getActiveSession, markAttendance
 } from '../../Services/attendance';
+import { useWebSocket } from '../../hooks/useWebSocket';
 
 // ── Colour helpers ─────────────────────────────────────────────────────────
 function getStatusColor(pct) {
@@ -66,6 +67,35 @@ function ScannerPanel({ onSuccess }) {
   const [message, setMessage] = useState('');
   const [activeSession, setActiveSession] = useState(null);
   const [loadingSession, setLoadingSession] = useState(true);
+
+  const sectionId = localStorage.getItem('sectionId');
+  const wsTopic = sectionId ? `/topic/session/${sectionId}` : null;
+
+  useWebSocket(
+    wsTopic,
+    useCallback((event) => {
+      console.log('Received session event via WebSocket:', event);
+      if (event.sessionId) {
+        if (event.startTime) {
+          // Session Started
+          setActiveSession({
+            id: event.sessionId,
+            sectionName: event.sectionName
+          });
+          setStatus('idle');
+          setMessage('');
+          setCode('');
+          toast.info(`New class session started: ${event.subjectName} (${event.sectionName})`);
+        } else {
+          // Session Ended
+          setActiveSession(null);
+          setStatus('idle');
+          setMessage('Session ended by instructor.');
+          toast.warn('Class session has ended.');
+        }
+      }
+    }, [])
+  );
 
   useEffect(() => {
     getActiveSession()
@@ -151,21 +181,33 @@ function ScannerPanel({ onSuccess }) {
 // ── History Item ───────────────────────────────────────────────────────────
 function HistoryItem({ record, index }) {
   const date = new Date(record.markedAt);
+  const isManual = record.markedBy === 'FACULTY_MANUAL';
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.04 }}
-      className="flex items-center justify-between py-2.5 border-b border-border/30 last:border-0"
+      className="flex items-center justify-between py-3 border-b border-border/30 last:border-0"
     >
       <div className="flex items-center gap-3">
         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
         <div>
-          <div className="text-sm font-medium">{record.sectionName}</div>
-          <div className="text-xs text-muted-foreground">{date.toLocaleDateString()} · {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          <div className="text-sm font-semibold text-foreground">{record.subjectName || 'General Class'}</div>
+          <div className="text-xs text-muted-foreground mt-0.5">
+            {record.sectionName} · {date.toLocaleDateString()} · {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
         </div>
       </div>
-      <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Present</span>
+      <div className="flex items-center gap-2">
+        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${
+          isManual 
+            ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border-indigo-500/20' 
+            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+        }`}>
+          {isManual ? 'Faculty Manual' : 'TOTP Verified'}
+        </span>
+        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Present</span>
+      </div>
     </motion.div>
   );
 }

@@ -44,3 +44,7 @@ export const getAllSubjects = () => API.get('/subjects');
 export const getAllSections = () => API.get('/sections');
 export const getAllFaculties = () => API.get('/faculty');
 
+// ─── Class Cancellations ─────────────────────────────────
+export const cancelClass = (entryId, data) =>
+  API.post(`/timetable/entries/${entryId}/cancel`, data);
+
