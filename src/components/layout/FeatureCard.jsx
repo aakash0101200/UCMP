@@ -18,10 +18,10 @@ const FeatureCard = ({ icon, title, description }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 rounded-2xl p-6">
-          {features.map((feature) => {
+          {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <div className="bg-white/5 border-2 p-4 shadow-2xl rounded-3xl ">
+              <div key={index} className="bg-white/5 border-2 p-4 shadow-2xl rounded-3xl ">
                 <div className="flex justify-center mt-4 mb-2">
                   <div className="flex justify-center items-center w-15 h-15 mb-2 mx-auto bg-black/10 dark:bg-white/10 rounded-full ">
                     <Icon className="w-8 h-8" />
