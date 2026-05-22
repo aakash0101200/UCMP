@@ -66,7 +66,8 @@ export default function StudentDashboard() {
           try {
             const termsRes = await getAcademicTerms();
             const currentTerm = termsRes.data?.[0] || "SPRING_2026";
-            const todayStr = new Date().toISOString().split("T")[0];
+            const d = new Date();
+            const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             const scheduleRes = await getResolvedSectionSchedule(sectionId, todayStr, currentTerm);
             setClasses(scheduleRes.data || []);
           } catch (e) {
