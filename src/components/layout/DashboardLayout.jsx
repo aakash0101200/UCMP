@@ -11,7 +11,23 @@ import { getActiveSession } from '../../Services/attendance';
 import { Zap, Loader2 } from 'lucide-react';
 import { getAnnouncements, getSectionAnnouncements, getStudentAnnouncements } from '../../Services/announcements';
 
-export default function DashboardLayout({children, onLogout }) {
+const getSafeReadNotificationIds = () => {
+  try {
+    const stored = localStorage.getItem('readNotificationIds');
+    if (!stored) return [];
+    
+    const parsed = JSON.parse(stored);
+    // Ensure the data inside is actually an array before returning it
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.error("Failed to parse readNotificationIds from localStorage:", error);
+    // Clear the corrupted data so it doesn't break future sessions
+    localStorage.removeItem('readNotificationIds');
+    return [];
+  }
+};
+
+export default function DashboardLayout({ children, onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [profile, setProfile] = useState(null);
@@ -40,7 +56,7 @@ export default function DashboardLayout({children, onLogout }) {
       }
 
       if (res && res.data) {
-        const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
+        const readIds = getSafeReadNotificationIds();
         const mapped = res.data.map(item => {
           const id = item.id || item.announcementId;
           return {
@@ -62,21 +78,18 @@ export default function DashboardLayout({children, onLogout }) {
   }, [profile, activeRole, fetchAnnouncements]);
 
   // Subscribe to real-time global notifications
-  useWebSocket(
-    '/topic/notifications/global',
-    useCallback((newNotif) => {
-      console.log('Received global notification:', newNotif);
-      const id = newNotif.id || newNotif.announcementId;
-      const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
-      setNotifications(prev => {
-        if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
-        return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
-      });
-      toast.info(`Announcement: ${newNotif.title}`);
-    }, [])
-  );
+  useWebSocket('/topic/notifications/global', (newNotif) => {
+    console.log('Received global notification:', newNotif);
+    const id = newNotif.id || newNotif.announcementId;
+    const readIds = getSafeReadNotificationIds();
+    setNotifications(prev => {
+      if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
+      return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
+    });
+    toast.info(`Announcement: ${newNotif.title}`);
+  });
 
-  // Subscribe to real-time section notifications (students only)
+  // Dynamic configuration for student topic strings
   const studentSecId = profile?.student?.sectionId || localStorage.getItem('sectionId');
   const sectionNotificationTopic = (activeRole?.toLowerCase() === 'student' && studentSecId) 
     ? `/topic/notifications/section/${studentSecId}` 
@@ -87,53 +100,50 @@ export default function DashboardLayout({children, onLogout }) {
     ? `/topic/notifications/student/${collegeId}`
     : null;
 
-  useWebSocket(
-    sectionNotificationTopic,
-    useCallback((newNotif) => {
-      console.log('Received section notification:', newNotif);
-      const id = newNotif.id || newNotif.announcementId;
-      const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
-      setNotifications(prev => {
-        if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
-        return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
-      });
-      if (newNotif.type === 'TIMETABLE') {
-        toast.error(`Class Cancellation Alert: ${newNotif.title}`);
-      } else if (newNotif.type === 'ATTENDANCE_SESSION') {
-        toast.success(`Attendance Session Started: ${newNotif.title}`);
-      } else if (newNotif.type === 'SCHEDULE') {
-        toast.info(`Schedule Update: ${newNotif.title}`);
-      } else if (newNotif.type === 'SCHEDULE_OVERRIDE') {
-        toast.warning(`⚡ Schedule Override: ${newNotif.title}`);
-      } else {
-        toast.info(`New Section Alert: ${newNotif.title}`);
-      }
-    }, [])
-  );
+  // Subscribe to real-time section notifications (students only)
+  useWebSocket(sectionNotificationTopic, (newNotif) => {
+    console.log('Received section notification:', newNotif);
+    const id = newNotif.id || newNotif.announcementId;
+    const readIds = getSafeReadNotificationIds();
+    setNotifications(prev => {
+      if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
+      return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
+    });
+    
+    if (newNotif.type === 'TIMETABLE') {
+      toast.error(`Class Cancellation Alert: ${newNotif.title}`);
+    } else if (newNotif.type === 'ATTENDANCE_SESSION') {
+      toast.success(`Attendance Session Started: ${newNotif.title}`);
+    } else if (newNotif.type === 'SCHEDULE') {
+      toast.info(`Schedule Update: ${newNotif.title}`);
+    } else if (newNotif.type === 'SCHEDULE_OVERRIDE') {
+      toast.warning(`⚡ Schedule Override: ${newNotif.title}`);
+    } else {
+      toast.info(`New Section Alert: ${newNotif.title}`);
+    }
+  });
 
-  useWebSocket(
-    studentNotificationTopic,
-    useCallback((newNotif) => {
-      console.log('Received student-specific notification:', newNotif);
-      const id = newNotif.id || newNotif.announcementId;
-      const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
-      setNotifications(prev => {
-        if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
-        return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
-      });
-      if (newNotif.type === 'ATTENDANCE_WARNING') {
-        toast.error(`Attendance Warning: ${newNotif.title}`);
-      } else {
-        toast.info(`Personal Alert: ${newNotif.title}`);
-      }
-    }, [])
-  );
+  // Subscribe to real-time user-specific notifications
+  useWebSocket(studentNotificationTopic, (newNotif) => {
+    console.log('Received student-specific notification:', newNotif);
+    const id = newNotif.id || newNotif.announcementId;
+    const readIds = getSafeReadNotificationIds();
+    setNotifications(prev => {
+      if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
+      return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
+    });
+    if (newNotif.type === 'ATTENDANCE_WARNING') {
+      toast.error(`Attendance Warning: ${newNotif.title}`);
+    } else {
+      toast.info(`Personal Alert: ${newNotif.title}`);
+    }
+  });
 
   const handleMarkRead = useCallback((id) => {
-    const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
+    const readIds = getSafeReadNotificationIds();
     if (!readIds.includes(id)) {
-      readIds.push(id);
-      localStorage.setItem('readNotificationIds', JSON.stringify(readIds));
+      const updatedReadIds = [...readIds, id];
+      localStorage.setItem('readNotificationIds', JSON.stringify(updatedReadIds));
     }
     setNotifications(prev =>
       prev.map(n => ((n.id || n.announcementId) === id ? { ...n, isRead: true } : n))
@@ -141,61 +151,57 @@ export default function DashboardLayout({children, onLogout }) {
   }, []);
 
   const handleMarkAllRead = useCallback(() => {
-    const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
+    const readIds = getSafeReadNotificationIds();
+    const readSet = new Set(readIds);
+
     notifications.forEach(n => {
       const id = n.id || n.announcementId;
-      if (!readIds.includes(id)) {
-        readIds.push(id);
-      }
+      readSet.add(id);
     });
-    localStorage.setItem('readNotificationIds', JSON.stringify(readIds));
+
+    const updatedReadIds = Array.from(readSet);
+    localStorage.setItem('readNotificationIds', JSON.stringify(updatedReadIds));
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
   }, [notifications]);
 
-  // Subscribe to real-time session start/end notifications
+  // Subscribe to real-time attendance session channels
   const wsTopic = (activeRole?.toLowerCase() === 'student' && sectionId) ? `/topic/session/${sectionId}` : null;
 
-  useWebSocket(
-    wsTopic,
-    useCallback((event) => {
-      console.log('Layout received session event via WebSocket:', event);
-      if (event.sessionId) {
-        if (event.startTime) {
-          setActiveSession({
-            id: event.sessionId,
-            subjectName: event.subjectName,
-            subjectCode: event.subjectCode
-          });
-          toast.info(`Attendance session started: ${event.subjectName}`);
-        } else {
-          setActiveSession(null);
-          toast.warn('Attendance session has ended.');
-        }
+  useWebSocket(wsTopic, (event) => {
+    console.log('Layout received session event via WebSocket:', event);
+    if (event.sessionId) {
+      if (event.startTime) {
+        setActiveSession({
+          id: event.sessionId,
+          subjectName: event.subjectName,
+          subjectCode: event.subjectCode
+        });
+        toast.info(`Attendance session started: ${event.subjectName}`);
+      } else {
+        setActiveSession(null);
+        toast.warn('Attendance session has ended.');
       }
-    }, [])
-  );
+    }
+  });
 
   // Subscribe to real-time class cancellations
   const wsCancellationTopic = (activeRole?.toLowerCase() === 'student' && sectionId) ? `/topic/cancellation/${sectionId}` : null;
 
-  useWebSocket(
-    wsCancellationTopic,
-    useCallback((event) => {
-      console.log('Layout received class cancellation event via WebSocket:', event);
-      toast.error(
-        <div className="text-left">
-          <span className="font-bold text-red-400 block mb-1">⚠️ Class Cancelled!</span>
-          <p className="text-xs text-white">
-            <strong>{event.subjectName}</strong> ({event.subjectCode}) on {event.cancellationDate} at {event.timeSlot} is cancelled.
-          </p>
-          <p className="text-[10px] text-neutral-400 mt-1 italic">Reason: "{event.reason}"</p>
-        </div>,
-        { autoClose: 10000 }
-      );
-    }, [])
-  );
+  useWebSocket(wsCancellationTopic, (event) => {
+    console.log('Layout received class cancellation event via WebSocket:', event);
+    toast.error(
+      <div className="text-left">
+        <span className="font-bold text-red-400 block mb-1">⚠️ Class Cancelled!</span>
+        <p className="text-xs text-white">
+          <strong>{event.subjectName}</strong> ({event.subjectCode}) on {event.cancellationDate} at {event.timeSlot} is cancelled.
+        </p>
+        <p className="text-[10px] text-neutral-400 mt-1 italic">Reason: "{event.reason}"</p>
+      </div>,
+      { autoClose: 10000 }
+    );
+  });
 
-  // Poll for already-active session on load/role change
+  // Poll for already-active sessions on layout mount
   useEffect(() => {
     if (activeRole?.toLowerCase() === 'student') {
       getActiveSession()
@@ -216,7 +222,7 @@ export default function DashboardLayout({children, onLogout }) {
     }
   }, [activeRole]);
   
-  // This useEffect fetches the full profile when the component mounts or the active role changes.
+  // Fetch full core profile
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -244,7 +250,7 @@ export default function DashboardLayout({children, onLogout }) {
     }
   }, [activeRole, navigate, onLogout]);
 
-  // This useEffect ensures the user is on the correct dashboard route for their active role.
+  // Handle active dashboard cross-role boundary security redirect paths
   useEffect(() => {
     if (activeRole) {
       const pathRole = location.pathname.split('/')[1];
@@ -255,13 +261,11 @@ export default function DashboardLayout({children, onLogout }) {
     }
   }, [activeRole, location.pathname, navigate]);
 
-  // Handler for role switching, which updates both local state and persistent storage.
   const handleRoleSwitch = (newRole) => {
     setActiveRole(newRole);
     setActiveRoleState(newRole);
   };
 
-  // Do not render the content until the profile is loaded to prevent errors.
   if (!profile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground transition-colors duration-300">
