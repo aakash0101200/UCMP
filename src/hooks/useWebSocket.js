@@ -11,6 +11,12 @@ const getWsUrl = () => {
 export const useWebSocket = (topic, onMessageReceived) => {
   const clientRef = useRef(null);
   const [connected, setConnected] = useState(false);
+  const callbackRef = useRef(onMessageReceived);
+
+  // Keep callbackRef updated on every render
+  useEffect(() => {
+    callbackRef.current = onMessageReceived;
+  }, [onMessageReceived]);
 
   useEffect(() => {
     if (!topic) return;
@@ -27,7 +33,9 @@ export const useWebSocket = (topic, onMessageReceived) => {
           if (message.body) {
             try {
               const payload = JSON.parse(message.body);
-              onMessageReceived(payload);
+              if (callbackRef.current) {
+                callbackRef.current(payload);
+              }
             } catch (err) {
               console.error("Error parsing WebSocket message:", err);
             }
@@ -52,7 +60,7 @@ export const useWebSocket = (topic, onMessageReceived) => {
         console.log(`STOMP client deactivated for topic: ${topic}`);
       }
     };
-  }, [topic, onMessageReceived]);
+  }, [topic]);
 
   return connected;
 };

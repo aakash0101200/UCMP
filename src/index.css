@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import "tailwindcss";
 
@@ -39,10 +39,10 @@ html {
   animation: bounce 2s infinite;
 }
 
-@custom-variant dark (.dark &);
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
   color-scheme: light dark;
   --radius: 0.625rem;
   /* Page bg: light gray so cards (white) visually 'float' */
@@ -213,7 +213,30 @@ html {
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+
+  h1 {
+    @apply font-semibold tracking-tight text-3xl md:text-4xl mb-6;
+  }
+
+  h2 {
+    @apply font-medium tracking-tight text-2xl mb-4;
+  }
+
+  h3 {
+    @apply font-medium tracking-tight text-xl mb-3;
+  }
+
+  h4, h5, h6 {
+    @apply font-medium tracking-tight text-lg mb-2;
+  }
+
+  /* Global typography overrides to prevent aggressive uppercase transforms and excessive weights on labels */
+  label {
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-weight: 500 !important;
   }
 }
 
@@ -333,31 +356,15 @@ html {
   animation: glitch 1s infinite;
 }
 
-
-
-
-
-/* @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+/* ==========================================================================
+   Form Fields Unified Theme Styles (Clean inputs inside cards)
+   ========================================================================== */
+.bg-card label {
+  @apply text-muted-foreground transition-colors duration-300;
 }
 
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-.animate-shimmer {
-  animation: shimmer 2s infinite;
-}
-
-@keyframes glitch {
-  0% { text-shadow: 2px 2px #22d3ee, -2px -2px #3b82f6; }
-  50% { text-shadow: -2px -2px #22d3ee, 2px 2px #3b82f6; }
-  100% { text-shadow: 2px 2px #22d3ee, -2px -2px #3b82f6; }
-}
-.animate-glitch {
-  animation: glitch 2s;
-} */
+.bg-card input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+.bg-card select,
+.bg-card textarea {
+  @apply bg-background text-foreground border-border/80 placeholder-muted-foreground/60 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all duration-200;
+}

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../../Services/auth"; // adjust path if needed
+import { login } from "../../Services/auth";
 import { toast } from "react-toastify";
-import i1 from "../../assets/Scroll/i1.webp"; // New image import
 
 const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -26,7 +25,6 @@ const LoginPage = ({ onLogin }) => {
       const role = await login(formData.collegeId, formData.password);
 
       if (role) {
-        // Notify App.jsx that user is now authenticated
         if (onLogin) onLogin();
 
         localStorage.setItem("role", role);
@@ -47,94 +45,150 @@ const LoginPage = ({ onLogin }) => {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen w-full transition-colors duration-500 not-dark:from-white not-dark:via-gray-100 not-dark:to-white dark:from-black dark:via-gray-900 dark:to-black">
-      {/* Animated Gradient Background */}
-      <div className="absolute inset-0 animate-gradient not-dark:bg-[radial-gradient(circle_at_50%_50%,#c0eaff,#ffffff,#e0f7ff)] dark:bg-[radial-gradient(circle_at_50%_50%,#1e3a8a,#0f172a,#000)]"></div>
+    <div className="relative min-h-screen overflow-hidden bg-background text-foreground transition-colors duration-300">
 
-      {/* Container: responsive layout */}
-      <div className="relative z-10 flex flex-col md:flex-row items-center w-full max-w-7xl min-h-[70vh] md:min-h-[80vh] lg:min-h-[70vh] mx-auto rounded-3xl overflow-visible shadow-xl">
+      {/* subtle ambient background */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[320px] bg-gradient-to-b from-indigo-500/5 to-transparent dark:from-indigo-400/5" />
 
-        {/* LEFT IMAGE: hidden on mobile, background on small screens */}
-        <div className="hidden sm:flex flex-1 items-center justify-center h-full p-4 md:p-6">
-          <img
-            src={i1}
-            alt="Illustration"
-            className="rounded-2xl shadow-lg object-contain max-h-[60vh] w-full"
-          />
-        </div>
+      <div className="relative flex min-h-screen items-center justify-center px-5 py-8 sm:px-6">
 
-        {/* RIGHT LOGIN FORM */}
-        <div className="flex flex-1 items-center justify-center h-full px-4 sm:px-6 md:px-12 lg:px-20">
-          <div className="w-full max-w-md p-6 sm:p-8 md:p-10 rounded-2xl backdrop-blur-xl border border-cyan-500/40 shadow-[0_0_30px_rgba(0,255,255,0.4)] animate-float group transition-transform duration-500 hover:scale-105 hover:shadow-cyan-400/60 max-h-[90%] overflow-auto relative bg-white/70 dark:bg-black/40">
+        <div className="mx-auto w-[92%] max-w-[390px] sm:w-full">
 
-            {/* Heading */}
-            <h2 className="mb-6 text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 animate-glitch">
-              LOGIN
-            </h2>
+          {/* Brand */}
+          <div className="mb-8 text-center">
+            {/* <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-border/70 bg-card shadow-sm">
+              <span className="text-sm font-semibold">AA</span>
+            </div> */}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <h1 className="text-3xl font-semibold tracking-tight text-card-foreground">
+              Welcome back
+            </h1>
+
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Sign in to access your academic workspace
+            </p>
+          </div>
+
+          {/* Card */}
+          <div className=" rounded-3xl border border-border/60 bg-card/95 p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] backdrop-blur sm:p-8 dark:shadow-black/20 ">
+
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-5"
+            >
 
               {/* College ID */}
-              <div>
-                <label className="block text-sm sm:text-base font-medium not-dark:text-cyan-700 dark:text-cyan-200">
+              <div className="space-y-2">
+                <label
+                  htmlFor="collegeId"
+                  className="text-sm font-medium text-muted-foreground"
+                >
                   College ID
                 </label>
+
                 <input
                   type="text"
-                  name="collegeId"
                   id="collegeId"
+                  name="collegeId"
                   value={formData.collegeId}
                   onChange={handleChange}
+                  placeholder="Enter your college ID"
                   required
-                  placeholder="Enter your ID"
-                  className="w-full px-3 py-2 sm:py-3 mt-1 rounded-lg not-dark:bg-white/70 dark:bg-black/40 not-dark:text-black dark:text-white not-dark:placeholder-gray-500 dark:placeholder-gray-400 border border-cyan-500/40 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:animate-pulse transition"
+                  className="
+                  h-11 w-full rounded-xl
+                  border border-border/80
+                  bg-background
+                  px-4
+                  text-sm
+                  outline-none
+                  transition-all duration-200
+                  placeholder:text-muted-foreground/50
+                  focus:border-indigo-500
+                  focus:ring-2
+                  focus:ring-indigo-500/10
+                  "
                 />
               </div>
 
               {/* Password */}
-              <div>
-                <label className="block text-sm sm:text-base font-medium not-dark:text-cyan-700 dark:text-cyan-200">
+              <div className="space-y-2">
+
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-muted-foreground"
+                >
                   Password
                 </label>
+
                 <input
                   type="password"
-                  name="password"
                   id="password"
+                  name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  required
                   placeholder="Enter your password"
-                  className="w-full px-3 py-2 sm:py-3 mt-1 rounded-lg not-dark:bg-white/70 dark:bg-black/40 not-dark:text-black dark:text-white not-dark:placeholder-gray-500 dark:placeholder-gray-400 border border-cyan-500/40 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:animate-pulse transition"
+                  required
+                  className="h-11 w-full rounded-xl border border-border/80 bg-background px-4 text-sm outline-none transition-all duration-200
+                  placeholder:text-muted-foreground/50 focus:border-indigo-500
+                  focus:ring-2 focus:ring-indigo-500/10 "
                 />
+                <div className="flex justify-end pt-1">
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      toast.info(
+                        "Password reset instructions have been sent to your registered email."
+                      )
+                    }
+                    className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    Forgot password?
+                  </button>
+
+                </div>
+
               </div>
-              
-              {/* Submit Button */}
+
+              {/* CTA */}
               <button
                 type="submit"
-                className="relative w-full py-2 sm:py-3 font-semibold text-white rounded-lg overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg transition-all duration-300 hover:shadow-cyan-400/80"
+                className="mt-2 h-11 w-full rounded-xl
+                bg-zinc-900 text-sm font-medium text-white
+                transition-all duration-200 hover:opacity-95 active:scale-[0.99] dark:bg-zinc-100
+                dark:text-zinc-900"
               >
-                <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent"></span>
-                <span className="relative z-10">Login</span>
+                Sign in
               </button>
 
-              {/* Register Link */}
-              <p className="mt-4 text-sm sm:text-base text-center not-dark:text-cyan-700 dark:text-cyan-200">
-                Don't have an account?{" "}
-                <Link to="/register" className="not-dark:text-cyan-600 dark:text-cyan-400 hover:underline">
-                  Register here
+            </form>
+
+            {/* footer */}
+            <div className="mt-6 border-t border-border/50 pt-5 text-center">
+
+              <p className="text-sm text-muted-foreground">
+                Don’t have an account?{" "}
+                <Link
+                  to="/register"
+                  className="
+                  font-medium
+                  text-foreground
+                  transition-opacity
+                  hover:opacity-70
+                  "
+                >
+                  Register
                 </Link>
               </p>
-            </form>
+
+            </div>
+
           </div>
+
         </div>
+
       </div>
-      
-      {/* Mobile Background Illustration */}
-      <img
-        src={i1}
-        alt="Background Illustration"
-        className="sm:hidden absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 opacity-20 pointer-events-none"
-      />
+
     </div>
   );
 };
