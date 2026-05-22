@@ -30,6 +30,7 @@ import FacultyGradebookPage from './pages/faculty/FacultyGradebookPage';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminTimetablePage from './pages/admin/AdminTimetablePage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
 
 import 'react-toastify/dist/ReactToastify.css';
 import ProfilePage from './components/Profile/ProfilePage';
@@ -162,6 +163,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="timetable" element={<AdminTimetablePage />} />
+          <Route path="users" element={<AdminUsersPage />} />
         </Route>
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />

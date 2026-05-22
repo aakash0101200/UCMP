@@ -87,3 +87,28 @@ export function register(user) {
     console.error(error.response?.data);
   }
 }
+
+export function adminCreateStudent(student) {
+  const data = {
+    collegeId: student.collegeId,
+    name: student.name,
+    email: student.email,
+    rollNumber: student.rollNumber,
+    year: parseInt(student.year),
+    batchId: parseInt(student.batchId),
+    sectionId: parseInt(student.sectionId)
+  };
+  return API.post('/admin/student', data);
+}
+
+export function adminCreateFaculty(faculty) {
+  const data = {
+    collegeId: faculty.collegeId,
+    name: faculty.name,
+    email: faculty.email,
+    department: faculty.department,
+    designation: faculty.designation,
+    sectionIds: faculty.sectionIds || []
+  };
+  return API.post('/admin/faculty', data);
+}
