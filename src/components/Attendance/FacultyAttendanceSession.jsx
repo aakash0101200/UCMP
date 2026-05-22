@@ -13,6 +13,18 @@ export default function FacultyAttendanceSession() {
     const [subjects, setSubjects]               = useState([]);
     const [selectedSectionId, setSelectedSectionId] = useState('');
     const [selectedSubjectId, setSelectedSubjectId] = useState('');
+    const [activeTerm, setActiveTerm] = useState('2026-27-ODD');
+
+    // Fetch available terms and select the latest one
+    useEffect(() => {
+        API.get('/timetable/terms')
+            .then(r => {
+                if (r.data && r.data.length > 0) {
+                    setActiveTerm(r.data[0]);
+                }
+            })
+            .catch(err => console.error('Failed to fetch terms:', err));
+    }, []);
 
     // Fetch faculty's assigned sections on mount
     useEffect(() => {
@@ -27,12 +39,10 @@ export default function FacultyAttendanceSession() {
     // When section changes, fetch subjects assigned to faculty for that section
     useEffect(() => {
         if (!selectedSectionId) { setSubjects([]); return; }
-        API.get('/timetable/assignments')
+        API.get(`/timetable/assignment/section/${selectedSectionId}?term=${activeTerm}`)
             .then(r => {
-                // Filter assignments for the selected section
-                const filtered = (r.data || []).filter(
-                    a => String(a.sectionId) === String(selectedSectionId)
-                );
+                // Since this returns assignments specifically for the selected section, we just use the data
+                const filtered = r.data || [];
                 setSubjects(filtered);
                 setSelectedSubjectId(filtered.length > 0 ? filtered[0].subjectId : '');
             })
@@ -43,7 +53,7 @@ export default function FacultyAttendanceSession() {
                     setSelectedSubjectId(r.data.length > 0 ? r.data[0].id : '');
                 }).catch(() => setSubjects([]));
             });
-    }, [selectedSectionId]);
+    }, [selectedSectionId, activeTerm]);
 
     // Start session
     const startSession = async () => {

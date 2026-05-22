@@ -1,32 +1,29 @@
 // src/utils/features.js
-import { BrainCircuit, CalendarSearch, ChartNoAxesCombined, FileCog, FileCog2, FileCogIcon, ServerCog, UserCheck,UserCheck2, UserRound, UsersRound } from "lucide-react";
-import Analysis from "../assets/cardnew/Analysis.png";
-import AttendanceIcon from "../assets/cardnew/attendance.png";
-import CentralizedManagement from "../assets/cardnew/CentralisedManagement.png";
-import RealTimeUpdates from "../assets/cardnew/RealTimeUpdates.png";
+import { CalendarSearch, ChartNoAxesCombined, ServerCog, UsersRound } from "lucide-react";
+
 export const features = [
   {
     id: 1,
     icon: UsersRound,
     title: "Attendance Tracking",
-    description: "Real-time attendance monitoring with percentage calculations"
+    description: "Monitor class attendance records in real-time with automated percentage calculations and visual progression logs."
   },
   {
     id: 2,
-    icon:  ServerCog,
-    title: "Centralized Management",
-    description: "Replace multiple disconnected tools with one unified platform for all academic and administrative needs."
+    icon: ServerCog,
+    title: "Centralized Ecosystem",
+    description: "Consolidate academic schedules, timetables, and resource allocation workflows into one unified dashboard interface."
   },
   {
     id: 3,
-    icon:  CalendarSearch ,
-    title: "Real-time Updates",
-    description: "Instant notifications and live updates ensure everyone stays informed about important announcements and deadlines."
+    icon: CalendarSearch,
+    title: "Instant Announcements",
+    description: "Stay updated with live alerts, push notifications, and broadcast details for timetable overrides and room shifts."
   },
   {
     id: 4,
-    icon:  ChartNoAxesCombined,
-    title: "Smart Analytics",
-    description: "Comprehensive attendance tracking with automated alerts when students fall below the 75% threshold."
+    icon: ChartNoAxesCombined,
+    title: "Intelligent Analytics",
+    description: "Gain performance insights with automated alerts and compliance tracking for student attendance requirements."
   }
 ];

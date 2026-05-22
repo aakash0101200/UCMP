@@ -21,6 +21,9 @@ export default defineConfig({
       
     },
   },
+  define: {
+    global: 'window', // Shims Node.js global to browser window
+  },
   
  
 })

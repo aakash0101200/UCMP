@@ -164,6 +164,7 @@ const LoginPage = ({ onLogin }) => {
                   name="collegeId"
                   value={formData.collegeId}
                   onChange={handleChange}
+                  placeholder="Enter your college ID"
                   required
                   autoComplete="username"
                   placeholder="e.g. CSE2024001"
@@ -345,6 +346,7 @@ const LoginPage = ({ onLogin }) => {
             .
           </p>
         </div>
+
       </div>
     </div>
   );

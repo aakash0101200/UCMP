@@ -30,13 +30,12 @@ export default function LandingNavBar() {
           </Link> */} 
 
            {/* Logo */}
-        <Link to="/" className="relative flex items-center h-20 w-38 mt-6">
+        <Link to="/" className="flex items-center">
           <img
-          src={blogo}
-          alt="Logo"
-          className="h-20 w-auto transition duration-300 
-               dark:invert dark:brightness-0"
-         />
+            src={blogo}
+            alt="Logo"
+            className="h-10 w-auto transition duration-300 dark:invert dark:brightness-0"
+          />
         </Link>
 
 
