@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import "tailwindcss";
 
@@ -39,10 +39,10 @@ html {
   animation: bounce 2s infinite;
 }
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (.dark &);
 
 :root {
-  font-family: 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
+  font-family: 'Roboto', sans-serif;
   color-scheme: light dark;
   --radius: 0.625rem;
   /* Page bg: light gray so cards (white) visually 'float' */
@@ -213,31 +213,65 @@ html {
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
   }
+}
 
-  h1 {
-    @apply font-semibold tracking-tight text-3xl md:text-4xl mb-6;
-  }
+/* ======================= */
+/* Login Page Design Tokens */
+/* ======================= */
 
-  h2 {
-    @apply font-medium tracking-tight text-2xl mb-4;
-  }
+:root {
+  /* Login-specific tokens — light mode */
+  --login-bg: oklch(0.968 0.003 264);
+  --login-panel: oklch(0.235 0.03 255);
+  --login-panel-fg: oklch(0.97 0 0);
+  --login-panel-muted: oklch(0.72 0.02 255);
+  --login-fg: oklch(0.17 0 0);
+  --login-muted: oklch(0.45 0.01 264);
+  --login-border: oklch(0.88 0.005 264);
+  --login-input: oklch(1 0 0);
+  --login-icon: oklch(0.58 0.01 264);
+  --login-accent: oklch(0.52 0.18 255);
+  --login-accent-hover: oklch(0.44 0.18 255);
+}
 
-  h3 {
-    @apply font-medium tracking-tight text-xl mb-3;
-  }
+.dark {
+  /* Login-specific tokens — dark mode */
+  --login-bg: oklch(0.13 0.01 255);
+  --login-panel: oklch(0.18 0.03 255);
+  --login-panel-fg: oklch(0.97 0 0);
+  --login-panel-muted: oklch(0.62 0.02 255);
+  --login-fg: oklch(0.94 0 0);
+  --login-muted: oklch(0.62 0.01 264);
+  --login-border: oklch(1 0 0 / 12%);
+  --login-input: oklch(1 0 0 / 6%);
+  --login-icon: oklch(0.55 0.01 264);
+  --login-accent: oklch(0.6 0.18 255);
+  --login-accent-hover: oklch(0.52 0.18 255);
+}
 
-  h4, h5, h6 {
-    @apply font-medium tracking-tight text-lg mb-2;
-  }
+/* Login input shared style */
+.login-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--login-border);
+  background-color: var(--login-input);
+  color: var(--login-fg);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
 
-  /* Global typography overrides to prevent aggressive uppercase transforms and excessive weights on labels */
-  label {
-    text-transform: none !important;
-    letter-spacing: normal !important;
-    font-weight: 500 !important;
-  }
+.login-input::placeholder {
+  color: var(--login-icon);
+}
+
+.login-input:focus {
+  border-color: var(--login-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--login-accent) 18%, transparent);
 }
 
 /* ======================= */
@@ -356,15 +390,31 @@ html {
   animation: glitch 1s infinite;
 }
 
-/* ==========================================================================
-   Form Fields Unified Theme Styles (Clean inputs inside cards)
-   ========================================================================== */
-.bg-card label {
-  @apply text-muted-foreground transition-colors duration-300;
+
+
+
+
+/* @keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-.bg-card input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
-.bg-card select,
-.bg-card textarea {
-  @apply bg-background text-foreground border-border/80 placeholder-muted-foreground/60 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all duration-200;
-}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px #22d3ee, -2px -2px #3b82f6; }
+  50% { text-shadow: -2px -2px #22d3ee, 2px 2px #3b82f6; }
+  100% { text-shadow: 2px 2px #22d3ee, -2px -2px #3b82f6; }
+}
+.animate-glitch {
+  animation: glitch 2s;
+} */
