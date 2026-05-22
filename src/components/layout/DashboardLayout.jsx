@@ -8,7 +8,8 @@ import { getActiveRole, setActiveRole } from "../../Services/auth.js";
 import { toast } from 'react-toastify';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { getActiveSession } from '../../Services/attendance';
-import { Zap } from 'lucide-react';
+import { Zap, Loader2 } from 'lucide-react';
+import { getAnnouncements, getSectionAnnouncements, getStudentAnnouncements } from '../../Services/announcements';
 
 export default function DashboardLayout({children, onLogout }) {
   const navigate = useNavigate();
@@ -16,9 +17,142 @@ export default function DashboardLayout({children, onLogout }) {
   const [profile, setProfile] = useState(null);
   const [activeRole, setActiveRoleState] = useState(getActiveRole());
   const [activeSession, setActiveSession] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+
+  const sectionId = localStorage.getItem('sectionId');
+
+  // Fetch initial announcements/notifications history
+  const fetchAnnouncements = useCallback(async () => {
+    try {
+      let res;
+      if (activeRole?.toLowerCase() === 'student') {
+        const studentSecId = profile?.student?.sectionId || localStorage.getItem('sectionId');
+        const collegeId = profile?.collegeId || localStorage.getItem('collegeId');
+        if (studentSecId && collegeId) {
+          res = await getStudentAnnouncements(collegeId, studentSecId);
+        } else if (studentSecId) {
+          res = await getSectionAnnouncements(studentSecId);
+        } else {
+          res = await getAnnouncements();
+        }
+      } else {
+        res = await getAnnouncements();
+      }
+
+      if (res && res.data) {
+        const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
+        const mapped = res.data.map(item => {
+          const id = item.id || item.announcementId;
+          return {
+            ...item,
+            isRead: readIds.includes(id)
+          };
+        });
+        setNotifications(mapped);
+      }
+    } catch (err) {
+      console.error('Failed to fetch announcements:', err);
+    }
+  }, [activeRole, profile]);
+
+  useEffect(() => {
+    if (profile && activeRole) {
+      fetchAnnouncements();
+    }
+  }, [profile, activeRole, fetchAnnouncements]);
+
+  // Subscribe to real-time global notifications
+  useWebSocket(
+    '/topic/notifications/global',
+    useCallback((newNotif) => {
+      console.log('Received global notification:', newNotif);
+      const id = newNotif.id || newNotif.announcementId;
+      const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
+      setNotifications(prev => {
+        if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
+        return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
+      });
+      toast.info(`Announcement: ${newNotif.title}`);
+    }, [])
+  );
+
+  // Subscribe to real-time section notifications (students only)
+  const studentSecId = profile?.student?.sectionId || localStorage.getItem('sectionId');
+  const sectionNotificationTopic = (activeRole?.toLowerCase() === 'student' && studentSecId) 
+    ? `/topic/notifications/section/${studentSecId}` 
+    : null;
+
+  const collegeId = profile?.collegeId || localStorage.getItem('collegeId');
+  const studentNotificationTopic = (activeRole?.toLowerCase() === 'student' && collegeId)
+    ? `/topic/notifications/student/${collegeId}`
+    : null;
+
+  useWebSocket(
+    sectionNotificationTopic,
+    useCallback((newNotif) => {
+      console.log('Received section notification:', newNotif);
+      const id = newNotif.id || newNotif.announcementId;
+      const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
+      setNotifications(prev => {
+        if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
+        return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
+      });
+      if (newNotif.type === 'TIMETABLE') {
+        toast.error(`Class Cancellation Alert: ${newNotif.title}`);
+      } else if (newNotif.type === 'ATTENDANCE_SESSION') {
+        toast.success(`Attendance Session Started: ${newNotif.title}`);
+      } else if (newNotif.type === 'SCHEDULE') {
+        toast.info(`Schedule Update: ${newNotif.title}`);
+      } else if (newNotif.type === 'SCHEDULE_OVERRIDE') {
+        toast.warning(`⚡ Schedule Override: ${newNotif.title}`);
+      } else {
+        toast.info(`New Section Alert: ${newNotif.title}`);
+      }
+    }, [])
+  );
+
+  useWebSocket(
+    studentNotificationTopic,
+    useCallback((newNotif) => {
+      console.log('Received student-specific notification:', newNotif);
+      const id = newNotif.id || newNotif.announcementId;
+      const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
+      setNotifications(prev => {
+        if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
+        return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
+      });
+      if (newNotif.type === 'ATTENDANCE_WARNING') {
+        toast.error(`Attendance Warning: ${newNotif.title}`);
+      } else {
+        toast.info(`Personal Alert: ${newNotif.title}`);
+      }
+    }, [])
+  );
+
+  const handleMarkRead = useCallback((id) => {
+    const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
+    if (!readIds.includes(id)) {
+      readIds.push(id);
+      localStorage.setItem('readNotificationIds', JSON.stringify(readIds));
+    }
+    setNotifications(prev =>
+      prev.map(n => ((n.id || n.announcementId) === id ? { ...n, isRead: true } : n))
+    );
+  }, []);
+
+  const handleMarkAllRead = useCallback(() => {
+    const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
+    notifications.forEach(n => {
+      const id = n.id || n.announcementId;
+      if (!readIds.includes(id)) {
+        readIds.push(id);
+      }
+    });
+    localStorage.setItem('readNotificationIds', JSON.stringify(readIds));
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+  }, [notifications]);
 
   // Subscribe to real-time session start/end notifications
-  const sectionId = localStorage.getItem('sectionId');
   const wsTopic = (activeRole?.toLowerCase() === 'student' && sectionId) ? `/topic/session/${sectionId}` : null;
 
   useWebSocket(
@@ -130,30 +264,37 @@ export default function DashboardLayout({children, onLogout }) {
   // Do not render the content until the profile is loaded to prevent errors.
   if (!profile) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading user profile...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground transition-colors duration-300">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-10 h-10 text-indigo-600 dark:text-[#6366F1] animate-spin" />
+          <p className="text-sm font-medium text-muted-foreground animate-pulse mt-4">
+            Loading academic profile...
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full bg-background">
+      <div className="flex min-h-screen w-full bg-background transition-colors duration-300">
         <AppSidebar
           userName={profile.name}
           userRole={activeRole?.toLowerCase()}
           onLogout={onLogout}
         />
 
-        <SidebarInset className="flex-1">
+        <SidebarInset className="flex-1 transition-colors duration-300">
           <DashboardNavBar 
             profile={profile}
             onLogout={onLogout}
             onRoleSwitch={handleRoleSwitch}
-            notificationCount={3}
+            notifications={notifications}
+            onMarkRead={handleMarkRead}
+            onMarkAllRead={handleMarkAllRead}
           />
 
-          <main className="flex-1 space-y-4 p-6 bg-sidebar/70">
+          <main className="flex-1 space-y-4 p-6 bg-sidebar/70 transition-colors duration-300">
             {activeSession && (
               <div className="p-4 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-lg backdrop-blur-sm animate-pulse text-left">
                 <div className="flex items-center gap-3">

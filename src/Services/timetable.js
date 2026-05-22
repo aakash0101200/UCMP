@@ -36,6 +36,9 @@ export const deleteAssignment = (id) =>
 // ─── Rooms ──────────────────────────────────────────────
 export const getAllRooms = () => API.get('/rooms');
 export const getAvailableRooms = () => API.get('/rooms/available');
+export const createRoom = (data) => API.post('/rooms', data);
+export const updateRoom = (id, data) => API.put(`/rooms/${id}`, data);
+export const deleteRoom = (id) => API.delete(`/rooms/${id}`);
 
 // ─── Subjects ───────────────────────────────────────────
 export const getAllSubjects = () => API.get('/subjects');
@@ -47,4 +50,27 @@ export const getAllFaculties = () => API.get('/faculty');
 // ─── Class Cancellations ─────────────────────────────────
 export const cancelClass = (entryId, data) =>
   API.post(`/timetable/entries/${entryId}/cancel`, data);
+
+// ─── AOCS Overrides & Resolved Schedules ──────────────────
+export const getResolvedSectionSchedule = (sectionId, date, term) =>
+  API.get(`/timetable/section/${sectionId}/resolved`, { params: { date, term } });
+
+export const getResolvedFacultySchedule = (facultyId, date, term) =>
+  API.get(`/timetable/faculty/${facultyId}/resolved`, { params: { date, term } });
+
+export const getFacultyAvailability = (date, startTime, endTime, subjectId, term) =>
+  API.get('/timetable/availability', { params: { date, startTime, endTime, subjectId, term } });
+
+export const createOverride = (data) =>
+  API.post('/timetable/override', data);
+
+export const cancelOverride = (id) =>
+  API.delete(`/timetable/override/${id}`);
+
+export const getAocsMetrics = (term) =>
+  API.get('/timetable/metrics', { params: { term } });
+
+export const getAcademicTerms = () =>
+  API.get('/timetable/terms');
+
 

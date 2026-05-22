@@ -1,9 +1,22 @@
+import { useNavigate } from 'react-router-dom';
 import vid from '../../assets/education.mp4';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const handleBeginJourney = () => {
+    const token = localStorage.getItem("token");
+    const activeRole = localStorage.getItem("activeRole") || localStorage.getItem("role");
+    if (token && activeRole) {
+      navigate(`/${activeRole.toLowerCase()}`);
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
 
-    <div className="flex flex-col items-center mt-4 lg:20">
+    <div className="flex flex-col items-center mt-4 lg:mt-20">
 
        <span className="bg-muted px-4 py-1 my-4 rounded-full z-10 text-xs border-2 border-neutral-600">
         🧠 | Learn Together
@@ -13,7 +26,7 @@ const HeroSection = () => {
          Welcome to Campus
       </h2>
       <h1 className="z-1  sm:text-6xl lg:text-7xl font-bold text-center mb-5 tracking-wide">
-          Unified Academic <span className="text-indigo-600">Management</span>
+           Unified Academic <span className="text-indigo-600">Management</span>
       </h1>
       <p className="z-1 text-lg sm:text-xl lg:text-2xl text-center text-neutral-800 dark:text-neutral-400 mb-6 max-w-4xl">
        Streamline academic workflows, track attendance, manage assignments,<br/> and stay connected with your 
@@ -22,11 +35,10 @@ const HeroSection = () => {
       <div className="z-1 flex justify-center my-10">
 
         <button 
-          
-          className="bg-indigo-600 text-white px-4 py-3 z-1 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-
+          onClick={handleBeginJourney}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 z-1 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
             Begin Your Journey!
-          </button>
+        </button>
       </div>
 
       <div className="flex mt-10 z-1 justify-center">

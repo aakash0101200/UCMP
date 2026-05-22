@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getSectionSchedule, getFacultySchedule, cancelClass } from '../../Services/timetable';
+import { getSectionSchedule, getFacultySchedule, getResolvedSectionSchedule, getResolvedFacultySchedule, cancelClass, getAcademicTerms } from '../../Services/timetable';
 import { getProfile } from '../../Services/profile';
 import { getActiveRole } from '../../Services/auth';
-import { Clock, MapPin, User, BookOpen, AlertCircle, Loader2, LayoutGrid, List, AlertTriangle, X } from 'lucide-react';
+import { Clock, MapPin, User, BookOpen, AlertCircle, Loader2, LayoutGrid, List, AlertTriangle, X, HelpCircle, Layers, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
@@ -41,6 +41,45 @@ function isCurrentSlot(day, timeStr) {
   return now.getHours() === parseInt(timeStr.split(':')[0]);
 }
 
+function getDatesForCurrentWeek() {
+  const current = new Date();
+  const day = current.getDay();
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const monday = new Date(current);
+  monday.setDate(current.getDate() + mondayOffset);
+
+  const dates = {};
+  const dayNames = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const date = String(d.getDate()).padStart(2, '0');
+    dates[dayNames[i]] = `${year}-${month}-${date}`;
+  }
+  return dates;
+}
+
+function getOverrideTooltip(entry) {
+  if (!entry) return undefined;
+  if (entry.isCancelled) return `CANCELLED: ${entry.overrideReason || 'No reason provided'}`;
+  let tooltip = '';
+  if (entry.isSubstituted) {
+    tooltip += `SUBSTITUTED: ${entry.originalFacultyName || 'Original'} replaced by ${entry.facultyName || 'Substitute'}. `;
+  }
+  if (entry.isRoomChanged) {
+    tooltip += `ROOM SHIFT: Originally ${entry.originalRoomName || 'Original Room'}, moved to ${entry.roomName || 'New Room'}. `;
+  }
+  if (entry.overrideType === 'MERGED_CLASS') {
+    tooltip += `MERGED: Combined with sections ${entry.mergedSectionNames?.join(', ') || 'N/A'}. `;
+  }
+  if (entry.overrideReason) {
+    tooltip += `Reason: ${entry.overrideReason}`;
+  }
+  return tooltip || undefined;
+}
+
 // Hook: detect mobile screen
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -54,12 +93,35 @@ function useIsMobile(breakpoint = 768) {
 
 export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
   const isMobile = useIsMobile();
+  const [selectedTerm, setSelectedTerm] = useState(term);
+  const [availableTerms, setAvailableTerms] = useState([]);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState(isMobile ? 'list' : 'grid');
   const [mobileDay, setMobileDay] = useState(getCurrentDay()); // Mobile: show one day at a time
   const role = getActiveRole();
+
+  useEffect(() => {
+    setSelectedTerm(term);
+  }, [term]);
+
+  useEffect(() => {
+    async function loadTerms() {
+      try {
+        const res = await getAcademicTerms();
+        if (res.data && res.data.length > 0) {
+          setAvailableTerms(res.data);
+          if (!res.data.includes(term)) {
+            setSelectedTerm(res.data[0]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load academic terms in grid:", err);
+      }
+    }
+    loadTerms();
+  }, []);
 
   // Cancellation Modal States
   const [selectedEntryForCancel, setSelectedEntryForCancel] = useState(null);
@@ -108,17 +170,37 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
         const profileRes = await getProfile(collegeId);
         const profile = profileRes.data;
 
-        let res;
+        let resEntries = [];
+        const weekDates = getDatesForCurrentWeek();
+
         if (role === 'STUDENT' && profile.student?.sectionId) {
-          res = await getSectionSchedule(profile.student.sectionId, term);
+          const promises = Object.values(weekDates).map(dateStr =>
+            getResolvedSectionSchedule(profile.student.sectionId, dateStr, selectedTerm)
+              .then(res => res.data || [])
+              .catch(err => {
+                console.error(`Failed to load resolved section schedule for ${dateStr}:`, err);
+                return [];
+              })
+          );
+          const results = await Promise.all(promises);
+          resEntries = results.flat();
         } else if (role === 'FACULTY' && profile.faculty?.facultyId) {
-          res = await getFacultySchedule(profile.faculty.facultyId, term);
+          const promises = Object.values(weekDates).map(dateStr =>
+            getResolvedFacultySchedule(profile.faculty.facultyId, dateStr, selectedTerm)
+              .then(res => res.data || [])
+              .catch(err => {
+                console.error(`Failed to load resolved faculty schedule for ${dateStr}:`, err);
+                return [];
+              })
+          );
+          const results = await Promise.all(promises);
+          resEntries = results.flat();
         } else {
           setError('No schedule data available for your role.');
           setLoading(false);
           return;
         }
-        setEntries(res.data || []);
+        setEntries(resEntries);
       } catch (err) {
         console.error('Failed to load schedule:', err);
         setError('Failed to load schedule. Please try again.');
@@ -127,7 +209,7 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
       }
     }
     fetchSchedule();
-  }, [role, term]);
+  }, [role, selectedTerm]);
 
   // Build lookup: "MONDAY|09:00" → entry
   // Backend sends startTime as "09:00:00" (with seconds), normalize to "09:00"
@@ -160,18 +242,6 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
     );
   }
 
-  if (entries.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-        <BookOpen className="h-10 w-10 text-muted-foreground/50 mb-3" />
-        <p className="text-lg font-medium text-muted-foreground">No schedule found</p>
-        <p className="text-sm text-muted-foreground/70 mt-1">
-          Timetable for term <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{term}</span> hasn't been generated yet.
-        </p>
-      </div>
-    );
-  }
-
   // ─── Render ────────────────────────────────────────────────────────
   return (
     <div className="space-y-4">
@@ -181,34 +251,59 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
           <h2 className="text-lg sm:text-xl font-bold tracking-tight">
             {role === 'STUDENT' ? 'My Class Schedule' : 'My Teaching Schedule'}
           </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            Term: <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{term}</span>
-            <span className="ml-2 sm:ml-3">{entries.length} classes/week</span>
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs text-muted-foreground">Term:</span>
+            {availableTerms.length > 0 ? (
+              <select
+                value={selectedTerm}
+                onChange={(e) => setSelectedTerm(e.target.value)}
+                className="text-xs border border-border/50 rounded px-1.5 py-0.5 bg-background text-foreground shadow-sm font-medium focus:ring-1 focus:ring-indigo-500 outline-none cursor-pointer"
+              >
+                {availableTerms.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            ) : (
+              <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{selectedTerm}</span>
+            )}
+            <span className="text-xs text-muted-foreground ml-2">{entries.length} classes/week</span>
+          </div>
         </div>
         {/* View toggle — hide grid option on mobile */}
-        <div className="flex gap-1 bg-muted rounded-lg p-1 self-start sm:self-auto">
-          {!isMobile && (
+        {entries.length > 0 && (
+          <div className="flex gap-1 bg-muted rounded-lg p-1 self-start sm:self-auto">
+            {!isMobile && (
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-1.5 text-xs rounded-md transition-all flex items-center gap-1.5
+                  ${viewMode === 'grid' ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" /> Grid
+              </button>
+            )}
             <button
-              onClick={() => setViewMode('grid')}
+              onClick={() => setViewMode('list')}
               className={`px-3 py-1.5 text-xs rounded-md transition-all flex items-center gap-1.5
-                ${viewMode === 'grid' ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+                ${viewMode === 'list' ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              <LayoutGrid className="h-3.5 w-3.5" /> Grid
+              <List className="h-3.5 w-3.5" /> List
             </button>
-          )}
-          <button
-            onClick={() => setViewMode('list')}
-            className={`px-3 py-1.5 text-xs rounded-md transition-all flex items-center gap-1.5
-              ${viewMode === 'list' ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            <List className="h-3.5 w-3.5" /> List
-          </button>
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* ─── MOBILE DAY PICKER (only in list mode on mobile) ──────────── */}
-      {isMobile && viewMode === 'list' && (
+      {entries.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center px-4 border border-dashed border-border/50 rounded-xl bg-background">
+          <BookOpen className="h-10 w-10 text-muted-foreground/50 mb-3" />
+          <p className="text-lg font-medium text-muted-foreground font-semibold">No schedule found</p>
+          <p className="text-sm text-muted-foreground/70 mt-1">
+            Timetable for term <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{selectedTerm}</span> hasn't been generated yet.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* ─── MOBILE DAY PICKER (only in list mode on mobile) ──────────── */}
+          {isMobile && viewMode === 'list' && (
         <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
           <button
             onClick={() => setMobileDay('ALL')}
@@ -288,34 +383,80 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
                         );
                       }
                       const colors = getSubjectColor(entry.subjectCode, colorMap);
+                      const isCancelled = entry.isCancelled;
+                      const tooltip = getOverrideTooltip(entry);
+                      
+                      // Soft-red background/border if cancelled
+                      const cellBg = isCancelled 
+                        ? 'bg-rose-500/10 dark:bg-rose-500/20 border-rose-500/30' 
+                        : `${colors.bg} ${colors.border}`;
+                      const textStyle = isCancelled 
+                        ? 'line-through text-rose-700/60 dark:text-rose-400/60' 
+                        : colors.text;
+
+                      const badges = [];
+                      if (entry.isCancelled) badges.push({ text: 'Cancelled', class: 'bg-rose-500/25 text-rose-700 dark:text-rose-400 border-rose-500/30' });
+                      if (entry.isSubstituted) badges.push({ text: 'Sub', class: 'bg-amber-500/25 text-amber-700 dark:text-amber-400 border-amber-500/30' });
+                      if (entry.isRoomChanged) badges.push({ text: 'Room', class: 'bg-blue-500/25 text-blue-700 dark:text-blue-400 border-blue-500/30' });
+                      if (entry.isTimeChanged) badges.push({ text: 'Shift', class: 'bg-purple-500/25 text-purple-700 dark:text-purple-400 border-purple-500/30' });
+                      if (entry.overrideType === 'MERGED_CLASS') badges.push({ text: 'Merged', class: 'bg-teal-500/25 text-teal-700 dark:text-teal-400 border-teal-500/30' });
+                      if (entry.entryType === 'EXTRA' || entry.overrideType === 'EXTRA_CLASS') badges.push({ text: 'Extra', class: 'bg-emerald-500/25 text-emerald-700 dark:text-emerald-400 border-emerald-500/30' });
+
                       return (
                         <td key={day} className="p-0.5 lg:p-1 border border-border/20">
                           <div 
                             onClick={() => handleOpenCancelModal(entry)}
-                            className={`relative rounded-lg p-1.5 lg:p-2 h-14 lg:h-16 ${colors.bg} border ${colors.border} transition-all hover:scale-[1.02] overflow-hidden
+                            title={tooltip}
+                            className={`relative rounded-lg p-1.5 lg:p-2 h-14 lg:h-16 ${cellBg} transition-all hover:scale-[1.02] overflow-hidden
                               ${role === 'FACULTY' ? 'cursor-pointer hover:border-red-500/50' : 'cursor-default'}
                               ${isCurrent ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-background' : ''}`}
                           >
-                            {isCurrent && (
+                            {isCurrent && !isCancelled && (
                               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
                             )}
-                            <p className={`text-[10px] lg:text-xs font-semibold truncate ${colors.text}`}>
+                            
+                            {/* Tiny Badges Indicator */}
+                            <div className="absolute top-1 right-1 flex gap-0.5">
+                              {badges.map((b, idx) => (
+                                <span key={idx} className={`text-[6px] lg:text-[7px] font-bold px-0.5 lg:px-1 py-0.2 rounded border ${b.class}`}>
+                                  {b.text}
+                                </span>
+                              ))}
+                            </div>
+
+                            <p className={`text-[10px] lg:text-xs font-semibold truncate ${textStyle}`}>
                               {entry.subjectCode}
                             </p>
-                            <p className="text-[9px] lg:text-[10px] text-muted-foreground truncate mt-0.5">
+                            <p className={`text-[9px] lg:text-[10px] text-muted-foreground truncate mt-0.5 ${isCancelled ? 'line-through' : ''}`}>
                               {entry.subjectName}
                             </p>
                             <div className="flex items-center gap-1 lg:gap-2 mt-0.5 lg:mt-1">
-                              <span className="text-[9px] lg:text-[10px] text-muted-foreground flex items-center gap-0.5">
-                                <MapPin className="h-2 w-2 lg:h-2.5 lg:w-2.5 flex-shrink-0" /><span className="truncate">{entry.roomName}</span>
+                              <span className={`text-[9px] lg:text-[10px] text-muted-foreground flex items-center gap-0.5 truncate ${isCancelled ? 'line-through' : ''}`}>
+                                <MapPin className="h-2.5 w-2.5 flex-shrink-0" />
+                                {entry.isRoomChanged ? (
+                                  <span className="truncate">
+                                    <span className="line-through text-muted-foreground/60 mr-0.5">{entry.originalRoomName}</span>
+                                    <strong className="text-foreground font-semibold dark:text-white">{entry.roomName}</strong>
+                                  </span>
+                                ) : (
+                                  <span className="truncate">{entry.roomName}</span>
+                                )}
                               </span>
                               {role === 'STUDENT' && (
-                                <span className="text-[9px] lg:text-[10px] text-muted-foreground items-center gap-0.5 hidden xl:flex">
-                                  <User className="h-2.5 w-2.5 flex-shrink-0" />{entry.facultyName?.split(' ')[0]}
+                                <span className={`text-[9px] lg:text-[10px] text-muted-foreground items-center gap-0.5 hidden xl:flex truncate ${isCancelled ? 'line-through' : ''}`}>
+                                  <User className="h-2.5 w-2.5 flex-shrink-0" />
+                                  {entry.isSubstituted ? (
+                                    <span className="truncate">
+                                      <span className="line-through text-muted-foreground/60 mr-0.5">{entry.originalFacultyName?.split(' ')[0]}</span>
+                                      <strong className="text-foreground font-semibold dark:text-white">{entry.facultyName?.split(' ')[0]}</strong>
+                                    </span>
+                                  ) : (
+                                    <span className="truncate">{entry.facultyName?.split(' ')[0]}</span>
+                                  )}
                                 </span>
                               )}
                               {role === 'FACULTY' && (
-                                <span className="text-[9px] lg:text-[10px] text-muted-foreground items-center gap-0.5 hidden xl:flex">
+                                <span className={`text-[9px] lg:text-[10px] text-muted-foreground items-center gap-0.5 hidden xl:flex truncate ${isCancelled ? 'line-through' : ''}`}>
                                   {entry.sectionName}
                                 </span>
                               )}
@@ -360,32 +501,79 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
                   <div className="space-y-2">
                     {dayEntries.map((entry) => {
                       const colors = getSubjectColor(entry.subjectCode, colorMap);
+                      const isCancelled = entry.isCancelled;
+                      const tooltip = getOverrideTooltip(entry);
                       const startNorm = entry.startTime?.substring(0, 5);
                       const endNorm = entry.endTime?.substring(0, 5);
+
+                      // Soft-red background/border if cancelled
+                      const cellBg = isCancelled 
+                        ? 'bg-rose-500/10 dark:bg-rose-500/20 border-rose-500/30' 
+                        : `${colors.bg} ${colors.border}`;
+                      const textStyle = isCancelled 
+                        ? 'line-through text-rose-700/60 dark:text-rose-400/60 font-semibold truncate' 
+                        : `font-semibold truncate ${colors.text}`;
+
+                      const badges = [];
+                      if (entry.isCancelled) badges.push({ text: 'Cancelled', class: 'bg-rose-500/25 text-rose-700 dark:text-rose-400 border-rose-500/30' });
+                      if (entry.isSubstituted) badges.push({ text: 'Subbed', class: 'bg-amber-500/25 text-amber-700 dark:text-amber-400 border-amber-500/30' });
+                      if (entry.isRoomChanged) badges.push({ text: 'Room Shift', class: 'bg-blue-500/25 text-blue-700 dark:text-blue-400 border-blue-500/30' });
+                      if (entry.isTimeChanged) badges.push({ text: 'Time Shift', class: 'bg-purple-500/25 text-purple-700 dark:text-purple-400 border-purple-500/30' });
+                      if (entry.overrideType === 'MERGED_CLASS') badges.push({ text: 'Merged', class: 'bg-teal-500/25 text-teal-700 dark:text-teal-400 border-teal-500/30' });
+                      if (entry.entryType === 'EXTRA' || entry.overrideType === 'EXTRA_CLASS') badges.push({ text: 'Extra Class', class: 'bg-emerald-500/25 text-emerald-700 dark:text-emerald-400 border-emerald-500/30' });
+
                       return (
                         <div 
                           key={entry.id} 
                           onClick={() => handleOpenCancelModal(entry)}
-                          className={`flex items-center gap-3 sm:gap-4 rounded-xl p-2.5 sm:p-3 ${colors.bg} border ${colors.border} transition-all
+                          title={tooltip}
+                          className={`flex items-center gap-3 sm:gap-4 rounded-xl p-2.5 sm:p-3 ${cellBg} transition-all
                             ${role === 'FACULTY' ? 'cursor-pointer hover:border-red-500/50 hover:scale-[1.01]' : ''}`}
                         >
-                          <div className="text-center min-w-[50px] sm:min-w-[60px]">
+                          <div className={`text-center min-w-[50px] sm:min-w-[60px] ${isCancelled ? 'line-through text-muted-foreground/60' : ''}`}>
                             <p className="text-xs font-mono font-bold">{startNorm}</p>
                             <p className="text-[10px] text-muted-foreground">{endNorm}</p>
                           </div>
-                          <div className={`w-1 h-10 rounded-full flex-shrink-0 ${colors.dot}`} />
+                          <div className={`w-1 h-10 rounded-full flex-shrink-0 ${isCancelled ? 'bg-rose-500/40' : colors.dot}`} />
                           <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-semibold truncate ${colors.text}`}>{entry.subjectName}</p>
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <MapPin className="h-3 w-3 flex-shrink-0" />{entry.roomName}
+                            <div className="flex items-center gap-2">
+                              <p className={`text-sm ${textStyle}`}>{entry.subjectName}</p>
+                              {badges.map((b, idx) => (
+                                <span key={idx} className={`text-[8px] font-bold px-1.5 py-0.5 rounded border leading-none ${b.class}`}>
+                                  {b.text}
+                                </span>
+                              ))}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+                              <span className={`text-xs text-muted-foreground flex items-center gap-1 ${isCancelled ? 'line-through' : ''}`}>
+                                <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                                {entry.isRoomChanged ? (
+                                  <span>
+                                    <span className="line-through text-muted-foreground/60 mr-1">{entry.originalRoomName}</span>
+                                    <strong className="text-foreground dark:text-white font-semibold">{entry.roomName}</strong>
+                                  </span>
+                                ) : (
+                                  entry.roomName
+                                )}
                               </span>
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <User className="h-3 w-3 flex-shrink-0" />{role === 'STUDENT' ? entry.facultyName : entry.sectionName}
+                              <span className={`text-xs text-muted-foreground flex items-center gap-1 ${isCancelled ? 'line-through' : ''}`}>
+                                <User className="h-3.5 w-3.5 flex-shrink-0" />
+                                {role === 'STUDENT' ? (
+                                  entry.isSubstituted ? (
+                                    <span>
+                                      <span className="line-through text-muted-foreground/60 mr-1">{entry.originalFacultyName}</span>
+                                      <strong className="text-foreground dark:text-white font-semibold">{entry.facultyName}</strong>
+                                    </span>
+                                  ) : (
+                                    entry.facultyName
+                                  )
+                                ) : (
+                                  entry.sectionName
+                                )}
                               </span>
                             </div>
                           </div>
-                          <span className="text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded hidden sm:block">
+                          <span className={`text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded hidden sm:block ${isCancelled ? 'line-through' : ''}`}>
                             {entry.subjectCode}
                           </span>
                         </div>
@@ -396,6 +584,8 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
               );
             })}
         </div>
+      )}
+        </>
       )}
 
       {/* Subject Legend */}

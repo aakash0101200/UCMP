@@ -218,6 +218,63 @@ html {
 }
 
 /* ======================= */
+/* Login Page Design Tokens */
+/* ======================= */
+
+:root {
+  /* Login-specific tokens — light mode */
+  --login-bg: oklch(0.968 0.003 264);
+  --login-panel: oklch(0.235 0.03 255);
+  --login-panel-fg: oklch(0.97 0 0);
+  --login-panel-muted: oklch(0.72 0.02 255);
+  --login-fg: oklch(0.17 0 0);
+  --login-muted: oklch(0.45 0.01 264);
+  --login-border: oklch(0.88 0.005 264);
+  --login-input: oklch(1 0 0);
+  --login-icon: oklch(0.58 0.01 264);
+  --login-accent: oklch(0.52 0.18 255);
+  --login-accent-hover: oklch(0.44 0.18 255);
+}
+
+.dark {
+  /* Login-specific tokens — dark mode */
+  --login-bg: oklch(0.13 0.01 255);
+  --login-panel: oklch(0.18 0.03 255);
+  --login-panel-fg: oklch(0.97 0 0);
+  --login-panel-muted: oklch(0.62 0.02 255);
+  --login-fg: oklch(0.94 0 0);
+  --login-muted: oklch(0.62 0.01 264);
+  --login-border: oklch(1 0 0 / 12%);
+  --login-input: oklch(1 0 0 / 6%);
+  --login-icon: oklch(0.55 0.01 264);
+  --login-accent: oklch(0.6 0.18 255);
+  --login-accent-hover: oklch(0.52 0.18 255);
+}
+
+/* Login input shared style */
+.login-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--login-border);
+  background-color: var(--login-input);
+  color: var(--login-fg);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.login-input::placeholder {
+  color: var(--login-icon);
+}
+
+.login-input:focus {
+  border-color: var(--login-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--login-accent) 18%, transparent);
+}
+
+/* ======================= */
 /* Login Page Animations CSS */
 /* ======================= */
 

@@ -6,7 +6,7 @@ export default function FacultyDashboard() {
     <div className="scroll-style space-y-6">
       <h2 className="text-2xl font-bold">Faculty Dashboard</h2>
       {/* Quick overview of today's schedule */}
-      <WeeklyScheduleGrid term="2026-27-ODD" />
+      <WeeklyScheduleGrid />
     </div>
   );
 }
