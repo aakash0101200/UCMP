@@ -510,15 +510,15 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="scroll-style space-y-6 pb-20 p-6 max-w-6xl mx-auto">
+    <div className="scroll-style space-y-5 pb-16 px-3 py-4 sm:px-5 lg:px-6 max-w-7xl mx-auto overflow-x-hidden">
 
       {/* Admin Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card/40 border border-border/50 p-6 rounded-2xl">
+      <div className=" flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-card/40 border border-border/50 p-4 sm:p-5 lg:p-6 rounded-2xl ">
         <div>
           <span className="text-xs font-semibold text-indigo-600 dark:text-[#6366F1] tracking-wider uppercase">
             Administrative Command Center
           </span>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight mt-1">
             System Workspace
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -537,22 +537,21 @@ const AdminDashboard = () => {
       </div>
 
       {/* Tabs Bar */}
-      <div className="flex border-b border-border/60 gap-6">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`pb-3 text-sm font-semibold transition-all border-b-2 px-1 flex items-center gap-2 ${activeTab === 'overview'
-              ? 'border-indigo-600 text-indigo-600 dark:border-[#6366F1] dark:text-[#6366F1]'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-        >
-          <LayoutDashboard className="w-4 h-4" />
-          Overview
-        </button>
+      <div className="flex overflow-x-auto whitespace-nowrap border-b border-border/60 gap-4 pb-2 scrollbar-hide">        <button
+        onClick={() => setActiveTab('overview')}
+        className={`shrink-0 pb-3 text-sm font-semibold transition-all border-b-2 px-1 flex items-center gap-2 ${activeTab === 'overview'
+          ? 'border-indigo-600 text-indigo-600 dark:border-[#6366F1] dark:text-[#6366F1]'
+          : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+      >
+        <LayoutDashboard className="w-4 h-4" />
+        Overview
+      </button>
         <button
           onClick={() => setActiveTab('announcements')}
-          className={`pb-3 text-sm font-semibold transition-all border-b-2 px-1 flex items-center gap-2 ${activeTab === 'announcements'
-              ? 'border-indigo-600 text-indigo-600 dark:border-[#6366F1] dark:text-[#6366F1]'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
+          className={`shrink-0 pb-3 text-sm font-semibold transition-all border-b-2 px-1 flex items-center gap-2 ${activeTab === 'announcements'
+            ? 'border-indigo-600 text-indigo-600 dark:border-[#6366F1] dark:text-[#6366F1]'
+            : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
         >
           <Megaphone className="w-4 h-4" />
@@ -560,9 +559,9 @@ const AdminDashboard = () => {
         </button>
         <button
           onClick={() => setActiveTab('users')}
-          className={`pb-3 text-sm font-semibold transition-all border-b-2 px-1 flex items-center gap-2 ${activeTab === 'users'
-              ? 'border-indigo-600 text-indigo-600 dark:border-[#6366F1] dark:text-[#6366F1]'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
+          className={`shrink-0 pb-3 text-sm font-semibold transition-all border-b-2 px-1 flex items-center gap-2 ${activeTab === 'users'
+            ? 'border-indigo-600 text-indigo-600 dark:border-[#6366F1] dark:text-[#6366F1]'
+            : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
         >
           <UserPlus className="w-4 h-4" />
@@ -574,34 +573,34 @@ const AdminDashboard = () => {
       {activeTab === 'overview' && (
         <div className="space-y-6">
           {/* Metrics Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 sm:gap-4">
             {/* Total Users */}
-            <div className="p-5 rounded-2xl bg-card border border-border/50">
+            <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border/50">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-muted-foreground">Total Users</span>
                 <Users className="w-4 h-4 text-indigo-500" />
               </div>
-              <h2 className="text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.totalUsers}</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.totalUsers}</h2>
               <p className="text-[10px] text-muted-foreground mt-1">Platform registrations</p>
             </div>
 
             {/* Students count */}
-            <div className="p-5 rounded-2xl bg-card border border-border/50">
+            <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border/50">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-muted-foreground">Students</span>
                 <GraduationCap className="w-4 h-4 text-indigo-500" />
               </div>
-              <h2 className="text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.studentCount}</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.studentCount}</h2>
               <p className="text-[10px] text-muted-foreground mt-1">Active enrollments</p>
             </div>
 
             {/* Faculty count */}
-            <div className="p-5 rounded-2xl bg-card border border-border/50">
+            <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border/50">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-muted-foreground">Faculty</span>
                 <Briefcase className="w-4 h-4 text-indigo-500" />
               </div>
-              <h2 className="text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.facultyCount}</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.facultyCount}</h2>
               <p className="text-[10px] text-muted-foreground mt-1">Teaching staff members</p>
             </div>
 
@@ -614,26 +613,26 @@ const AdminDashboard = () => {
                 <span className="text-xs font-medium text-muted-foreground">Active Notices</span>
                 <Bell className="w-4 h-4 text-indigo-500" />
               </div>
-              <h2 className="text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{announcements.length}</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{announcements.length}</h2>
               <p className="text-[10px] text-muted-foreground mt-1 hover:underline text-indigo-600 dark:text-[#6366F1]">Manage notices &rarr;</p>
             </button>
 
             {/* Pending Approvals */}
-            <div className="p-5 rounded-2xl bg-card border border-border/50">
+            <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border/50">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-muted-foreground">Overrides</span>
                 <ShieldCheck className="w-4 h-4 text-indigo-500" />
               </div>
-              <h2 className="text-3xl font-extrabold text-card-foreground tracking-tight mt-3">2</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-card-foreground tracking-tight mt-3">2</h2>
               <p className="text-[10px] text-muted-foreground mt-1">Timetable conflicts resolved</p>
             </div>
           </div>
 
           {/* Overrides & Actions Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
 
             {/* System Status & Overrides Preview */}
-            <div className="lg:col-span-2 p-5 rounded-2xl bg-card border border-border/50 space-y-4">
+            <div className="xl:col-span-2 p-5 rounded-2xl bg-card border border-border/50 space-y-4">
               <div className="flex justify-between items-center pb-2 border-b border-border/40">
                 <h3 className="font-bold text-sm text-card-foreground flex items-center gap-2">
                   <Activity className="w-4 h-4 text-indigo-500" />
@@ -667,7 +666,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Quick Actions Shortcuts */}
-            <div className="p-5 rounded-2xl bg-card border border-border/50 space-y-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border/50 space-y-4">
               <h3 className="font-bold text-sm text-card-foreground">
                 Administrative Shortcut Actions
               </h3>
@@ -750,8 +749,8 @@ const AdminDashboard = () => {
                 type="button"
                 onClick={() => setRegType('single')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${regType === 'single'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 Single User
@@ -760,8 +759,8 @@ const AdminDashboard = () => {
                 type="button"
                 onClick={() => setRegType('bulk')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${regType === 'bulk'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 Bulk CSV Import
@@ -965,7 +964,7 @@ const AdminDashboard = () => {
 
                     <div className="space-y-2 sm:col-span-2">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide block mb-1">Assigned Sections</label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-background/50 border border-border/50 rounded-xl max-h-48 overflow-y-auto">
+                      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-background/50 border border-border/50 rounded-xl max-h-48 overflow-y-auto">
                         {sections.map(sec => (
                           <label key={sec.id} className="flex items-center gap-2 text-xs text-foreground cursor-pointer hover:text-indigo-500">
                             <input
@@ -1028,8 +1027,8 @@ const AdminDashboard = () => {
                       setParsedRecords([]);
                     }}
                     className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${bulkRole === 'STUDENT'
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
+                      ? 'bg-indigo-600 text-white shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
                       }`}
                   >
                     Student
@@ -1041,8 +1040,8 @@ const AdminDashboard = () => {
                       setParsedRecords([]);
                     }}
                     className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${bulkRole === 'FACULTY'
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
+                      ? 'bg-indigo-600 text-white shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
                       }`}
                   >
                     Faculty
@@ -1152,7 +1151,7 @@ const AdminDashboard = () => {
 
                   {/* Preview Table */}
                   <div className="overflow-x-auto border border-border/50 rounded-xl bg-background/10 max-h-96 scrollbar-thin">
-                    <table className="w-full border-collapse text-left text-xs">
+                    <table className="min-w-[700px] w-full border-collapse text-left text-xs">
                       <thead className="bg-background/80 sticky top-0 border-b border-border/50 text-muted-foreground font-semibold text-[10px] uppercase">
                         <tr>
                           <th className="p-3">ID / Name</th>
@@ -1177,10 +1176,10 @@ const AdminDashboard = () => {
                               </span>
                               {record.message && (
                                 <span className={`text-[9px] block mt-0.5 ${record.status === 'invalid' || record.status === 'failed'
-                                    ? 'text-rose-500 font-medium'
-                                    : record.status === 'success'
-                                      ? 'text-emerald-500 font-medium'
-                                      : 'text-muted-foreground'
+                                  ? 'text-rose-500 font-medium'
+                                  : record.status === 'success'
+                                    ? 'text-emerald-500 font-medium'
+                                    : 'text-muted-foreground'
                                   }`}>
                                   {record.message}
                                 </span>
@@ -1188,14 +1187,14 @@ const AdminDashboard = () => {
                             </td>
                             <td className="p-3">
                               <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold inline-flex items-center gap-1 ${record.status === 'success'
-                                  ? 'bg-emerald-500/10 text-emerald-500'
-                                  : record.status === 'failed'
+                                ? 'bg-emerald-500/10 text-emerald-500'
+                                : record.status === 'failed'
+                                  ? 'bg-rose-500/10 text-rose-500'
+                                  : record.status === 'invalid'
                                     ? 'bg-rose-500/10 text-rose-500'
-                                    : record.status === 'invalid'
-                                      ? 'bg-rose-500/10 text-rose-500'
-                                      : record.status === 'uploading'
-                                        ? 'bg-indigo-500/10 text-indigo-500 animate-pulse'
-                                        : 'bg-amber-500/10 text-amber-500'
+                                    : record.status === 'uploading'
+                                      ? 'bg-indigo-500/10 text-indigo-500 animate-pulse'
+                                      : 'bg-amber-500/10 text-amber-500'
                                 }`}>
                                 {record.status.toUpperCase()}
                               </span>
