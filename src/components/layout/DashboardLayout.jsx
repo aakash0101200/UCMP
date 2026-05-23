@@ -288,6 +288,12 @@ export default function DashboardLayout({ children, onLogout }) {
         />
 
         <SidebarInset className="flex-1 transition-colors duration-300">
+          {profile.collegeId?.toUpperCase().startsWith("DEMO_") && (
+            <div className="bg-indigo-600 dark:bg-indigo-900 text-white px-4 py-2 text-center text-xs font-semibold tracking-wide flex items-center justify-center gap-2 shadow-md z-50">
+              <Zap className="w-4 h-4 text-amber-300 shrink-0" />
+              <span>Running in Demo Mode (Read-Only) — Database modifications and writes are disabled.</span>
+            </div>
+          )}
           <DashboardNavBar 
             profile={profile}
             onLogout={onLogout}

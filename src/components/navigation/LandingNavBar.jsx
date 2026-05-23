@@ -55,12 +55,10 @@ export default function LandingNavBar() {
                 {label}
               </Link>
             ))}
-            <ModeToggle />
           </div>
 
-          {/* Mobile Menu & Theme Toggle */}
+          {/* Mobile Menu & Toggle Trigger */}
           <div className="flex md:hidden items-center gap-2">
-            <ModeToggle />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"

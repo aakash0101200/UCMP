@@ -13,6 +13,7 @@ import About from './pages/home/about';
 import ContactPage from './pages/home/ContactPage';
 import LoginPage from './pages/home/LoginPage';
 import RegisterPage from './pages/home/RegisterPage';
+import NotFoundPage from './pages/home/NotFoundPage';
 
 import StudentDashboard from './pages/student/StudentDashboard';
 
@@ -45,14 +46,39 @@ function AppShell({ children }) {
     pathname.startsWith('/faculty') ||
     pathname.startsWith('/admin');
 
+  // Enforce Light Mode on all public routes inside AppShell
+  React.useEffect(() => {
+    const root = window.document.documentElement;
+    const originalTheme = localStorage.getItem("vite-ui-theme") || "system";
+
+    const forceLight = () => {
+      root.classList.remove("dark");
+      root.classList.add("light");
+    };
+
+    // Execute immediately and on next tick to safely override parent ThemeProvider
+    forceLight();
+    const timeoutId = setTimeout(forceLight, 0);
+
+    return () => {
+      clearTimeout(timeoutId);
+      root.classList.remove("light", "dark");
+      if (originalTheme === "system") {
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        root.classList.add(systemTheme);
+      } else {
+        root.classList.add(originalTheme);
+      }
+    };
+  }, [pathname]);
+
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       {!isDashboard && <LandingNavBar />}
-      {/* 3. Ensure main wrapper uses dark: variants */}
-      <main className="min-h-screen bg-background text-foreground dark:bg-background dark:text-foreground">
+      <main className="flex-grow bg-background text-foreground">
         {children}
       </main>
-    </>
+    </div>
   );
 }
 
@@ -124,6 +150,14 @@ export default function App() {
             </AppShell>
           }
         />
+        <Route
+          path="/settings"
+          element={
+            isAuthenticated
+              ? <DashboardLayout userRole={(localStorage.getItem("activeRole") || "student").toLowerCase()} onLogout={handleLogout}><NotFoundPage embedded={true} /></DashboardLayout>
+              : <Navigate to="/login" replace />
+          }
+        />
 
         {/* ─── STUDENT routes (nested with Outlet) ─────────────────── */}
         <Route path="/student" element={
@@ -164,11 +198,15 @@ export default function App() {
           <Route path="profile" element={<ProfilePage />} />
           <Route path="timetable" element={<AdminTimetablePage />} />
           <Route path="users" element={<AdminUsersPage />} />
+          <Route path="courses" element={<NotFoundPage embedded={true} />} />
+          <Route path="reports" element={<NotFoundPage embedded={true} />} />
+          <Route path="system" element={<NotFoundPage embedded={true} />} />
         </Route>
+        <Route path="*" element={<AppShell><NotFoundPage /></AppShell>} />
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
       <SpeedInsights />
     </BrowserRouter>
   );
-}
 
+}
