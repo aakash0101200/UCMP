@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "../../Services/auth";
 import { toast } from "react-toastify";
 import i1 from "../../assets/Scroll/i1.webp";
+import { motion, AnimatePresence } from "framer-motion";
+
+const MotionLink = motion(Link);
 
 const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -11,7 +14,49 @@ const LoginPage = ({ onLogin }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDemoDrawer, setShowDemoDrawer] = useState(false);
   const navigate = useNavigate();
+
+  const handleAutofill = (roleType) => {
+    let collegeId = "";
+    let password = "";
+
+    if (roleType === "STUDENT") {
+      collegeId = "DEMO_2025CS001";
+      password = "Student@123";
+    } else if (roleType === "FACULTY") {
+      collegeId = "DEMO_clg00";
+      password = "Faculty@123";
+    } else if (roleType === "ADMIN") {
+      collegeId = "DEMO_ADMIN_001";
+      password = "Admin@123";
+    }
+
+    setFormData({ collegeId, password });
+    toast.success(`Autofilled ${roleType.charAt(0) + roleType.slice(1).toLowerCase()} credentials!`);
+    setShowDemoDrawer(false);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024 && window.innerHeight >= 720) {
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,10 +85,13 @@ const LoginPage = ({ onLogin }) => {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex items-center justify-center bg-login-bg px-4 pt-20 pb-4">
+    <div className="min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] lg:overflow-x-hidden flex items-center justify-center bg-login-bg px-4">
 
       {/* Login Card */}
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="
         w-full max-w-[410px]
         bg-card/95
@@ -62,7 +110,7 @@ const LoginPage = ({ onLogin }) => {
         ">
 
           {/* Professional Minimal Badge */}
-          <div className="flex justify-center">
+          {/* <div className="flex justify-center">
             <div
               className="
               w-12 h-12 rounded-2xl
@@ -86,26 +134,10 @@ const LoginPage = ({ onLogin }) => {
                 <path d="M21 12c0 1.66-.67 3.16-1.76 4.24A5.98 5.98 0 0115 18H9a6 6 0 110-12h6a6 6 0 016 6z" />
               </svg>
             </div>
-          </div>
+          </div> */}
 
           {/* Identity */}
           <div className="space-y-2">
-            <div
-              className="
-              inline-flex items-center
-              rounded-full
-              border border-indigo-500/20
-              bg-indigo-500/10
-              px-3 py-1
-              text-[11px]
-              font-medium
-              tracking-[0.2em]
-              uppercase
-              text-indigo-500
-            "
-            >
-              UCMP Portal
-            </div>
 
             <h1 className="text-3xl font-bold tracking-tight text-foreground">
               Welcome back
@@ -115,6 +147,69 @@ const LoginPage = ({ onLogin }) => {
               Sign in to continue to your academic workspace.
             </p>
           </div>
+        </div>
+
+        {/* Quick Demo Access Accordion */}
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => setShowDemoDrawer(!showDemoDrawer)}
+            className="
+              inline-flex items-center gap-1.5
+              text-xs text-indigo-500 hover:text-indigo-600
+              font-medium
+              bg-indigo-50/50 dark:bg-indigo-950/20
+              border border-indigo-100 dark:border-indigo-900/30
+              px-3 py-1.5 rounded-full
+              transition-all
+              cursor-pointer
+              shadow-sm
+            "
+          >
+            <span> Quick Demo Access</span>
+            <svg
+              className={`w-3 h-3 transition-transform ${showDemoDrawer ? "rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <AnimatePresence>
+            {showDemoDrawer && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="mt-3 overflow-hidden bg-muted/40 rounded-xl p-3 border border-border/40 grid grid-cols-3 gap-2"
+              >
+                <button
+                  type="button"
+                  onClick={() => handleAutofill("STUDENT")}
+                  className="p-2 rounded-lg bg-card border border-border/50 hover:border-indigo-500 text-xs font-semibold text-foreground text-center cursor-pointer transition-all hover:shadow-sm"
+                >
+                  Student
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAutofill("FACULTY")}
+                  className="p-2 rounded-lg bg-card border border-border/50 hover:border-indigo-500 text-xs font-semibold text-foreground text-center cursor-pointer transition-all hover:shadow-sm"
+                >
+                  Faculty
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAutofill("ADMIN")}
+                  className="p-2 rounded-lg bg-card border border-border/50 hover:border-indigo-500 text-xs font-semibold text-foreground text-center cursor-pointer transition-all hover:shadow-sm"
+                >
+                  Admin
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Form */}
@@ -129,8 +224,8 @@ const LoginPage = ({ onLogin }) => {
               College ID
             </label>
 
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-login-icon">
+            <div className="relative group">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-login-icon group-focus-within:text-indigo-500 transition-colors duration-200">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -193,9 +288,9 @@ const LoginPage = ({ onLogin }) => {
               </button>
             </div>
 
-            <div className="relative">
+            <div className="relative group">
 
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-login-icon">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-login-icon group-focus-within:text-indigo-500 transition-colors duration-200">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -273,9 +368,11 @@ const LoginPage = ({ onLogin }) => {
           </div>
 
           {/* Submit */}
-          <button
+          <motion.button
             type="submit"
             disabled={isLoading}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="
             w-full h-12
             rounded-xl
@@ -287,10 +384,11 @@ const LoginPage = ({ onLogin }) => {
             transition-all
             shadow-lg shadow-indigo-500/20
             disabled:opacity-60
+            cursor-pointer
           "
           >
             {isLoading ? "Signing in..." : "Sign in"}
-          </button>
+          </motion.button>
         </form>
 
         {/* Footer */}
@@ -308,8 +406,10 @@ const LoginPage = ({ onLogin }) => {
             </div>
           </div>
 
-          <Link
+          <MotionLink
             to="/register"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="
             w-full h-11
             rounded-xl
@@ -321,7 +421,7 @@ const LoginPage = ({ onLogin }) => {
           "
           >
             Create an account
-          </Link>
+          </MotionLink>
 
           <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
             By continuing, you agree to our{" "}
@@ -336,7 +436,7 @@ const LoginPage = ({ onLogin }) => {
           </p>
 
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
