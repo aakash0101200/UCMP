@@ -35,8 +35,8 @@ const Home = () => {
         <HeroSection />
       </div>
 
-      <div className=" my-8 relative z-10">
-        <ImageCarousel/>
+      <div className=" my-4 lg:my-6 relative z-10">
+        <ImageCarousel />
       </div>
 
       {/* Feature Card below*/}

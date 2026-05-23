@@ -198,7 +198,8 @@ export default function ImageCarousel() {
       onTouchEnd={handleTouchEnd}
     >
       {/* Dynamic Inline Styles for Keyframe Animations */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes kenburns {
           0% { transform: scale(1) translate3d(0, 0, 0); }
           100% { transform: scale(1.08) translate3d(0, 0, 0); }
@@ -216,13 +217,12 @@ export default function ImageCarousel() {
       `}} />
 
       {/* Background Image Layer */}
-      <div className="absolute inset-0 w-full h-full z-0 bg-[#12141C]">
+      <div className="absolute inset-0 flex items-center z-0 px-6 sm:px-10 lg:px-20 max-w-6xl mx-auto w-full h-full">
         {slides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
+            className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
           >
             {index === currentIndex && (
               <img
@@ -242,7 +242,7 @@ export default function ImageCarousel() {
 
       {/* Left-Aligned Constrained Content Layer */}
       <div className="absolute inset-0 flex items-center z-20 px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full">
-        <div className="max-w-2xl text-left">
+        <div className="max-w-xl text-left">
           {slides.map((slide, index) => {
             if (index !== currentIndex) return null;
             return (
@@ -265,7 +265,8 @@ export default function ImageCarousel() {
 
                 {/* Narrative Paragraph */}
                 <p
-                  className="animate-fade-up text-sm sm:text-base md:text-lg text-[#94A3B8] leading-relaxed max-w-xl"
+                  className="animate-fade-up text-sm sm:text-base text-[#CBD5E1] leading-7 max-w-md
+"
                   style={{ animationDelay: '300ms', animationFillMode: 'both' }}
                 >
                   {slide.description}
@@ -278,13 +279,40 @@ export default function ImageCarousel() {
                 >
                   <button
                     onClick={handleCTA}
-                    className="bg-[#6366F1] hover:bg-[#5053C9] text-[#F8FAFC] px-6 py-3 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-indigo-500/20 hover:scale-[1.02]"
+                    className="
+                    bg-[#6366F1]
+                    hover:bg-[#5053C9]
+                    text-white
+                    px-5 py-2.5
+                    text-base
+                    font-medium
+                    cursor-pointer
+                    rounded-xl
+                    transition-all
+                    hover:opacity-90
+                    "
                   >
                     {slide.primaryBtn}
                   </button>
                   <button
                     onClick={handleCTA}
-                    className="border border-[#94A3B8]/30 hover:border-[#94A3B8]/60 bg-[#1E2230]/40 hover:bg-[#1E2230]/70 text-[#F8FAFC] px-6 py-3 font-semibold rounded-xl backdrop-blur-md transition-all duration-300"
+                    className="
+                    border border-[#94A3B8]/20
+                    bg-[#1E2230]/30
+                    text-white
+                    px-5 py-2.5
+                    text-base
+                    font-medium
+                    cursor-pointer
+                    rounded-xl
+                    backdrop-blur-sm
+                    hover:opacity-90
+                    transition-all
+                    shadow-sm
+                    hover:shadow-md
+                    border border-[#94A3B8]/20
+                    bg-[#1E2230]/30
+                    "
                   >
                     {slide.secondaryBtn}
                   </button>
@@ -298,31 +326,29 @@ export default function ImageCarousel() {
       {/* Navigation Arrows (Subtle, Glassmorphic) */}
       <button
         onClick={handlePrev}
-        className="absolute left-6 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full border border-white/5 bg-[#12141C]/30 hover:bg-[#1E2230]/75 text-[#94A3B8] hover:text-[#F8FAFC] backdrop-blur-md transition-all duration-300 hover:scale-105"
+        className="absolute left-6 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full border border-white/5 bg-[#12141C]/30 hover:bg-[#1E2230]/75 text-[#94A3B8] hover:text-[#F8FAFC] backdrop-blur-md transition-all duration-300 hover:scale-105"
         aria-label="Previous slide"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="w-4 h-4" />
       </button>
 
       <button
         onClick={handleNext}
-        className="absolute right-6 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full border border-white/5 bg-[#12141C]/30 hover:bg-[#1E2230]/75 text-[#94A3B8] hover:text-[#F8FAFC] backdrop-blur-md transition-all duration-300 hover:scale-105"
+        className="absolute right-6 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full border border-white/5 bg-[#12141C]/30 hover:bg-[#1E2230]/75 text-[#94A3B8] hover:text-[#F8FAFC] backdrop-blur-md transition-all duration-300 hover:scale-105"
         aria-label="Next slide"
       >
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className="w-4 h-4" />
       </button>
 
-      {/* Progress Indicators / Pagination (Minimal Dash Bars) */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex gap-2.5">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2.5">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`h-1.5 rounded-full transition-all duration-500 ${
-              index === currentIndex
-                ? 'w-8 bg-[#6366F1]'
-                : 'w-2.5 bg-white/20 hover:bg-white/40'
-            }`}
+            className={`h-1.5 rounded-full transition-all duration-500 ${index === currentIndex
+              ? 'w-8 bg-[#6366F1]'
+              : 'w-2.5 bg-white/20 hover:bg-white/40'
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
