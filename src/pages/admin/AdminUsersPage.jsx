@@ -15,34 +15,67 @@ import {
   FileText,
   Activity,
   Layers,
-  HelpCircle
+  KeyRound,
+  Pencil,
+  Trash2,
+  X,
+  Check
 } from 'lucide-react';
-import { getAllUsers } from '../../Services/admin';
+import { 
+  getAllUsers, 
+  resetUserPassword, 
+  updateStudentSection, 
+  updateFacultySections, 
+  deleteUser 
+} from '../../Services/admin';
+import { getAllSections } from '../../Services/timetable';
 import { toast } from 'react-toastify';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
+  const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Modals state
+  const [editingUser, setEditingUser] = useState(null); // student or faculty user object
+  const [deletingUser, setDeletingUser] = useState(null); // user object to delete
+  const [resettingUser, setResettingUser] = useState(null); // user object to reset password
+  
+  // Edit forms state
+  const [selectedSectionId, setSelectedSectionId] = useState(''); // for student transfer
+  const [facultySectionIds, setFacultySectionIds] = useState([]); // for faculty sections
+
   // State to track which nodes are expanded
-  // Keys can be: 'dept:CSE', 'dept:CSE:admins', 'dept:CSE:faculty', 'dept:CSE:sections', 'dept:CSE:sec:Section A'
   const [expandedNodes, setExpandedNodes] = useState({});
 
   useEffect(() => {
-    fetchUsers();
+    fetchInitialData();
   }, []);
 
-  const fetchUsers = async () => {
+  const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const response = await getAllUsers();
-      setUsers(response.data || []);
+      const [usersRes, sectionsRes] = await Promise.all([
+        getAllUsers(),
+        getAllSections()
+      ]);
+      setUsers(usersRes.data || []);
+      setSections(sectionsRes.data || []);
     } catch (error) {
-      console.error('Error fetching users:', error);
-      toast.error('Failed to load user directory.');
+      console.error('Error fetching admin users data:', error);
+      toast.error('Failed to load user directory and section list.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshUsersList = async () => {
+    try {
+      const usersRes = await getAllUsers();
+      setUsers(usersRes.data || []);
+    } catch (error) {
+      console.error('Error refreshing users list:', error);
     }
   };
 
@@ -51,11 +84,6 @@ export default function AdminUsersPage() {
       ...prev,
       [nodeId]: !prev[nodeId]
     }));
-  };
-
-  // Helper to expand all nodes matching a search, or collapse/expand general ones
-  const expandAll = (nodesObj) => {
-    setExpandedNodes(nodesObj);
   };
 
   // Main stats
@@ -71,7 +99,6 @@ export default function AdminUsersPage() {
   const groupedData = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     
-    // Filter users first
     const filteredUsers = users.filter(user => {
       if (!query) return true;
       return (
@@ -83,16 +110,6 @@ export default function AdminUsersPage() {
       );
     });
 
-    // Grouping structure:
-    // {
-    //   [deptOrBranch]: {
-    //      admins: [],
-    //      faculty: [],
-    //      sections: {
-    //         [sectionName]: []
-    //      }
-    //   }
-    // }
     const groups = {};
 
     filteredUsers.forEach(user => {
@@ -130,7 +147,7 @@ export default function AdminUsersPage() {
     return groups;
   }, [users, searchQuery]);
 
-  // Automatically expand folders if there is a search query active
+  // Automatically expand folders when searching
   useEffect(() => {
     if (searchQuery.trim()) {
       const autoExpand = {};
@@ -148,12 +165,86 @@ export default function AdminUsersPage() {
     }
   }, [searchQuery, groupedData]);
 
+  // Action: Reset password
+  const handleResetPassword = async () => {
+    if (!resettingUser) return;
+    try {
+      const res = await resetUserPassword(resettingUser.collegeId);
+      toast.success(res.data || 'Password reset successfully.');
+      setResettingUser(null);
+    } catch (error) {
+      console.error('Password reset failed:', error);
+      toast.error(error.response?.data || 'Failed to reset password.');
+    }
+  };
+
+  // Action: Delete user
+  const handleDeleteUser = async () => {
+    if (!deletingUser) return;
+    try {
+      await deleteUser(deletingUser.collegeId);
+      toast.success(`User ${deletingUser.name} deleted successfully.`);
+      setDeletingUser(null);
+      refreshUsersList();
+    } catch (error) {
+      console.error('Deletion failed:', error);
+      toast.error(error.response?.data || 'Failed to delete user.');
+    }
+  };
+
+  // Open edit modal
+  const openEditModal = (user) => {
+    setEditingUser(user);
+    if (user.role === 'STUDENT') {
+      // Find matching section in global sections list
+      const matched = sections.find(s => s.sectionName === user.sectionName);
+      setSelectedSectionId(matched ? matched.id : '');
+    } else if (user.role === 'FACULTY') {
+      setFacultySectionIds(user.sectionIds || []);
+    }
+  };
+
+  // Action: Update Student Section
+  const handleUpdateStudentSection = async () => {
+    if (!editingUser || !selectedSectionId) return;
+    try {
+      await updateStudentSection(editingUser.collegeId, parseInt(selectedSectionId));
+      toast.success(`Transferred ${editingUser.name} to the new section.`);
+      setEditingUser(null);
+      refreshUsersList();
+    } catch (error) {
+      console.error('Section transfer failed:', error);
+      toast.error(error.response?.data || 'Failed to transfer section.');
+    }
+  };
+
+  // Action: Update Faculty Sections
+  const handleUpdateFacultySections = async () => {
+    if (!editingUser) return;
+    try {
+      await updateFacultySections(editingUser.collegeId, facultySectionIds);
+      toast.success(`Updated class teaching assignments for ${editingUser.name}.`);
+      setEditingUser(null);
+      refreshUsersList();
+    } catch (error) {
+      console.error('Faculty assignment update failed:', error);
+      toast.error(error.response?.data || 'Failed to update sections.');
+    }
+  };
+
+  // Checkbox toggle helper
+  const toggleFacultySection = (id) => {
+    setFacultySectionIds(prev => 
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-foreground">
         <Activity className="w-10 h-10 text-indigo-600 dark:text-[#6366F1] animate-spin mb-4" />
         <p className="text-sm font-medium text-muted-foreground animate-pulse">
-          Loading user directory hierarchy...
+          Loading user directory & class details...
         </p>
       </div>
     );
@@ -165,13 +256,13 @@ export default function AdminUsersPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card/40 border border-border/50 p-6 rounded-2xl">
         <div>
           <span className="text-xs font-semibold text-indigo-600 dark:text-[#6366F1] tracking-wider uppercase">
-            Management console
+            Administrative Registry
           </span>
           <h1 className="text-3xl font-extrabold text-foreground tracking-tight mt-1">
             User Directory
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Browse and search academic registry level-by-level
+            Browse and manage access, reset passwords, or reassign sections level-by-level
           </p>
         </div>
 
@@ -314,6 +405,7 @@ export default function AdminUsersPage() {
                                     <th className="px-4 py-2">College ID</th>
                                     <th className="px-4 py-2">Name</th>
                                     <th className="px-4 py-2">Email</th>
+                                    <th className="px-4 py-2 text-right">Actions</th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border/20 bg-background/25">
@@ -322,6 +414,24 @@ export default function AdminUsersPage() {
                                       <td className="px-4 py-2 font-semibold font-mono text-indigo-400">{admin.collegeId}</td>
                                       <td className="px-4 py-2 font-medium">{admin.name}</td>
                                       <td className="px-4 py-2 text-muted-foreground">{admin.email}</td>
+                                      <td className="px-4 py-2 text-right">
+                                        <div className="flex justify-end gap-2">
+                                          <button
+                                            title="Reset Password"
+                                            onClick={() => setResettingUser(admin)}
+                                            className="p-1.5 rounded-lg hover:bg-amber-500/10 text-amber-500 transition-colors"
+                                          >
+                                            <KeyRound className="w-4 h-4" />
+                                          </button>
+                                          <button
+                                            title="Delete User"
+                                            onClick={() => setDeletingUser(admin)}
+                                            className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-colors"
+                                          >
+                                            <Trash2 className="w-4 h-4" />
+                                          </button>
+                                        </div>
+                                      </td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -359,6 +469,7 @@ export default function AdminUsersPage() {
                                     <th className="px-4 py-2">Name</th>
                                     <th className="px-4 py-2">Email</th>
                                     <th className="px-4 py-2">Department</th>
+                                    <th className="px-4 py-2 text-right">Actions</th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border/20 bg-background/25">
@@ -368,6 +479,31 @@ export default function AdminUsersPage() {
                                       <td className="px-4 py-2 font-medium">{fac.name}</td>
                                       <td className="px-4 py-2 text-muted-foreground">{fac.email}</td>
                                       <td className="px-4 py-2 text-muted-foreground/80">{fac.department || dept}</td>
+                                      <td className="px-4 py-2 text-right">
+                                        <div className="flex justify-end gap-2">
+                                          <button
+                                            title="Assign Classes/Sections"
+                                            onClick={() => openEditModal(fac)}
+                                            className="p-1.5 rounded-lg hover:bg-indigo-500/10 text-indigo-500 transition-colors"
+                                          >
+                                            <Pencil className="w-4 h-4" />
+                                          </button>
+                                          <button
+                                            title="Reset Password"
+                                            onClick={() => setResettingUser(fac)}
+                                            className="p-1.5 rounded-lg hover:bg-amber-500/10 text-amber-500 transition-colors"
+                                          >
+                                            <KeyRound className="w-4 h-4" />
+                                          </button>
+                                          <button
+                                            title="Delete User"
+                                            onClick={() => setDeletingUser(fac)}
+                                            className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-colors"
+                                          >
+                                            <Trash2 className="w-4 h-4" />
+                                          </button>
+                                        </div>
+                                      </td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -429,6 +565,7 @@ export default function AdminUsersPage() {
                                               <th className="px-4 py-1.5">Email</th>
                                               <th className="px-4 py-1.5">Year</th>
                                               <th className="px-4 py-1.5">College ID</th>
+                                              <th className="px-4 py-1.5 text-right">Actions</th>
                                             </tr>
                                           </thead>
                                           <tbody className="divide-y divide-border/20 bg-background/25">
@@ -439,6 +576,31 @@ export default function AdminUsersPage() {
                                                 <td className="px-4 py-1.5 text-muted-foreground">{student.email}</td>
                                                 <td className="px-4 py-1.5 text-muted-foreground/80">{student.year || 'N/A'}</td>
                                                 <td className="px-4 py-1.5 text-muted-foreground/60 font-mono">{student.collegeId}</td>
+                                                <td className="px-4 py-1.5 text-right">
+                                                  <div className="flex justify-end gap-1.5">
+                                                    <button
+                                                      title="Transfer Section"
+                                                      onClick={() => openEditModal(student)}
+                                                      className="p-1 rounded hover:bg-indigo-500/10 text-indigo-500 transition-colors"
+                                                    >
+                                                      <Pencil className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                      title="Reset Password"
+                                                      onClick={() => setResettingUser(student)}
+                                                      className="p-1 rounded hover:bg-amber-500/10 text-amber-500 transition-colors"
+                                                    >
+                                                      <KeyRound className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                      title="Delete User"
+                                                      onClick={() => setDeletingUser(student)}
+                                                      className="p-1 rounded hover:bg-rose-500/10 text-rose-500 transition-colors"
+                                                    >
+                                                      <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                  </div>
+                                                </td>
                                               </tr>
                                             ))}
                                           </tbody>
@@ -461,6 +623,183 @@ export default function AdminUsersPage() {
           })
         )}
       </div>
+
+      {/* Edit Section/Assignments Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#1E2230] border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl p-6 relative animate-in fade-in duration-200">
+            <button 
+              onClick={() => setEditingUser(null)}
+              className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-500">
+                {editingUser.role === 'STUDENT' ? <GraduationCap className="w-6 h-6" /> : <Briefcase className="w-6 h-6" />}
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Modify User Access</h3>
+                <p className="text-xs text-muted-foreground">Adjust attributes for {editingUser.name}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <span className="text-xs text-muted-foreground">College ID</span>
+                <p className="font-mono text-sm font-semibold text-indigo-400 mt-0.5">{editingUser.collegeId}</p>
+              </div>
+
+              {/* STUDENT: Section transfer select */}
+              {editingUser.role === 'STUDENT' && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Reassign Section</label>
+                  <select
+                    className="w-full bg-background border border-border/80 rounded-xl p-2.5 text-sm focus:outline-none focus:border-indigo-500"
+                    value={selectedSectionId}
+                    onChange={(e) => setSelectedSectionId(e.target.value)}
+                  >
+                    <option value="">-- Choose New Section --</option>
+                    {sections.map(sec => (
+                      <option key={sec.id} value={sec.id}>
+                        {sec.sectionName} (Batch: {sec.batch?.batchName || 'N/A'})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-muted-foreground">
+                    Changing the student's section automatically synchronizes their batch/branch mappings.
+                  </p>
+                </div>
+              )}
+
+              {/* FACULTY: Sections checkbox grid */}
+              {editingUser.role === 'FACULTY' && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Assign Taught Classes/Sections</label>
+                  <div className="max-h-60 overflow-y-auto border border-border/60 rounded-xl p-3 bg-background/40 grid grid-cols-2 gap-2.5">
+                    {sections.length === 0 ? (
+                      <p className="text-xs text-muted-foreground col-span-2 text-center py-4">No sections available.</p>
+                    ) : (
+                      sections.map(sec => {
+                        const isChecked = facultySectionIds.includes(sec.id);
+                        return (
+                          <div 
+                            key={sec.id} 
+                            onClick={() => toggleFacultySection(sec.id)}
+                            className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer select-none text-xs font-semibold transition-all ${
+                              isChecked 
+                                ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400' 
+                                : 'border-border/60 hover:bg-muted/30 text-muted-foreground'
+                            }`}
+                          >
+                            <div className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-all ${
+                              isChecked ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-muted-foreground/50'
+                            }`}>
+                              {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                            </div>
+                            <span className="truncate">{sec.sectionName}</span>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Select the class sections this faculty member is authorized to teach and record attendance for.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                onClick={() => setEditingUser(null)}
+                className="px-4 py-2 border border-border/80 rounded-xl text-sm font-medium hover:bg-muted/40 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={editingUser.role === 'STUDENT' ? handleUpdateStudentSection : handleUpdateFacultySections}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-sm font-medium text-white transition-colors"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation: Password Reset Modal */}
+      {resettingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#1E2230] border border-border/50 rounded-2xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500">
+                <KeyRound className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold">Reset User Password</h3>
+            </div>
+
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Are you sure you want to reset the password for <strong className="text-foreground">{resettingUser.name}</strong> ({resettingUser.collegeId})? 
+            </p>
+            <p className="text-xs text-amber-500 mt-2 font-medium bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20">
+              The password will be reset to the role-based default. Faculty default is <strong>Faculty@123</strong>, and Student default is <strong>Student@123</strong>.
+            </p>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setResettingUser(null)}
+                className="px-4 py-2 border border-border/80 rounded-xl text-sm font-medium hover:bg-muted/40 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResetPassword}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-xl text-sm font-medium text-white transition-colors"
+              >
+                Confirm Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation: Deletion Modal */}
+      {deletingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#1E2230] border border-border/50 rounded-2xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-rose-500/10 rounded-xl text-rose-500">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-rose-500">Delete User Account</h3>
+            </div>
+
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Warning! You are about to permanently delete <strong className="text-foreground">{deletingUser.name}</strong> (College ID: <span className="font-mono text-indigo-400 font-semibold">{deletingUser.collegeId}</span>). 
+            </p>
+            <p className="text-xs text-rose-500 mt-2 font-medium bg-rose-500/10 p-2.5 rounded-lg border border-rose-500/20">
+              This action is destructive and irreversible. All academic profiles, role associations, and personal settings linked to this user will be removed.
+            </p>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setDeletingUser(null)}
+                className="px-4 py-2 border border-border/80 rounded-xl text-sm font-medium hover:bg-muted/40 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-500 rounded-xl text-sm font-medium text-white transition-colors"
+              >
+                Delete Permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
