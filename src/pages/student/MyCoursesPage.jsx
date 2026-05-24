@@ -8,8 +8,6 @@ import P3 from "@/components/Profile/P3";
 import P4 from "@/components/Profile/P4";
 
 
-import BottomNavBar from "@/components/navigation/BottomNavBar";
-
 export default function MyCoursesPage() {
   return (
     <div className="scroll-style ">
@@ -20,11 +18,6 @@ export default function MyCoursesPage() {
 <P2/>
 <P3/>
 <P4/>
-
-
-
-    
-<BottomNavBar />
 
 
     </div>

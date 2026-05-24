@@ -58,6 +58,14 @@ export default function AdminTimetablePage() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Focus filters & progressive selection workflow states
+  const [selectedYear, setSelectedYear] = useState('3');
+  const [selectedBranch, setSelectedBranch] = useState('Computer Science');
+  const [activeSectionId, setActiveSectionId] = useState(null);
+  const [facultiesLoaded, setFacultiesLoaded] = useState(false);
+  const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
+  const [loadingCanvas, setLoadingCanvas] = useState(false);
+
   // Selected section for the grid view
   const [selectedSection, setSelectedSection] = useState('');
 
@@ -199,13 +207,7 @@ export default function AdminTimetablePage() {
     fetchData();
   }, [term]);
 
-  // Fetch resolved schedules for selected section or faculty when page state changes
-  useEffect(() => {
-    if (selectedSection && activeTab === 'canvas') {
-      fetchEntries();
-    }
-  }, [selectedSection, term, activeTab]);
-
+  // Fetch resolved schedules for faculty when page state changes
   useEffect(() => {
     if (selectedAbsFaculty && absDate && activeTab === 'aocs') {
       fetchAbsFacultySchedule();
@@ -213,6 +215,25 @@ export default function AdminTimetablePage() {
       setAbsFacultySchedule([]);
     }
   }, [selectedAbsFaculty, absDate, term, activeTab]);
+
+  // Fetch faculties list on disruption tab if not loaded
+  useEffect(() => {
+    if (activeTab === 'aocs' && !facultiesLoaded) {
+      const loadFacs = async () => {
+        try {
+          const res = await getAllFaculties();
+          setFaculties(res.data || []);
+          setFacultiesLoaded(true);
+          if (res.data?.length > 0 && !selectedAbsFaculty) {
+            setSelectedAbsFaculty(String(res.data[0].id));
+          }
+        } catch (err) {
+          console.error("AOCS tab load faculties failed:", err);
+        }
+      };
+      loadFacs();
+    }
+  }, [activeTab, facultiesLoaded, selectedAbsFaculty]);
 
   const fetchMetrics = useCallback(async () => {
     setLoadingMetrics(true);
@@ -232,30 +253,106 @@ export default function AdminTimetablePage() {
     }
   }, [term, activeTab, fetchMetrics]);
 
+  // Filter sections by selected Year and selected Branch
+  const getFilteredSections = useCallback(() => {
+    if (!sections || sections.length === 0) return [];
+    
+    return sections.filter(sec => {
+      const batchName = sec.batch?.batchName || '';
+      
+      const matchesBranch = selectedBranch === 'Computer Science'
+        ? (batchName.toLowerCase().includes('cs') || batchName.toLowerCase().includes('computer'))
+        : batchName.toLowerCase().includes(selectedBranch.toLowerCase());
+        
+      const termStartYear = parseInt(term.substring(0, 4)) || 2026;
+      const targetGradYear = termStartYear + (4 - parseInt(selectedYear));
+      
+      const matchesYear = batchName.includes(String(targetGradYear)) || 
+                          batchName.includes(String(targetGradYear - 1)) || 
+                          batchName.toLowerCase().includes(`year ${selectedYear}`) ||
+                          batchName.toLowerCase().includes(`yr ${selectedYear}`);
+                          
+      return matchesBranch && matchesYear;
+    });
+  }, [sections, selectedBranch, selectedYear, term]);
+
+  const visibleSections = React.useMemo(() => {
+    const filtered = getFilteredSections();
+    if (filtered.length > 0) return filtered;
+    
+    const branchOnly = sections.filter(sec => {
+      const batchName = sec.batch?.batchName || '';
+      return selectedBranch === 'Computer Science'
+        ? (batchName.toLowerCase().includes('cs') || batchName.toLowerCase().includes('computer'))
+        : batchName.toLowerCase().includes(selectedBranch.toLowerCase());
+    });
+    if (branchOnly.length > 0) return branchOnly;
+    
+    if (sections.length > 0) return sections;
+    
+    return [
+      { id: 1, sectionName: "Section A", batch: { id: 1, batchName: `B.Tech ${selectedBranch} Year ${selectedYear}` } }
+    ];
+  }, [sections, selectedBranch, selectedYear, getFilteredSections]);
+
+  const loadCanvasData = useCallback(async (sectionId) => {
+    if (!sectionId) return;
+    setLoadingCanvas(true);
+    try {
+      const res = await getSectionSchedule(sectionId, term);
+      setEntries(res.data || []);
+      
+      if (!facultiesLoaded) {
+        getAllFaculties().then(facRes => {
+          setFaculties(facRes.data || []);
+          setFacultiesLoaded(true);
+        }).catch(err => console.error("Lazy load faculties failed:", err));
+      }
+      
+      getAssignments(term).then(assignsRes => {
+        setAssignments(assignsRes.data || []);
+        setAssignmentsLoaded(true);
+      }).catch(err => console.error("Lazy load assignments failed:", err));
+      
+    } catch (err) {
+      console.error("Error loading lazy canvas:", err);
+      toast.error("Failed to load section schedule grid");
+    } finally {
+      setLoadingCanvas(false);
+    }
+  }, [term, facultiesLoaded]);
+
+  const handleSectionTabClick = (sectionId) => {
+    setActiveSectionId(sectionId);
+    setSelectedSection(String(sectionId));
+    loadCanvasData(sectionId);
+  };
+
+  // Auto-select first section when visibleSections changes
+  useEffect(() => {
+    if (visibleSections.length > 0) {
+      const firstSecId = visibleSections[0].id;
+      setActiveSectionId(firstSecId);
+      setSelectedSection(String(firstSecId));
+      loadCanvasData(firstSecId);
+    } else {
+      setActiveSectionId(null);
+      setSelectedSection('');
+      setEntries([]);
+    }
+  }, [visibleSections, loadCanvasData]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [subs, secs, facs, rms, assigns] = await Promise.all([
+      const [subs, secs, rms] = await Promise.all([
         getAllSubjects(),
         getAllSections(),
-        getAllFaculties(),
-        getAllRooms(),
-        getAssignments(term)
+        getAllRooms()
       ]);
       setSubjects(subs.data || []);
       setSections(secs.data || []);
-      setFaculties(facs.data || []);
       setRooms(rms.data || []);
-      setAssignments(assigns.data || []);
-
-      // Auto-select first section
-      if (!selectedSection && secs.data?.length > 0) {
-        setSelectedSection(String(secs.data[0].id));
-      }
-      // Auto-select first faculty for absence coordinator
-      if (!selectedAbsFaculty && facs.data?.length > 0) {
-        setSelectedAbsFaculty(String(facs.data[0].id));
-      }
     } catch (error) {
       console.error("Error fetching timetable data:", error);
       toast.error("Failed to load master timetable data");
@@ -267,7 +364,6 @@ export default function AdminTimetablePage() {
   const fetchEntries = async () => {
     if (!selectedSection) return;
     try {
-      // For the drag-and-drop canvas, get template schedule
       const res = await getSectionSchedule(selectedSection, term);
       setEntries(res.data || []);
     } catch (error) {
@@ -336,9 +432,10 @@ export default function AdminTimetablePage() {
   };
 
   const handleEntryChange = useCallback(() => {
-    fetchEntries();
-    getAssignments(term).then(r => setAssignments(r.data || [])).catch(() => { });
-  }, [selectedSection, term]);
+    if (activeSectionId) {
+      loadCanvasData(activeSectionId);
+    }
+  }, [activeSectionId, loadCanvasData]);
 
   // AOCS: Register direct cancellation override
   const handleCancelSlot = async (slot) => {
@@ -758,48 +855,107 @@ export default function AdminTimetablePage() {
 
             {/* Right Column: Timetable Canvas */}
             <div className="xl:col-span-3">
-              <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm">
+              <div className="p-4 sm:p-5 bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm">
                 
-                {/* Selector Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <h3 className="font-semibold text-sm text-slate-200">Schedule Canvas for:</h3>
+                {/* Step 1: Focus Selection Control Panel */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl border bg-slate-50/50 dark:bg-[#161B26] border-slate-200/50 dark:border-slate-800 mb-6 text-left">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 1: Academic Year</label>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {['1', '2', '3', '4'].map(yr => (
+                        <button
+                          key={yr}
+                          type="button"
+                          onClick={() => setSelectedYear(yr)}
+                          className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all ${selectedYear === yr 
+                            ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white shadow-sm' 
+                            : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-50 dark:bg-[#0B0F19] dark:border-slate-850 dark:text-slate-400 dark:hover:bg-slate-900/60 dark:hover:text-white'}`}
+                        >
+                          {yr === '1' ? '1st Year' : yr === '2' ? '2nd Year' : yr === '3' ? '3rd Year' : '4th Year'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5 text-left">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Department/Branch</label>
                     <select
-                      value={selectedSection}
-                      onChange={e => setSelectedSection(e.target.value)}
-                      className="text-sm border border-neutral-800 rounded-lg px-3 py-1 bg-neutral-950 text-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+                      value={selectedBranch}
+                      onChange={e => setSelectedBranch(e.target.value)}
+                      className="text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-1.5 bg-white dark:bg-[#0B0F19] text-slate-700 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer"
                     >
-                      <option value="">Select Section...</option>
-                      {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
+                      <option value="Computer Science">Computer Science</option>
+                      <option value="Information Technology">Information Technology</option>
+                      <option value="Electronics Engineering">Electronics Engineering</option>
+                      <option value="Mechanical Engineering">Mechanical Engineering</option>
+                      <option value="Civil Engineering">Civil Engineering</option>
                     </select>
                   </div>
-                  <button
-                    onClick={() => { fetchEntries(); fetchData(); }}
-                    className="p-1.5 hover:bg-neutral-800 rounded-lg text-slate-400 hover:text-white transition-colors"
-                    title="Refresh Schedule"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                  </button>
                 </div>
 
-                {!selectedSection ? (
-                  <div className="min-h-[450px] flex flex-col items-center justify-center text-center">
-                    <CalendarIcon className="w-16 h-16 text-slate-800 mb-4" />
-                    <h3 className="text-lg font-bold text-white">Master Schedule Canvas</h3>
-                    <p className="text-xs text-slate-400 max-w-sm mt-2">
-                      Select a section above to start dragging active subject assignments onto the weekly timetable template.
-                    </p>
+                {/* Step 2: Section Selector Tab Row */}
+                <div className="flex flex-col gap-2 mb-6 text-left">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 2: Section Level</label>
+                  <div className="flex flex-wrap items-center gap-2 border-b border-slate-200/50 dark:border-slate-800 pb-3">
+                    {visibleSections.map(sec => (
+                      <button
+                        key={sec.id}
+                        type="button"
+                        onClick={() => handleSectionTabClick(sec.id)}
+                        className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all duration-200 ${activeSectionId === sec.id
+                          ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400'
+                          : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-50 dark:bg-[#0B0F19] dark:border-slate-850 dark:text-slate-400 dark:hover:bg-slate-900/60 dark:hover:text-white'}`}
+                      >
+                        {sec.sectionName}
+                        {sec.batch?.batchName && (
+                          <span className="ml-1.5 opacity-60 font-normal text-[10px]">
+                            ({sec.batch.batchName})
+                          </span>
+                        )}
+                      </button>
+                    ))}
                   </div>
-                ) : (
-                  <ScheduleGrid
-                    entries={entries}
-                    assignments={gridAssignments}
-                    rooms={rooms}
-                    term={term}
-                    sectionId={parseInt(selectedSection)}
-                    onEntryChange={handleEntryChange}
-                  />
-                )}
+                </div>
+
+                {/* Step 3: Lazy Loaded Canvas */}
+                <div className="relative">
+                  <div className="absolute right-0 -top-14">
+                    <button
+                      onClick={() => { if (activeSectionId) loadCanvasData(activeSectionId); else fetchData(); }}
+                      className="p-1.5 hover:bg-neutral-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+                      title="Refresh Schedule"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {loadingCanvas ? (
+                    <div className="min-h-[450px] flex flex-col items-center justify-center text-center py-20 bg-white dark:bg-[#161B26] border border-slate-200/50 dark:border-slate-800 rounded-xl shadow-sm">
+                      <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
+                      <p className="text-xs text-slate-450">Loading progressive section timetable template...</p>
+                    </div>
+                  ) : !activeSectionId ? (
+                    <div className="min-h-[450px] flex flex-col items-center justify-center text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl py-20">
+                      <CalendarIcon className="w-16 h-16 text-slate-350 dark:text-slate-700 mb-4 animate-bounce duration-1000" />
+                      <h3 className="text-base font-bold text-slate-750 dark:text-slate-300">No Section Available</h3>
+                      <p className="text-xs text-slate-550 dark:text-slate-450 max-w-sm mt-2">
+                        Choose a different Academic Year or Branch in Step 1 to populate matching sections.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="animate-in fade-in duration-300">
+                      <ScheduleGrid
+                        entries={entries}
+                        assignments={gridAssignments}
+                        rooms={rooms}
+                        term={term}
+                        sectionId={parseInt(selectedSection)}
+                        onEntryChange={handleEntryChange}
+                      />
+                    </div>
+                  )}
+                </div>
+
               </div>
             </div>
           </div>

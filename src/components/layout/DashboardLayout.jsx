@@ -303,7 +303,7 @@ export default function DashboardLayout({ children, onLogout }) {
             onMarkAllRead={handleMarkAllRead}
           />
 
-          <main className="flex-1 space-y-4 p-6 bg-sidebar/70 transition-colors duration-300">
+          <main className="flex-1 min-w-0 space-y-4 p-6 bg-sidebar/70 transition-colors duration-300">
             {activeSession && (
               <div className="p-4 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-lg backdrop-blur-sm animate-pulse text-left">
                 <div className="flex items-center gap-3">

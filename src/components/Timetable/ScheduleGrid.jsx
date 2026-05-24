@@ -16,19 +16,40 @@ const TIME_SLOTS = [
   { start: '16:00', end: '17:00', label: '4 PM' },
 ];
 
-const SUBJECT_COLORS = [
-  { bg: 'bg-indigo-100 dark:bg-indigo-500/15', border: 'border-l-4 border-indigo-500', text: 'text-indigo-800 dark:text-indigo-300' },
-  { bg: 'bg-emerald-100 dark:bg-emerald-500/15', border: 'border-l-4 border-emerald-500', text: 'text-emerald-800 dark:text-emerald-300' },
-  { bg: 'bg-amber-100 dark:bg-amber-500/15', border: 'border-l-4 border-amber-500', text: 'text-amber-800 dark:text-amber-300' },
-  { bg: 'bg-rose-100 dark:bg-rose-500/15', border: 'border-l-4 border-rose-500', text: 'text-rose-800 dark:text-rose-300' },
-  { bg: 'bg-cyan-100 dark:bg-cyan-500/15', border: 'border-l-4 border-cyan-500', text: 'text-cyan-800 dark:text-cyan-300' },
-  { bg: 'bg-violet-100 dark:bg-violet-500/15', border: 'border-l-4 border-violet-500', text: 'text-violet-800 dark:text-violet-300' },
-  { bg: 'bg-orange-100 dark:bg-orange-500/15', border: 'border-l-4 border-orange-500', text: 'text-orange-800 dark:text-orange-300' },
-  { bg: 'bg-pink-100 dark:bg-pink-500/15', border: 'border-l-4 border-pink-500', text: 'text-pink-800 dark:text-pink-300' },
-];
+function getSubjectCategory(code = '', name = '') {
+  const c = String(code).toLowerCase();
+  const n = String(name).toLowerCase();
 
-function getColor(subjectId) {
-  return SUBJECT_COLORS[(subjectId || 0) % SUBJECT_COLORS.length];
+  if (n.includes('lab') || n.includes('programming') || n.includes('practical') || n.includes('workshop') || c.endsWith('l') || c.includes('lab')) {
+    return 'LABS_PROG';
+  }
+  if (n.includes('math') || n.includes('algebra') || n.includes('calculus') || n.includes('discrete') || n.includes('theory') || n.includes('probability') || n.includes('statistics') || c.startsWith('ma') || c.startsWith('mth')) {
+    return 'MATH_THEORY';
+  }
+  return 'CORE_SYSTEMS';
+}
+
+function getZenithStyles(subjectCode, subjectName) {
+  const cat = getSubjectCategory(subjectCode, subjectName);
+  if (cat === 'MATH_THEORY') {
+    return {
+      bg: 'bg-emerald-55/90 dark:bg-emerald-500/10',
+      text: 'text-emerald-700 dark:text-emerald-400',
+      border: 'border border-emerald-200/80 dark:border-emerald-500/20'
+    };
+  } else if (cat === 'LABS_PROG') {
+    return {
+      bg: 'bg-rose-55/90 dark:bg-rose-500/10',
+      text: 'text-rose-700 dark:text-rose-400',
+      border: 'border border-rose-200/80 dark:border-rose-500/20'
+    };
+  } else {
+    return {
+      bg: 'bg-indigo-55/90 dark:bg-indigo-500/10',
+      text: 'text-indigo-700 dark:text-indigo-400',
+      border: 'border border-indigo-200/80 dark:border-indigo-500/20'
+    };
+  }
 }
 
 // Normalize "09:00:00" → "09:00"
@@ -105,14 +126,13 @@ function PlacementModal({ assignment, day, slot, rooms, onConfirm, onCancel, isV
   );
 }
 
-// ── Delete Confirmation Overlay (inline, no confirm() dialog needed) ─────────
 function DeleteConfirm({ entry, onConfirm, onCancel }) {
-  const color = getColor(entry.subjectId);
+  const color = getZenithStyles(entry.subjectCode, entry.subjectName);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onCancel}>
       <div className="bg-background border border-border rounded-xl shadow-2xl p-5 w-80 mx-4" onClick={e => e.stopPropagation()}>
         <div className="flex items-center gap-3 mb-3">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color.bg} ${color.border}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color.bg} ${color.border}`}>
             <span className={`text-xs font-bold ${color.text}`}>{entry.subjectCode?.slice(0, 3)}</span>
           </div>
           <div>
@@ -250,16 +270,16 @@ export default function ScheduleGrid({ entries, assignments, rooms, term, sectio
               const k = `${a.subjectId}-${a.facultyId}-${a.sectionId}`;
               const remaining = a.weeklySlots - (placedCounts[k] || 0);
               if (remaining <= 0) return null;
-              const c = getColor(a.subjectId);
+              const c = getZenithStyles(a.subjectCode, a.subjectName);
               return (
                 <div
                   key={a.id}
                   draggable
                   onDragStart={e => handleDragStart(e, a)}
-                  className={`px-3 py-2 rounded-lg cursor-grab active:cursor-grabbing select-none transition-all hover:scale-[1.02] hover:shadow-md ${c.bg} ${c.border}`}
+                  className={`px-3 py-2 rounded-xl cursor-grab active:cursor-grabbing select-none transition-all hover:scale-[1.02] hover:shadow-md ${c.bg} ${c.border}`}
                 >
                   <div className={`text-sm font-semibold ${c.text}`}>{a.subjectCode}</div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                  <div className="text-[10px] opacity-80">
                     {a.facultyName || a.facultyCollegeId} · {remaining} left
                   </div>
                 </div>
@@ -270,15 +290,15 @@ export default function ScheduleGrid({ entries, assignments, rooms, term, sectio
       )}
 
       {/* ── Schedule Grid ───────────────────────────────────────────────── */}
-      <div className="overflow-x-auto rounded-xl border border-border/50">
+      <div className="overflow-x-auto rounded-xl border border-slate-200/60 dark:border-slate-800 bg-[#F8F9FA] dark:bg-[#161B26] p-1.5 shadow-sm">
         <table className="w-full border-collapse min-w-[700px]">
           <thead>
-            <tr className="bg-muted/30">
-              <th className="p-2 text-xs font-semibold text-muted-foreground border-b border-r border-border/30 w-16 text-center">
+            <tr className="bg-slate-100/50 dark:bg-[#111622]/40">
+              <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 border-b border-r border-slate-200/50 dark:border-slate-800/80 w-16 text-center">
                 <Clock className="w-4 h-4 mx-auto" />
               </th>
               {DAYS.map(d => (
-                <th key={d} className="p-2 text-xs font-semibold text-muted-foreground border-b border-r border-border/30 text-center uppercase tracking-wider">
+                <th key={d} className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 border-b border-r border-slate-200/50 dark:border-slate-800/80 text-center uppercase tracking-wider">
                   {DAY_SHORT[d]}
                 </th>
               ))}
@@ -291,26 +311,26 @@ export default function ScheduleGrid({ entries, assignments, rooms, term, sectio
                 <React.Fragment key={slot.start}>
                   {isLunchBefore && (
                     <tr>
-                      <td colSpan={DAYS.length + 1} className="text-center text-[10px] text-muted-foreground/60 py-1 bg-muted/10 border-b border-border/20 italic">
+                      <td colSpan={DAYS.length + 1} className="text-center text-[10px] text-slate-400/60 py-2 bg-slate-100/30 dark:bg-slate-900/20 border-b border-slate-200/50 dark:border-slate-800/80 italic">
                         — Lunch Break (1:00 – 2:00 PM) —
                       </td>
                     </tr>
                   )}
                   <tr>
-                    <td className="p-2 text-[11px] font-mono text-muted-foreground text-center border-r border-b border-border/20 bg-muted/10 whitespace-nowrap">
+                    <td className="p-3 text-xs font-medium text-slate-500 dark:text-slate-400 text-center border-r border-b border-slate-200/50 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#111622]/30 whitespace-nowrap">
                       {slot.label}
                     </td>
                     {DAYS.map(day => {
                       const cellKey = `${day}|${slot.start}`;
                       const entry = entryMap[cellKey];
                       const isHover = hoverCell === cellKey;
-                      const c = entry ? getColor(entry.subjectId) : null;
+                      const c = entry ? getZenithStyles(entry.subjectCode, entry.subjectName) : null;
 
                       return (
                         <td
                           key={cellKey}
-                          className={`border-r border-b border-border/20 p-1 h-[72px] align-top transition-colors relative overflow-visible
-                            ${isHover ? 'bg-indigo-500/10 ring-2 ring-inset ring-indigo-500/40' : 'hover:bg-muted/20'}
+                          className={`border-r border-b border-slate-200/50 dark:border-slate-800/80 p-1.5 h-[90px] bg-white dark:bg-[#161B26] align-top transition-colors relative overflow-visible
+                            ${isHover ? 'bg-indigo-500/5 ring-2 ring-inset ring-indigo-500/30' : 'hover:bg-slate-50/80 dark:hover:bg-[#1C2333]/50'}
                           `}
                           onDragOver={e => handleDragOver(e, day, slot)}
                           onDragLeave={handleDragLeave}
@@ -319,24 +339,25 @@ export default function ScheduleGrid({ entries, assignments, rooms, term, sectio
                           {entry ? (
                             /* Entry card — click anywhere on it to delete */
                             <div
-                              className={`h-full rounded-md p-1.5 relative cursor-pointer group/card ${c.bg} ${c.border}`}
+                              className={`h-full rounded-xl p-2 relative cursor-pointer group/card flex flex-col justify-between ${c.bg} ${c.border} hover:scale-[1.01] transition-transform`}
                               title="Click to remove"
                               onClick={() => setDeleteModal(entry)}
                             >
                               {/* Hover indicator */}
-                              <div className="absolute inset-0 bg-red-500/0 group-hover/card:bg-red-500/8 rounded-md transition-colors flex items-start justify-end p-1 pointer-events-none">
+                              <div className="absolute inset-0 bg-red-500/0 group-hover/card:bg-red-500/5 rounded-xl transition-colors flex items-start justify-end p-1 pointer-events-none">
                                 <X className="w-3.5 h-3.5 text-red-500 opacity-0 group-hover/card:opacity-100 transition-opacity" />
                               </div>
-                              <div className={`text-[11px] font-semibold truncate ${c.text}`}>
-                                {entry.subjectCode || entry.subjectName}
+                              <div className={`text-[11px] font-bold truncate ${c.text}`}>
+                                {entry.subjectCode}
                               </div>
-                              <div className="text-[9px] text-slate-500 dark:text-slate-400 truncate">{entry.roomName}</div>
-                              <div className="text-[9px] text-slate-500 dark:text-slate-400 truncate">{entry.facultyName}</div>
+                              <div className="text-[9px] text-slate-500 dark:text-slate-400 truncate mt-1">
+                                {entry.roomName} · {entry.facultyName}
+                              </div>
                             </div>
                           ) : (
                             isHover && (
                               <div className="h-full flex items-center justify-center pointer-events-none">
-                                <span className="text-[10px] text-indigo-400 font-medium">Drop here</span>
+                                <span className="text-[10px] text-indigo-400 font-medium animate-pulse">Drop here</span>
                               </div>
                             )
                           )}
