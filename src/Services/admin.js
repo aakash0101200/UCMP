@@ -30,3 +30,11 @@ export const updateFacultySections = (collegeId, sectionIds) => API.put(`/admin/
  * Deletes a user by college ID.
  */
 export const deleteUser = (collegeId) => API.delete(`/admin/users/${collegeId}`);
+
+/**
+ * Lazy loading mindmap endpoints
+ */
+export const getDepartments = () => API.get('/admin/users/departments');
+export const getDepartmentSections = (deptName) => API.get(`/admin/users/departments/${encodeURIComponent(deptName)}/sections`);
+export const getDepartmentFaculty = (deptName, page = 0, size = 30) => API.get(`/admin/users/departments/${encodeURIComponent(deptName)}/faculty?page=${page}&size=${size}`);
+export const getSectionStudents = (sectionId, page = 0, size = 30) => API.get(`/admin/users/sections/${sectionId}/students?page=${page}&size=${size}`);

@@ -1,6 +1,5 @@
 import React from "react";
 import { FileText, Clock, AlertCircle } from "lucide-react";
-import BottomNavBar from "@/components/navigation/BottomNavBar";
 
 /**
  * Student Assignment Page — VIEW ONLY
@@ -103,8 +102,6 @@ export default function AssignmentPage() {
           ))}
         </div>
       )}
-
-      <BottomNavBar />
     </div>
   );
 }

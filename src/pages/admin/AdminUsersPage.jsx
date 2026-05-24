@@ -1,202 +1,312 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Search, 
   Users, 
   GraduationCap, 
   Briefcase, 
   Shield, 
-  Folder, 
-  FolderOpen, 
-  ChevronRight, 
-  ChevronDown, 
   Mail, 
-  User, 
   Hash, 
-  FileText,
-  Activity,
   Layers,
   KeyRound,
   Pencil,
   Trash2,
   X,
-  Check
+  Check,
+  RefreshCw
 } from 'lucide-react';
 import { 
-  getAllUsers, 
   resetUserPassword, 
   updateStudentSection, 
   updateFacultySections, 
-  deleteUser 
+  deleteUser,
+  getDepartments,
+  getDepartmentSections,
+  getDepartmentFaculty,
+  getSectionStudents,
+  getAllUsers
 } from '../../Services/admin';
 import { getAllSections } from '../../Services/timetable';
 import { toast } from 'react-toastify';
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState([]);
-  const [sections, setSections] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [departments, setDepartments] = useState([]);
+  const [activeDept, setActiveDept] = useState('');
+  const [activeBranchType, setActiveBranchType] = useState(''); // 'Faculty' | 'Sections'
+  const [activeSectionId, setActiveSectionId] = useState('');
+  
+  const [sectionsList, setSectionsList] = useState([]);
+  const [personnelList, setPersonnelList] = useState([]);
+  const [personnelPage, setPersonnelPage] = useState(0);
+  const [hasLoadedAll, setHasLoadedAll] = useState(true);
+
+  const [loadingDepts, setLoadingDepts] = useState(true);
+  const [loadingSections, setLoadingSections] = useState(false);
+  const [loadingPersonnel, setLoadingPersonnel] = useState(false);
+  
+  // Search state
   const [searchQuery, setSearchQuery] = useState('');
+  const [allUsers, setAllUsers] = useState([]);
+  const [loadingAllUsers, setLoadingAllUsers] = useState(false);
+  
+  // Global sections list (for reassignment dropdowns)
+  const [sections, setSections] = useState([]);
   
   // Modals state
-  const [editingUser, setEditingUser] = useState(null); // student or faculty user object
-  const [deletingUser, setDeletingUser] = useState(null); // user object to delete
-  const [resettingUser, setResettingUser] = useState(null); // user object to reset password
+  const [editingUser, setEditingUser] = useState(null); // student or faculty object
+  const [deletingUser, setDeletingUser] = useState(null);
+  const [resettingUser, setResettingUser] = useState(null);
   
   // Edit forms state
-  const [selectedSectionId, setSelectedSectionId] = useState(''); // for student transfer
-  const [facultySectionIds, setFacultySectionIds] = useState([]); // for faculty sections
+  const [selectedSectionId, setSelectedSectionId] = useState('');
+  const [facultySectionIds, setFacultySectionIds] = useState([]);
 
-  // State to track which nodes are expanded
-  const [expandedNodes, setExpandedNodes] = useState({});
+  // SVGs Connectors coordinate state
+  const [connectors, setConnectors] = useState([]);
+  const containerRef = useRef(null);
 
+  // Initial load
   useEffect(() => {
-    fetchInitialData();
+    const initData = async () => {
+      setLoadingDepts(true);
+      try {
+        const [deptsRes, sectionsRes] = await Promise.all([
+          getDepartments(),
+          getAllSections()
+        ]);
+        setDepartments(deptsRes.data || []);
+        setSections(sectionsRes.data || []);
+      } catch (err) {
+        console.error('Failed to load initial directory data:', err);
+        toast.error('Failed to load academic departments.');
+      } finally {
+        setLoadingDepts(false);
+      }
+    };
+    initData();
   }, []);
 
-  const fetchInitialData = async () => {
-    setLoading(true);
-    try {
-      const [usersRes, sectionsRes] = await Promise.all([
-        getAllUsers(),
-        getAllSections()
-      ]);
-      setUsers(usersRes.data || []);
-      setSections(sectionsRes.data || []);
-    } catch (error) {
-      console.error('Error fetching admin users data:', error);
-      toast.error('Failed to load user directory and section list.');
-    } finally {
-      setLoading(false);
+  // Fetch sections list when active department changes
+  useEffect(() => {
+    if (!activeDept || activeDept === 'Administration') {
+      setSectionsList([]);
+      return;
     }
-  };
+    const fetchSections = async () => {
+      setLoadingSections(true);
+      try {
+        const res = await getDepartmentSections(activeDept);
+        setSectionsList(res.data || []);
+      } catch (err) {
+        console.error('Failed to load sections:', err);
+        toast.error('Failed to load department sections.');
+      } finally {
+        setLoadingSections(false);
+      }
+    };
+    fetchSections();
+  }, [activeDept]);
 
-  const refreshUsersList = async () => {
-    try {
-      const usersRes = await getAllUsers();
-      setUsers(usersRes.data || []);
-    } catch (error) {
-      console.error('Error refreshing users list:', error);
+  // Fetch personnel list when path criteria change
+  useEffect(() => {
+    if (activeDept) {
+      setPersonnelList([]);
+      setPersonnelPage(0);
+      setHasLoadedAll(true);
+      fetchPersonnel(0, false);
+    } else {
+      setPersonnelList([]);
     }
-  };
+  }, [activeDept, activeBranchType, activeSectionId]);
 
-  const toggleNode = (nodeId) => {
-    setExpandedNodes(prev => ({
-      ...prev,
-      [nodeId]: !prev[nodeId]
-    }));
-  };
-
-  // Main stats
-  const stats = useMemo(() => {
-    const total = users.length;
-    const admins = users.filter(u => u.role === 'ADMIN').length;
-    const faculty = users.filter(u => u.role === 'FACULTY').length;
-    const students = users.filter(u => u.role === 'STUDENT').length;
-    return { total, admins, faculty, students };
-  }, [users]);
-
-  // Filter and group users based on search query
-  const groupedData = useMemo(() => {
-    const query = searchQuery.toLowerCase().trim();
-    
-    const filteredUsers = users.filter(user => {
-      if (!query) return true;
-      return (
-        user.name?.toLowerCase().includes(query) ||
-        user.collegeId?.toLowerCase().includes(query) ||
-        user.email?.toLowerCase().includes(query) ||
-        user.rollNumber?.toLowerCase().includes(query) ||
-        user.role?.toLowerCase().includes(query)
-      );
-    });
-
-    const groups = {};
-
-    filteredUsers.forEach(user => {
-      let dept = 'Administration';
-      
-      if (user.role === 'FACULTY') {
-        dept = user.department || 'Unassigned Faculty';
-      } else if (user.role === 'STUDENT') {
-        dept = user.branch || 'Unassigned Students';
-      } else {
-        dept = 'Administration';
-      }
-
-      if (!groups[dept]) {
-        groups[dept] = {
-          admins: [],
-          faculty: [],
-          sections: {}
-        };
-      }
-
-      if (user.role === 'ADMIN') {
-        groups[dept].admins.push(user);
-      } else if (user.role === 'FACULTY') {
-        groups[dept].faculty.push(user);
-      } else if (user.role === 'STUDENT') {
-        const sec = user.sectionName || 'No Section';
-        if (!groups[dept].sections[sec]) {
-          groups[dept].sections[sec] = [];
-        }
-        groups[dept].sections[sec].push(user);
-      }
-    });
-
-    return groups;
-  }, [users, searchQuery]);
-
-  // Automatically expand folders when searching
+  // Load all users for flat search list if search is active
   useEffect(() => {
     if (searchQuery.trim()) {
-      const autoExpand = {};
-      Object.keys(groupedData).forEach(dept => {
-        autoExpand[`dept:${dept}`] = true;
-        autoExpand[`dept:${dept}:admins`] = true;
-        autoExpand[`dept:${dept}:faculty`] = true;
-        autoExpand[`dept:${dept}:sections`] = true;
-        
-        Object.keys(groupedData[dept].sections).forEach(sec => {
-          autoExpand[`dept:${dept}:sec:${sec}`] = true;
-        });
-      });
-      setExpandedNodes(autoExpand);
+      const fetchAll = async () => {
+        setLoadingAllUsers(true);
+        try {
+          const res = await getAllUsers();
+          setAllUsers(res.data || []);
+        } catch (err) {
+          console.error('Search data fetch failed:', err);
+        } finally {
+          setLoadingAllUsers(false);
+        }
+      };
+      fetchAll();
     }
-  }, [searchQuery, groupedData]);
+  }, [searchQuery]);
 
-  // Action: Reset password
+  const fetchPersonnel = async (pageNumber = 0, append = false) => {
+    if (!activeDept) return;
+    if (activeBranchType === 'Sections' && !activeSectionId) {
+      setPersonnelList([]);
+      return;
+    }
+
+    setLoadingPersonnel(true);
+    try {
+      let res;
+      if (activeBranchType === 'Faculty') {
+        res = await getDepartmentFaculty(activeDept, pageNumber, 30);
+      } else if (activeBranchType === 'Sections' && activeSectionId) {
+        res = await getSectionStudents(activeSectionId, pageNumber, 30);
+      }
+
+      if (res && res.data) {
+        const { content, last } = res.data;
+        if (append) {
+          setPersonnelList(prev => [...prev, ...content]);
+        } else {
+          setPersonnelList(content);
+        }
+        setPersonnelPage(pageNumber);
+        setHasLoadedAll(last);
+      }
+    } catch (err) {
+      console.error('Failed to load personnel:', err);
+      toast.error('Failed to load directory members.');
+    } finally {
+      setLoadingPersonnel(false);
+    }
+  };
+
+  const handleLoadMore = () => {
+    fetchPersonnel(personnelPage + 1, true);
+  };
+
+  // Path selection triggers
+  const handleDeptClick = (dept) => {
+    if (activeDept === dept) {
+      setActiveDept('');
+      setActiveBranchType('');
+      setActiveSectionId('');
+    } else {
+      setActiveDept(dept);
+      setActiveBranchType('');
+      setActiveSectionId('');
+    }
+  };
+
+  const handleBranchTypeClick = (type) => {
+    if (activeBranchType === type) {
+      setActiveBranchType('');
+      setActiveSectionId('');
+    } else {
+      setActiveBranchType(type);
+      setActiveSectionId('');
+    }
+  };
+
+  const handleSectionClick = (sectionId) => {
+    if (activeSectionId === sectionId) {
+      setActiveSectionId('');
+    } else {
+      setActiveSectionId(sectionId);
+    }
+  };
+
+  // Recalculate coordinates for mindmap Bezier lines
+  const updateConnectors = () => {
+    if (!containerRef.current || searchQuery.trim()) {
+      setConnectors([]);
+      return;
+    }
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const newConnectors = [];
+
+    // Query node DOM elements by identifier
+    const nodes = containerRef.current.querySelectorAll('[data-node-id]');
+    const nodeRects = {};
+
+    nodes.forEach(node => {
+      const id = node.getAttribute('data-node-id');
+      nodeRects[id] = node.getBoundingClientRect();
+    });
+
+    nodes.forEach(node => {
+      const id = node.getAttribute('data-node-id');
+      const parentId = node.getAttribute('data-parent-id');
+
+      if (parentId && nodeRects[parentId] && nodeRects[id]) {
+        const parentRect = nodeRects[parentId];
+        const childRect = nodeRects[id];
+
+        // Calculate absolute center-right of parent and center-left of child relative to container scroll
+        const parentX = parentRect.left - containerRect.left + parentRect.width;
+        const parentY = parentRect.top - containerRect.top + parentRect.height / 2;
+
+        const childX = childRect.left - containerRect.left;
+        const childY = childRect.top - containerRect.top + childRect.height / 2;
+
+        newConnectors.push({
+          id: `${parentId}-${id}`,
+          x1: parentX,
+          y1: parentY,
+          x2: childX,
+          y2: childY
+        });
+      }
+    });
+
+    setConnectors(newConnectors);
+  };
+
+  // Triggers updates on UI changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateConnectors();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [activeDept, activeBranchType, activeSectionId, personnelList, searchQuery, departments]);
+
+  useEffect(() => {
+    window.addEventListener('resize', updateConnectors);
+    return () => window.removeEventListener('resize', updateConnectors);
+  }, []);
+
+  // Update connectors on container scroll to keep curves anchored correctly
+  const handleScroll = () => {
+    updateConnectors();
+  };
+
+  const refreshActiveData = () => {
+    fetchPersonnel(0, false);
+    if (searchQuery.trim()) {
+      getAllUsers().then(res => setAllUsers(res.data || [])).catch(console.error);
+    }
+  };
+
+  // Actions handlers
   const handleResetPassword = async () => {
     if (!resettingUser) return;
     try {
       const res = await resetUserPassword(resettingUser.collegeId);
       toast.success(res.data || 'Password reset successfully.');
       setResettingUser(null);
-    } catch (error) {
-      console.error('Password reset failed:', error);
-      toast.error(error.response?.data || 'Failed to reset password.');
+      refreshActiveData();
+    } catch (err) {
+      console.error('Password reset failed:', err);
+      toast.error(err.response?.data || 'Failed to reset password.');
     }
   };
 
-  // Action: Delete user
   const handleDeleteUser = async () => {
     if (!deletingUser) return;
     try {
       await deleteUser(deletingUser.collegeId);
       toast.success(`User ${deletingUser.name} deleted successfully.`);
       setDeletingUser(null);
-      refreshUsersList();
-    } catch (error) {
-      console.error('Deletion failed:', error);
-      toast.error(error.response?.data || 'Failed to delete user.');
+      refreshActiveData();
+    } catch (err) {
+      console.error('Deletion failed:', err);
+      toast.error(err.response?.data || 'Failed to delete user.');
     }
   };
 
-  // Open edit modal
   const openEditModal = (user) => {
     setEditingUser(user);
     if (user.role === 'STUDENT') {
-      // Find matching section in global sections list
       const matched = sections.find(s => s.sectionName === user.sectionName);
       setSelectedSectionId(matched ? matched.id : '');
     } else if (user.role === 'FACULTY') {
@@ -204,433 +314,414 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Action: Update Student Section
   const handleUpdateStudentSection = async () => {
     if (!editingUser || !selectedSectionId) return;
     try {
       await updateStudentSection(editingUser.collegeId, parseInt(selectedSectionId));
       toast.success(`Transferred ${editingUser.name} to the new section.`);
       setEditingUser(null);
-      refreshUsersList();
-    } catch (error) {
-      console.error('Section transfer failed:', error);
-      toast.error(error.response?.data || 'Failed to transfer section.');
+      refreshActiveData();
+    } catch (err) {
+      console.error('Section transfer failed:', err);
+      toast.error(err.response?.data || 'Failed to transfer student.');
     }
   };
 
-  // Action: Update Faculty Sections
   const handleUpdateFacultySections = async () => {
     if (!editingUser) return;
     try {
       await updateFacultySections(editingUser.collegeId, facultySectionIds);
       toast.success(`Updated class teaching assignments for ${editingUser.name}.`);
       setEditingUser(null);
-      refreshUsersList();
-    } catch (error) {
-      console.error('Faculty assignment update failed:', error);
-      toast.error(error.response?.data || 'Failed to update sections.');
+      refreshActiveData();
+    } catch (err) {
+      console.error('Faculty assignment update failed:', err);
+      toast.error(err.response?.data || 'Failed to update sections.');
     }
   };
 
-  // Checkbox toggle helper
   const toggleFacultySection = (id) => {
     setFacultySectionIds(prev => 
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-foreground">
-        <Activity className="w-10 h-10 text-indigo-600 dark:text-[#6366F1] animate-spin mb-4" />
-        <p className="text-sm font-medium text-muted-foreground animate-pulse">
-          Loading user directory & class details...
-        </p>
-      </div>
+  // Search Results filtering
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase().trim();
+    return allUsers.filter(user => 
+      user.name?.toLowerCase().includes(query) ||
+      user.collegeId?.toLowerCase().includes(query) ||
+      user.email?.toLowerCase().includes(query) ||
+      user.rollNumber?.toLowerCase().includes(query) ||
+      user.role?.toLowerCase().includes(query)
     );
-  }
+  }, [allUsers, searchQuery]);
 
   return (
-    <div className="scroll-style space-y-6 pb-20 p-6 max-w-6xl mx-auto text-foreground">
+    <div className="space-y-6 pb-20 p-6 max-w-7xl mx-auto text-[#1A202C] dark:text-slate-100 transition-colors duration-300">
+      
       {/* Header Area */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card/40 border border-border/50 p-6 rounded-2xl">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent p-6 rounded-3xl shadow-sm">
         <div>
           <span className="text-xs font-semibold text-indigo-600 dark:text-[#6366F1] tracking-wider uppercase">
-            Administrative Registry
+            Administrative Command Registry
           </span>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight mt-1">
-            User Directory
+          <h1 className="text-4xl font-light tracking-tight mt-1">
+            User Mindmap Tree
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Browse and manage access, reset passwords, or reassign sections level-by-level
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Browse corporate structure, reassign sections, and manage accounts dynamically level-by-level.
           </p>
         </div>
 
         <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search by name, ID, email..."
-            className="w-full bg-background/50 border border-border/80 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-indigo-500/50 transition-all placeholder:text-muted-foreground/60"
+            placeholder="Search directory..."
+            className="w-full bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl py-2 pl-10 pr-4 text-xs focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-400"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
 
-      {/* Metric summary boxes */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-card border border-border/50">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Total Users</span>
-            <Users className="w-4 h-4 text-indigo-500" />
-          </div>
-          <h2 className="text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.total}</h2>
-          <p className="text-[10px] text-muted-foreground mt-1">Overall accounts registered</p>
+      {loadingDepts ? (
+        <div className="flex flex-col items-center justify-center py-24">
+          <RefreshCw className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
+          <p className="text-xs text-slate-500 dark:text-slate-400 animate-pulse">
+            Loading registry connections...
+          </p>
         </div>
-
-        <div className="p-5 rounded-2xl bg-card border border-border/50">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Admins</span>
-            <Shield className="w-4 h-4 text-indigo-500" />
+      ) : searchQuery.trim() ? (
+        /* Flat Search View */
+        <div className="space-y-4">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            Search Matches ({filteredUsers.length})
           </div>
-          <h2 className="text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.admins}</h2>
-          <p className="text-[10px] text-muted-foreground mt-1">System administrators</p>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-card border border-border/50">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Faculty</span>
-            <Briefcase className="w-4 h-4 text-indigo-500" />
-          </div>
-          <h2 className="text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.faculty}</h2>
-          <p className="text-[10px] text-muted-foreground mt-1">Teaching staff members</p>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-card border border-border/50">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Students</span>
-            <GraduationCap className="w-4 h-4 text-indigo-500" />
-          </div>
-          <h2 className="text-3xl font-extrabold text-card-foreground tracking-tight mt-3">{stats.students}</h2>
-          <p className="text-[10px] text-muted-foreground mt-1">Enrolled students</p>
-        </div>
-      </div>
-
-      {/* Directory Tree Structure */}
-      <div className="space-y-4">
-        {Object.keys(groupedData).length === 0 ? (
-          <div className="text-center py-16 bg-card/20 rounded-2xl border border-border/30">
-            <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-            <h3 className="font-semibold text-lg text-muted-foreground">No Users Found</h3>
-            <p className="text-sm text-muted-foreground/70">
-              Try adjusting your search criteria or register new users.
-            </p>
-          </div>
-        ) : (
-          Object.keys(groupedData).sort().map(dept => {
-            const deptNodeId = `dept:${dept}`;
-            const isDeptExpanded = !!expandedNodes[deptNodeId];
-            
-            // Calculate department stats
-            const deptAdmins = groupedData[dept].admins.length;
-            const deptFaculty = groupedData[dept].faculty.length;
-            let deptStudents = 0;
-            Object.values(groupedData[dept].sections).forEach(secStudents => {
-              deptStudents += secStudents.length;
-            });
-            const deptTotal = deptAdmins + deptFaculty + deptStudents;
-
-            return (
-              <div 
-                key={dept} 
-                className="bg-card border border-border/40 rounded-2xl overflow-hidden transition-all duration-200"
-              >
-                {/* Department Row */}
-                <div 
-                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/30 select-none transition-colors border-b border-border/20"
-                  onClick={() => toggleNode(deptNodeId)}
+          {loadingAllUsers ? (
+            <div className="text-center py-12">
+              <RefreshCw className="w-6 h-6 text-indigo-500 animate-spin mx-auto mb-2" />
+              <span className="text-xs text-slate-400">Searching records...</span>
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="text-center py-16 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent rounded-3xl text-slate-400">
+              No matching records found in database.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredUsers.map(person => (
+                <div
+                  key={person.collegeId}
+                  className="p-5 rounded-3xl bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent hover:shadow-md transition-all flex flex-col gap-3 shadow-sm text-xs"
                 >
-                  <div className="flex items-center gap-3">
-                    {isDeptExpanded ? (
-                      <FolderOpen className="w-5 h-5 text-indigo-500" />
-                    ) : (
-                      <Folder className="w-5 h-5 text-indigo-400" />
-                    )}
-                    <span className="font-bold text-base tracking-wide text-foreground">
-                      {dept}
-                    </span>
-                    <span className="text-[11px] font-semibold bg-indigo-500/10 text-indigo-600 dark:text-[#6366F1] px-2 py-0.5 rounded-full border border-indigo-500/20">
-                      {deptTotal} {deptTotal === 1 ? 'User' : 'Users'}
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-bold text-slate-900 dark:text-white text-sm">{person.name}</h4>
+                      <p className="text-[10px] font-mono text-indigo-500 dark:text-indigo-400 mt-0.5">{person.collegeId}</p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                      person.role === 'ADMIN' 
+                        ? 'bg-amber-500/10 text-amber-500' 
+                        : person.role === 'FACULTY' 
+                          ? 'bg-blue-500/10 text-blue-500' 
+                          : 'bg-emerald-500/10 text-emerald-500'
+                    }`}>
+                      {person.role}
                     </span>
                   </div>
-                  
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground/80">
-                    <div className="hidden sm:flex items-center gap-3">
-                      {deptAdmins > 0 && <span>Admins: {deptAdmins}</span>}
-                      {deptFaculty > 0 && <span>Faculty: {deptFaculty}</span>}
-                      {deptStudents > 0 && <span>Students: {deptStudents}</span>}
+
+                  <div className="text-slate-500 dark:text-slate-400 space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="truncate">{person.email}</span>
                     </div>
-                    {isDeptExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    {person.role === 'FACULTY' && (
+                      <div className="flex items-center gap-1.5">
+                        <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{person.designation || 'Faculty Staff'} ({person.department})</span>
+                      </div>
+                    )}
+                    {person.role === 'STUDENT' && (
+                      <div className="flex items-center gap-1.5">
+                        <Hash className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Roll: {person.rollNumber} • Year {person.year} • Section: {person.sectionName || 'N/A'}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-end gap-1.5 border-t border-slate-100 dark:border-slate-800/40 pt-2 mt-1">
+                    <button
+                      title={person.role === 'STUDENT' ? 'Transfer Section' : 'Assign Sections'}
+                      onClick={() => openEditModal(person)}
+                      className="p-1.5 rounded-lg hover:bg-indigo-500/10 text-indigo-500 transition-all"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      title="Reset Password"
+                      onClick={() => setResettingUser(person)}
+                      className="p-1.5 rounded-lg hover:bg-amber-500/10 text-amber-500 transition-all"
+                    >
+                      <KeyRound className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      title="Delete User"
+                      onClick={() => setDeletingUser(person)}
+                      className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Mindmap Visual Hierarchy Graph */
+        <div 
+          ref={containerRef}
+          onScroll={handleScroll}
+          id="mindmap-container" 
+          className="flex overflow-x-auto gap-16 py-12 px-6 relative min-h-[600px] w-full rounded-3xl bg-slate-50/50 dark:bg-[#0B0F19]/25 border border-slate-100 dark:border-slate-800/20 no-scrollbar select-none"
+        >
+          {/* SVG Connections Overlay */}
+          <svg className="absolute inset-0 pointer-events-none w-full h-full z-0">
+            {connectors.map(conn => {
+              const dx = Math.abs(conn.x2 - conn.x1) * 0.45;
+              const pathStr = `M ${conn.x1} ${conn.y1} C ${conn.x1 + dx} ${conn.y1}, ${conn.x2 - dx} ${conn.y2}, ${conn.x2} ${conn.y2}`;
+              return (
+                <path
+                  key={conn.id}
+                  d={pathStr}
+                  stroke="url(#mindmap-grad)"
+                  strokeWidth="2.5"
+                  fill="none"
+                  strokeLinecap="round"
+                  className="opacity-70 dark:opacity-40 transition-all duration-300"
+                />
+              );
+            })}
+            <defs>
+              <linearGradient id="mindmap-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#6366F1" />
+                <stop offset="100%" stopColor="#3B82F6" />
+              </linearGradient>
+            </defs>
+          </svg>
 
-                {/* Sub levels */}
-                {isDeptExpanded && (
-                  <div className="p-4 pl-8 space-y-3 bg-card/20 border-t border-border/10">
-                    
-                    {/* 1. Admins Node */}
-                    {groupedData[dept].admins.length > 0 && (
-                      <div className="space-y-1">
-                        <div 
-                          className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-muted/40 cursor-pointer text-sm font-semibold select-none"
-                          onClick={() => toggleNode(`${deptNodeId}:admins`)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-amber-500" />
-                            <span>Admins</span>
-                            <span className="text-[10px] px-1.5 py-0.2 bg-amber-500/10 text-amber-500 rounded-md">
-                              {groupedData[dept].admins.length}
-                            </span>
-                          </div>
-                          {expandedNodes[`${deptNodeId}:admins`] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-                        </div>
-                        
-                        {expandedNodes[`${deptNodeId}:admins`] && (
-                          <div className="pl-6 pt-1 space-y-2">
-                            <div className="overflow-x-auto rounded-xl border border-border/40">
-                              <table className="min-w-full divide-y divide-border/30 text-left text-xs">
-                                <thead className="bg-muted/50 text-muted-foreground font-medium uppercase tracking-wider">
-                                  <tr>
-                                    <th className="px-4 py-2">College ID</th>
-                                    <th className="px-4 py-2">Name</th>
-                                    <th className="px-4 py-2">Email</th>
-                                    <th className="px-4 py-2 text-right">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-border/20 bg-background/25">
-                                  {groupedData[dept].admins.map(admin => (
-                                    <tr key={admin.collegeId} className="hover:bg-muted/20">
-                                      <td className="px-4 py-2 font-semibold font-mono text-indigo-400">{admin.collegeId}</td>
-                                      <td className="px-4 py-2 font-medium">{admin.name}</td>
-                                      <td className="px-4 py-2 text-muted-foreground">{admin.email}</td>
-                                      <td className="px-4 py-2 text-right">
-                                        <div className="flex justify-end gap-2">
-                                          <button
-                                            title="Reset Password"
-                                            onClick={() => setResettingUser(admin)}
-                                            className="p-1.5 rounded-lg hover:bg-amber-500/10 text-amber-500 transition-colors"
-                                          >
-                                            <KeyRound className="w-4 h-4" />
-                                          </button>
-                                          <button
-                                            title="Delete User"
-                                            onClick={() => setDeletingUser(admin)}
-                                            className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-colors"
-                                          >
-                                            <Trash2 className="w-4 h-4" />
-                                          </button>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+          {/* Column 1: Departments */}
+          <div className="flex flex-col gap-4 z-10 w-60 shrink-0 justify-center">
+            <div className="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-2">Departments</div>
+            {departments.map(dept => {
+              const isSelected = activeDept === dept;
+              return (
+                <div
+                  key={dept}
+                  data-node-id={`dept:${dept}`}
+                  onClick={() => handleDeptClick(dept)}
+                  className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-center ${
+                    isSelected
+                      ? 'bg-slate-900 text-white border-indigo-500 shadow-md dark:bg-slate-100 dark:text-slate-900'
+                      : 'bg-white dark:bg-[#161B26] border-slate-100 dark:border-transparent hover:scale-[1.02] text-slate-800 dark:text-slate-200'
+                  }`}
+                >
+                  <span className="font-bold text-xs">{dept}</span>
+                </div>
+              );
+            })}
+          </div>
 
-                    {/* 2. Faculty Node */}
-                    {groupedData[dept].faculty.length > 0 && (
-                      <div className="space-y-1">
-                        <div 
-                          className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-muted/40 cursor-pointer text-sm font-semibold select-none"
-                          onClick={() => toggleNode(`${deptNodeId}:faculty`)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <Briefcase className="w-4 h-4 text-blue-500" />
-                            <span>Faculty</span>
-                            <span className="text-[10px] px-1.5 py-0.2 bg-blue-500/10 text-blue-500 rounded-md">
-                              {groupedData[dept].faculty.length}
-                            </span>
-                          </div>
-                          {expandedNodes[`${deptNodeId}:faculty`] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-                        </div>
-
-                        {expandedNodes[`${deptNodeId}:faculty`] && (
-                          <div className="pl-6 pt-1 space-y-2">
-                            <div className="overflow-x-auto rounded-xl border border-border/40">
-                              <table className="min-w-full divide-y divide-border/30 text-left text-xs">
-                                <thead className="bg-muted/50 text-muted-foreground font-medium uppercase tracking-wider">
-                                  <tr>
-                                    <th className="px-4 py-2">College ID</th>
-                                    <th className="px-4 py-2">Name</th>
-                                    <th className="px-4 py-2">Email</th>
-                                    <th className="px-4 py-2">Department</th>
-                                    <th className="px-4 py-2 text-right">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-border/20 bg-background/25">
-                                  {groupedData[dept].faculty.map(fac => (
-                                    <tr key={fac.collegeId} className="hover:bg-muted/20">
-                                      <td className="px-4 py-2 font-semibold font-mono text-indigo-400">{fac.collegeId}</td>
-                                      <td className="px-4 py-2 font-medium">{fac.name}</td>
-                                      <td className="px-4 py-2 text-muted-foreground">{fac.email}</td>
-                                      <td className="px-4 py-2 text-muted-foreground/80">{fac.department || dept}</td>
-                                      <td className="px-4 py-2 text-right">
-                                        <div className="flex justify-end gap-2">
-                                          <button
-                                            title="Assign Classes/Sections"
-                                            onClick={() => openEditModal(fac)}
-                                            className="p-1.5 rounded-lg hover:bg-indigo-500/10 text-indigo-500 transition-colors"
-                                          >
-                                            <Pencil className="w-4 h-4" />
-                                          </button>
-                                          <button
-                                            title="Reset Password"
-                                            onClick={() => setResettingUser(fac)}
-                                            className="p-1.5 rounded-lg hover:bg-amber-500/10 text-amber-500 transition-colors"
-                                          >
-                                            <KeyRound className="w-4 h-4" />
-                                          </button>
-                                          <button
-                                            title="Delete User"
-                                            onClick={() => setDeletingUser(fac)}
-                                            className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-colors"
-                                          >
-                                            <Trash2 className="w-4 h-4" />
-                                          </button>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* 3. Sections & Students */}
-                    {Object.keys(groupedData[dept].sections).length > 0 && (
-                      <div className="space-y-1">
-                        <div 
-                          className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-muted/40 cursor-pointer text-sm font-semibold select-none"
-                          onClick={() => toggleNode(`${deptNodeId}:sections`)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <Layers className="w-4 h-4 text-emerald-500" />
-                            <span>Sections</span>
-                            <span className="text-[10px] px-1.5 py-0.2 bg-emerald-500/10 text-emerald-500 rounded-md">
-                              {Object.keys(groupedData[dept].sections).length}
-                            </span>
-                          </div>
-                          {expandedNodes[`${deptNodeId}:sections`] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-                        </div>
-
-                        {expandedNodes[`${deptNodeId}:sections`] && (
-                          <div className="pl-6 pt-1 space-y-3">
-                            {Object.keys(groupedData[dept].sections).sort().map(secName => {
-                              const secNodeId = `${deptNodeId}:sec:${secName}`;
-                              const isSecExpanded = !!expandedNodes[secNodeId];
-                              const secStudents = groupedData[dept].sections[secName];
-
-                              return (
-                                <div key={secName} className="space-y-1 border-l-2 border-border/40 pl-3">
-                                  <div 
-                                    className="flex items-center justify-between py-1 px-3 rounded-lg hover:bg-muted/30 cursor-pointer text-xs font-semibold select-none"
-                                    onClick={() => toggleNode(secNodeId)}
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <GraduationCap className="w-3.5 h-3.5 text-teal-500" />
-                                      <span className="text-foreground">{secName}</span>
-                                      <span className="text-[9px] bg-teal-500/10 text-teal-600 dark:text-teal-400 px-1.5 rounded-full">
-                                        {secStudents.length} {secStudents.length === 1 ? 'Student' : 'Students'}
-                                      </span>
-                                    </div>
-                                    {isSecExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-                                  </div>
-
-                                  {isSecExpanded && (
-                                    <div className="pl-3 pt-1">
-                                      <div className="overflow-x-auto rounded-xl border border-border/40">
-                                        <table className="min-w-full divide-y divide-border/30 text-left text-[11px]">
-                                          <thead className="bg-muted/50 text-muted-foreground font-medium uppercase">
-                                            <tr>
-                                              <th className="px-4 py-1.5">Roll No</th>
-                                              <th className="px-4 py-1.5">Name</th>
-                                              <th className="px-4 py-1.5">Email</th>
-                                              <th className="px-4 py-1.5">Year</th>
-                                              <th className="px-4 py-1.5">College ID</th>
-                                              <th className="px-4 py-1.5 text-right">Actions</th>
-                                            </tr>
-                                          </thead>
-                                          <tbody className="divide-y divide-border/20 bg-background/25">
-                                            {secStudents.map(student => (
-                                              <tr key={student.collegeId} className="hover:bg-muted/20">
-                                                <td className="px-4 py-1.5 font-semibold font-mono text-indigo-400">{student.rollNumber || 'N/A'}</td>
-                                                <td className="px-4 py-1.5 font-medium">{student.name}</td>
-                                                <td className="px-4 py-1.5 text-muted-foreground">{student.email}</td>
-                                                <td className="px-4 py-1.5 text-muted-foreground/80">{student.year || 'N/A'}</td>
-                                                <td className="px-4 py-1.5 text-muted-foreground/60 font-mono">{student.collegeId}</td>
-                                                <td className="px-4 py-1.5 text-right">
-                                                  <div className="flex justify-end gap-1.5">
-                                                    <button
-                                                      title="Transfer Section"
-                                                      onClick={() => openEditModal(student)}
-                                                      className="p-1 rounded hover:bg-indigo-500/10 text-indigo-500 transition-colors"
-                                                    >
-                                                      <Pencil className="w-3.5 h-3.5" />
-                                                    </button>
-                                                    <button
-                                                      title="Reset Password"
-                                                      onClick={() => setResettingUser(student)}
-                                                      className="p-1 rounded hover:bg-amber-500/10 text-amber-500 transition-colors"
-                                                    >
-                                                      <KeyRound className="w-3.5 h-3.5" />
-                                                    </button>
-                                                    <button
-                                                      title="Delete User"
-                                                      onClick={() => setDeletingUser(student)}
-                                                      className="p-1 rounded hover:bg-rose-500/10 text-rose-500 transition-colors"
-                                                    >
-                                                      <Trash2 className="w-3.5 h-3.5" />
-                                                    </button>
-                                                  </div>
-                                                </td>
-                                              </tr>
-                                            ))}
-                                          </tbody>
-                                        </table>
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                  </div>
-                )}
+          {/* Column 2: Branch Types */}
+          {activeDept && (
+            <div className="flex flex-col gap-8 z-10 w-60 shrink-0 justify-center">
+              <div className="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-2">Branch Categories</div>
+              
+              {/* Faculty Branch */}
+              <div
+                data-node-id="branch:Faculty"
+                data-parent-id={`dept:${activeDept}`}
+                onClick={() => handleBranchTypeClick('Faculty')}
+                className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-center ${
+                  activeBranchType === 'Faculty'
+                    ? 'bg-slate-900 text-white border-indigo-500 shadow-md dark:bg-slate-100 dark:text-slate-900'
+                    : 'bg-white dark:bg-[#161B26] border-slate-100 dark:border-transparent hover:scale-[1.02] text-slate-800 dark:text-slate-200'
+                }`}
+              >
+                <span className="font-bold text-xs flex items-center justify-center gap-2">
+                  <Briefcase className="w-3.5 h-3.5" />
+                  Faculty staff
+                </span>
               </div>
-            );
-          })
-        )}
-      </div>
+
+              {/* Sections Branch */}
+              {activeDept !== 'Administration' && (
+                <div
+                  data-node-id="branch:Sections"
+                  data-parent-id={`dept:${activeDept}`}
+                  onClick={() => handleBranchTypeClick('Sections')}
+                  className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-center ${
+                    activeBranchType === 'Sections'
+                      ? 'bg-slate-900 text-white border-indigo-500 shadow-md dark:bg-slate-100 dark:text-slate-900'
+                      : 'bg-white dark:bg-[#161B26] border-slate-100 dark:border-transparent hover:scale-[1.02] text-slate-800 dark:text-slate-200'
+                  }`}
+                >
+                  <span className="font-bold text-xs flex items-center justify-center gap-2">
+                    <Layers className="w-3.5 h-3.5" />
+                    Sections list
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Column 3: Sections */}
+          {activeDept && activeBranchType === 'Sections' && (
+            <div className="flex flex-col gap-4 z-10 w-60 shrink-0 justify-center">
+              <div className="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-2">Sections</div>
+              {loadingSections ? (
+                <div className="text-center text-xs text-slate-400">Loading sections...</div>
+              ) : sectionsList.length === 0 ? (
+                <div className="text-center text-xs text-slate-400">No sections found.</div>
+              ) : (
+                sectionsList.map(sec => {
+                  const isSelected = activeSectionId === sec.id;
+                  return (
+                    <div
+                      key={sec.id}
+                      data-node-id={`sec:${sec.id}`}
+                      data-parent-id="branch:Sections"
+                      onClick={() => handleSectionClick(sec.id)}
+                      className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-center ${
+                        isSelected
+                          ? 'bg-slate-900 text-white border-indigo-500 shadow-md dark:bg-slate-100 dark:text-slate-900'
+                          : 'bg-white dark:bg-[#161B26] border-slate-100 dark:border-transparent hover:scale-[1.02] text-slate-800 dark:text-slate-200'
+                      }`}
+                    >
+                      <span className="font-bold text-xs">{sec.sectionName}</span>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* Column 4: Personnel Directory */}
+          {((activeDept && activeBranchType === 'Faculty') || (activeBranchType === 'Sections' && activeSectionId)) && (
+            <div className="flex flex-col gap-4 z-10 w-72 shrink-0 max-h-[550px] overflow-y-auto no-scrollbar p-2 border border-slate-100 dark:border-slate-800/40 rounded-3xl bg-slate-50/50 dark:bg-[#0B0F19]/20">
+              <div className="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-1 sticky top-0 py-1 bg-transparent">
+                {activeBranchType === 'Faculty' ? 'Faculty Directory' : 'Enrolled Students'}
+              </div>
+              
+              {loadingPersonnel && personnelList.length === 0 ? (
+                <div className="text-center text-xs text-slate-400 py-8">Loading directory...</div>
+              ) : personnelList.length === 0 ? (
+                <div className="text-center text-xs text-slate-400 py-8">No records registered.</div>
+              ) : (
+                <>
+                  {personnelList.map(person => (
+                    <div
+                      key={person.collegeId}
+                      data-node-id={`person:${person.collegeId}`}
+                      data-parent-id={activeBranchType === 'Faculty' ? 'branch:Faculty' : `sec:${activeSectionId}`}
+                      className="p-4 rounded-2xl bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent hover:shadow-md hover:scale-[1.01] transition-all flex flex-col gap-2 shadow-sm text-xs"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-bold text-slate-900 dark:text-white text-xs">{person.name}</h4>
+                          <p className="text-[9px] font-mono text-indigo-500 dark:text-indigo-400 mt-0.5">{person.collegeId}</p>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                          person.role === 'ADMIN' 
+                            ? 'bg-amber-500/10 text-amber-500' 
+                            : person.role === 'FACULTY' 
+                              ? 'bg-blue-500/10 text-blue-500' 
+                              : 'bg-emerald-500/10 text-emerald-500'
+                        }`}>
+                          {person.role}
+                        </span>
+                      </div>
+
+                      <div className="text-slate-500 dark:text-slate-400 space-y-1 text-[10px]">
+                        <div className="flex items-center gap-1.5">
+                          <Mail className="w-3.5 h-3.5 text-slate-400" />
+                          <span className="truncate">{person.email}</span>
+                        </div>
+                        {person.role === 'FACULTY' && (
+                          <div className="flex items-center gap-1.5">
+                            <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{person.designation || 'Faculty Staff'} ({person.department})</span>
+                          </div>
+                        )}
+                        {person.role === 'STUDENT' && (
+                          <div className="flex items-center gap-1.5">
+                            <Hash className="w-3.5 h-3.5 text-slate-400" />
+                            <span>Roll: {person.rollNumber} • Year {person.year}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex justify-end gap-1.5 border-t border-slate-100 dark:border-slate-800/40 pt-2 mt-1">
+                        <button
+                          title={person.role === 'STUDENT' ? 'Transfer Section' : 'Assign Sections'}
+                          onClick={() => openEditModal(person)}
+                          className="p-1 rounded hover:bg-indigo-500/10 text-indigo-500 transition-all"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          title="Reset Password"
+                          onClick={() => setResettingUser(person)}
+                          className="p-1 rounded hover:bg-amber-500/10 text-amber-500 transition-all"
+                        >
+                          <KeyRound className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          title="Delete User"
+                          onClick={() => setDeletingUser(person)}
+                          className="p-1 rounded hover:bg-rose-500/10 text-rose-500 transition-all"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Load More Button Node */}
+                  {!hasLoadedAll && (
+                    <div
+                      onClick={handleLoadMore}
+                      className="p-3 text-center border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-500 rounded-2xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-all text-xs font-bold text-indigo-500 dark:text-indigo-400 select-none"
+                    >
+                      {loadingPersonnel ? (
+                        <div className="flex items-center justify-center gap-1">
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Loading next batch...</span>
+                        </div>
+                      ) : (
+                        <span>Load More Records...</span>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Edit Section/Assignments Modal */}
       {editingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-[#1E2230] border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl p-6 relative animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent rounded-3xl w-full max-w-lg shadow-2xl p-6 relative animate-in fade-in duration-200">
             <button 
               onClick={() => setEditingUser(null)}
-              className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -641,14 +732,14 @@ export default function AdminUsersPage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Modify User Access</h3>
-                <p className="text-xs text-muted-foreground">Adjust attributes for {editingUser.name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Adjust attributes for {editingUser.name}</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <span className="text-xs text-muted-foreground">College ID</span>
-                <p className="font-mono text-sm font-semibold text-indigo-400 mt-0.5">{editingUser.collegeId}</p>
+                <span className="text-xs text-slate-400">College ID</span>
+                <p className="font-mono text-sm font-semibold text-indigo-500 dark:text-indigo-400 mt-0.5">{editingUser.collegeId}</p>
               </div>
 
               {/* STUDENT: Section transfer select */}
@@ -656,7 +747,7 @@ export default function AdminUsersPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Reassign Section</label>
                   <select
-                    className="w-full bg-background border border-border/80 rounded-xl p-2.5 text-sm focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100"
                     value={selectedSectionId}
                     onChange={(e) => setSelectedSectionId(e.target.value)}
                   >
@@ -667,7 +758,7 @@ export default function AdminUsersPage() {
                       </option>
                     ))}
                   </select>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[11px] text-slate-400">
                     Changing the student's section automatically synchronizes their batch/branch mappings.
                   </p>
                 </div>
@@ -677,9 +768,9 @@ export default function AdminUsersPage() {
               {editingUser.role === 'FACULTY' && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Assign Taught Classes/Sections</label>
-                  <div className="max-h-60 overflow-y-auto border border-border/60 rounded-xl p-3 bg-background/40 grid grid-cols-2 gap-2.5">
+                  <div className="max-h-60 overflow-y-auto border border-slate-200 dark:border-slate-800/60 rounded-xl p-3 bg-slate-50 dark:bg-[#0B0F19]/20 grid grid-cols-2 gap-2.5">
                     {sections.length === 0 ? (
-                      <p className="text-xs text-muted-foreground col-span-2 text-center py-4">No sections available.</p>
+                      <p className="text-xs text-slate-400 col-span-2 text-center py-4">No sections available.</p>
                     ) : (
                       sections.map(sec => {
                         const isChecked = facultySectionIds.includes(sec.id);
@@ -690,11 +781,11 @@ export default function AdminUsersPage() {
                             className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer select-none text-xs font-semibold transition-all ${
                               isChecked 
                                 ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400' 
-                                : 'border-border/60 hover:bg-muted/30 text-muted-foreground'
+                                : 'border-slate-200 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/30 text-slate-500'
                             }`}
                           >
                             <div className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-all ${
-                              isChecked ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-muted-foreground/50'
+                              isChecked ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-400'
                             }`}>
                               {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                             </div>
@@ -704,7 +795,7 @@ export default function AdminUsersPage() {
                       })
                     )}
                   </div>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[11px] text-slate-400">
                     Select the class sections this faculty member is authorized to teach and record attendance for.
                   </p>
                 </div>
@@ -714,13 +805,13 @@ export default function AdminUsersPage() {
             <div className="flex justify-end gap-3 mt-8">
               <button
                 onClick={() => setEditingUser(null)}
-                className="px-4 py-2 border border-border/80 rounded-xl text-sm font-medium hover:bg-muted/40 transition-colors"
+                className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={editingUser.role === 'STUDENT' ? handleUpdateStudentSection : handleUpdateFacultySections}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-sm font-medium text-white transition-colors"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-medium text-white transition-colors"
               >
                 Save Changes
               </button>
@@ -732,7 +823,7 @@ export default function AdminUsersPage() {
       {/* Confirmation: Password Reset Modal */}
       {resettingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-[#1E2230] border border-border/50 rounded-2xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent rounded-3xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500">
                 <KeyRound className="w-6 h-6" />
@@ -740,23 +831,23 @@ export default function AdminUsersPage() {
               <h3 className="text-lg font-bold">Reset User Password</h3>
             </div>
 
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Are you sure you want to reset the password for <strong className="text-foreground">{resettingUser.name}</strong> ({resettingUser.collegeId})? 
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              Are you sure you want to reset the password for <strong className="text-slate-800 dark:text-white">{resettingUser.name}</strong> ({resettingUser.collegeId})? 
             </p>
             <p className="text-xs text-amber-500 mt-2 font-medium bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20">
-              The password will be reset to the role-based default. Faculty default is <strong>Faculty@123</strong>, and Student default is <strong>Student@123</strong>.
+              The password will be reset to the role-based default: Student default is <strong>Student@123</strong>, and Faculty default is <strong>Faculty@123</strong>.
             </p>
 
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setResettingUser(null)}
-                className="px-4 py-2 border border-border/80 rounded-xl text-sm font-medium hover:bg-muted/40 transition-colors"
+                className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleResetPassword}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-xl text-sm font-medium text-white transition-colors"
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-xl text-xs font-medium text-white transition-colors"
               >
                 Confirm Reset
               </button>
@@ -768,7 +859,7 @@ export default function AdminUsersPage() {
       {/* Confirmation: Deletion Modal */}
       {deletingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-[#1E2230] border border-border/50 rounded-2xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent rounded-3xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-rose-500/10 rounded-xl text-rose-500">
                 <Trash2 className="w-6 h-6" />
@@ -776,8 +867,8 @@ export default function AdminUsersPage() {
               <h3 className="text-lg font-bold text-rose-500">Delete User Account</h3>
             </div>
 
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Warning! You are about to permanently delete <strong className="text-foreground">{deletingUser.name}</strong> (College ID: <span className="font-mono text-indigo-400 font-semibold">{deletingUser.collegeId}</span>). 
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              Warning! You are about to permanently delete <strong className="text-slate-800 dark:text-white">{deletingUser.name}</strong> (College ID: <span className="font-mono text-indigo-500 dark:text-indigo-400 font-semibold">{deletingUser.collegeId}</span>). 
             </p>
             <p className="text-xs text-rose-500 mt-2 font-medium bg-rose-500/10 p-2.5 rounded-lg border border-rose-500/20">
               This action is destructive and irreversible. All academic profiles, role associations, and personal settings linked to this user will be removed.
@@ -786,13 +877,13 @@ export default function AdminUsersPage() {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setDeletingUser(null)}
-                className="px-4 py-2 border border-border/80 rounded-xl text-sm font-medium hover:bg-muted/40 transition-colors"
+                className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteUser}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-500 rounded-xl text-sm font-medium text-white transition-colors"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-500 rounded-xl text-xs font-medium text-white transition-colors"
               >
                 Delete Permanently
               </button>

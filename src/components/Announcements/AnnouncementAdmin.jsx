@@ -74,34 +74,34 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
 
 
 
-    try{
-       
-    if (editingId) {
-      // If editing an existing announcement, update it
-      const response = await API.put(`/${editingId}`, newAnnouncement);
-      const updatedAnnouncement = response.data;
-      const updatedList = announcements.map((a) =>
-        a.announcementId === editingId ? updatedAnnouncement : a
-      );
-      onAnnouncementsChange(updatedList); // Update list
-    } else {
-      console.log("adding");
-      // If creating a new announcement, add it to the beginning of the list
-      const response = await API.post('/add', newAnnouncement);
-      const saveAnnouncement = response.data;
-      //Add new to the front of list
-      onAnnouncementsChange([saveAnnouncement, ...announcements]);
-    }
+    try {
 
-    // After submitting: reset the form and close it
-    resetForm();
-    setIsComposing(false);
-    } catch (error){
+      if (editingId) {
+        // If editing an existing announcement, update it
+        const response = await API.put(`/${editingId}`, newAnnouncement);
+        const updatedAnnouncement = response.data;
+        const updatedList = announcements.map((a) =>
+          a.announcementId === editingId ? updatedAnnouncement : a
+        );
+        onAnnouncementsChange(updatedList); // Update list
+      } else {
+        console.log("adding");
+        // If creating a new announcement, add it to the beginning of the list
+        const response = await API.post('/add', newAnnouncement);
+        const saveAnnouncement = response.data;
+        //Add new to the front of list
+        onAnnouncementsChange([saveAnnouncement, ...announcements]);
+      }
+
+      // After submitting: reset the form and close it
+      resetForm();
+      setIsComposing(false);
+    } catch (error) {
       console.error('Error in saving announcement:', error);
       alert('Failed to save announcement...')
     }
-    
-   
+
+
   };
 
   // Called when the user clicks the edit button on an existing announcement
@@ -123,49 +123,46 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
 
   // Called when the user clicks the delete button
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure to delete this announcement')) 
+    if (!window.confirm('Are you sure to delete this announcement'))
       return;
 
-    try{
+    try {
       await API.delete(`/${id}`);
       const filtered = announcements.filter((a) => a.announcementId !== id); // Remove selected announcement
       onAnnouncementsChange(filtered); // Update list
-    } catch (error){
+    } catch (error) {
       console.error('Error in deleting announcement:', error);
-     alert("Delete failed. Try again!..");
+      alert("Delete failed. Try again!..");
     }
   };
 
   return (
-    <div className="space-y-6 bg-sidebar rounded-2xl p-5 m-4 ">
+    <div className="space-y-6 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent rounded-[2rem] p-6 shadow-sm">
       {/* Title and Add button section */}
-
       <div className="flex justify-between items-center">
-         <h2 className="text-xl font-semibold">Manage Announcements</h2>
-            <button onClick={() => {
-               resetForm();        // Clear any existing form data
-               setIsComposing(true); // Show the form 
-               }} 
-              className="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 flex items-center gap-1"
-           >
-            <Plus className="w-4 h-4" /> Add {/* "+" icon and text */}
-            </button>
+        <h2 className="text-sm font-bold text-slate-900 dark:text-white">Manage Announcements</h2>
+        <button onClick={() => {
+          resetForm();        // Clear any existing form data
+          setIsComposing(true); // Show the form 
+        }}
+          className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 text-white px-4 py-2 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 duration-200 cursor-pointer"
+        >
+          <Plus className="w-4 h-4" /> Add
+        </button>
       </div>
-
-
 
       {/* Show the form only when isComposing is true */}
       {isComposing && (
         <form
           onSubmit={handleSubmit}
-          className="p-4 bg-gray-70 rounded border space-y-4 shadow"
+          className="p-5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-2xl space-y-4 shadow-sm"
         >
           {/* Grid layout for input fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
               placeholder="Title"
-              className="border p-2 rounded"
+              className="bg-white dark:bg-[#161B26] border border-slate-200 dark:border-slate-800/60 rounded-xl py-2 px-3 text-xs w-full text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
@@ -173,21 +170,21 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
             <input
               type="text"
               placeholder="Author"
-              className="border p-2 rounded"
+              className="bg-white dark:bg-[#161B26] border border-slate-200 dark:border-slate-800/60 rounded-xl py-2 px-3 text-xs w-full text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
               value={formData.author}
               onChange={(e) => setFormData({ ...formData, author: e.target.value })}
             />
             <input
               type="text"
               placeholder="Time (optional)"
-              className="border p-2 rounded"
+              className="bg-white dark:bg-[#161B26] border border-slate-200 dark:border-slate-800/60 rounded-xl py-2 px-3 text-xs w-full text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
               value={formData.time}
               onChange={(e) => setFormData({ ...formData, time: e.target.value })}
             />
             <input
               type="text"
               placeholder="Location"
-              className="border p-2 rounded"
+              className="bg-white dark:bg-[#161B26] border border-slate-200 dark:border-slate-800/60 rounded-xl py-2 px-3 text-xs w-full text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             />
@@ -196,21 +193,20 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
           {/* Text area for longer description */}
           <textarea
             placeholder="Description"
-            className="w-full border p-2 rounded"
+            className="w-full bg-white dark:bg-[#161B26] border border-slate-200 dark:border-slate-800/60 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             required
+            rows={3}
           />
 
           {/* Dropdown and checkbox section */}
           <div className="flex items-center gap-4">
-
-
-            {/* Dropdown for announcement type */}    {/** need updation + */}
+            {/* Dropdown for announcement type */}
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="border p-2 rounded"
+              className="bg-white dark:bg-[#161B26] border border-slate-200 dark:border-slate-800/60 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
             >
               <option value="event">Event</option>
               <option value="deadline">Deadline</option>
@@ -219,20 +215,20 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
             </select>
 
             {/* Checkbox for completion status */}
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.isCompleted}
                 onChange={(e) =>
                   setFormData({ ...formData, isCompleted: e.target.checked })
                 }
+                className="rounded border-slate-300 dark:border-slate-800 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
               />
-              Completed {/** closed */}
+              Completed
             </label>
           </div>
 
-          
-        {/* Action buttons: Cancel or Save/Update */}
+          {/* Action buttons: Cancel or Save/Update */}
           <div className="flex justify-end gap-2">
             <button
               type="button"
@@ -240,76 +236,76 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
                 resetForm();        // Clear form
                 setIsComposing(false); // Hide form
               }}
-              className="px-3 py-1 border border-gray-400 rounded hover:bg-gray-100"
+              className="px-4 py-2 border border-slate-250 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-1.5 bg-green-600 text-white rounded hover:bg-green-700"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition-all shadow-sm shadow-emerald-500/10"
             >
-              {editingId ? 'Update' : 'Save'} {/* Show "Update" if editing */}
+              {editingId ? 'Update' : 'Save'}
             </button>
           </div>
         </form>
       )}
-
 
       {/* List of all announcements with edit/delete options */}
       <div className="space-y-4">
         {announcements.map((a) => (
           <div
             key={a.announcementId}
-            className="border p-4 rounded shadow-sm bg-sidebar flex justify-between items-start "
+            className="border border-slate-100 dark:border-transparent p-4 rounded-2xl shadow-sm bg-slate-50 dark:bg-[#0B0F19]/60 flex justify-between items-start hover:shadow-md hover:scale-[1.01] transition-all duration-200"
           >
             {/* Left side: announcement content */}
             <div>
-              <h3 className="text-lg font-semibold">{a.title}</h3>
-              <p className="text-sm text-gray-600">{a.description}</p>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{a.title}</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{a.description}</p>
 
               {/* Metadata: time, location, author, type, completed */}
-              <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-3">
-                <span>
-                  <Clock className="inline w-4 h-4 mr-1" />{a.time}
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-2.5 flex flex-wrap gap-4 font-medium">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-slate-400" />{a.time}
                 </span>
-                
+
                 {a.location && (
-                  <span>
-                    <MapPin className="inline w-4 h-4 mr-1" />
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
                     {a.location}
                   </span>
                 )}
-                <span>
-                  <User className="inline w-4 h-4 mr-1" />
+                <span className="flex items-center gap-1">
+                  <User className="w-3.5 h-3.5 text-slate-400" />
                   {a.author}
                 </span>
-                <span className="capitalize">
-                  <AlertCircle className="inline w-4 h-4 mr-1" />
+                <span className="capitalize flex items-center gap-1">
+                  <AlertCircle className="w-3.5 h-3.5 text-slate-400" />
                   {a.type}
                 </span>
-                
-                
+
                 {a.isCompleted && (
-                  <span className="text-green-600 flex items-center gap-1">
-                    <CheckCircle className="w-4 h-4" /> Completed
+                  <span className="text-emerald-600 dark:text-emerald-500 flex items-center gap-1 font-bold">
+                    <CheckCircle className="w-3.5 h-3.5" /> Completed
                   </span>
                 )}
               </div>
             </div>
 
             {/* Right side: edit and delete buttons */}
-            <div className="flex gap-2 mt-2">
+            <div className="flex gap-1 mt-1 shrink-0">
               <button
-                onClick={() => handleEdit(a)} // Populate form with this item's data
-                className="p-1 text-blue-600 hover:text-blue-800"
+                onClick={() => handleEdit(a)}
+                className="p-1.5 rounded-lg hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-colors"
+                title="Edit Notice"
               >
-                <Edit3 className="w-4 h-4" />
+                <Edit3 className="w-3.5 h-3.5" />
               </button>
               <button
-                onClick={() => handleDelete(a.announcementId)} // Remove this announcement
-                className="p-1 text-red-600 hover:text-red-800"
+                onClick={() => handleDelete(a.announcementId)}
+                className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 transition-colors"
+                title="Delete Notice"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
