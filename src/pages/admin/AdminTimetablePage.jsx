@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Calendar as CalendarIcon, 
-  Clock, 
-  MapPin, 
-  User, 
-  AlertCircle, 
-  Plus, 
-  Loader2, 
-  BookOpen, 
-  Trash2, 
-  RefreshCw, 
-  AlertTriangle, 
-  Check, 
-  Search, 
-  Shuffle, 
-  X, 
-  Layers, 
-  Users, 
+import {
+  Calendar as CalendarIcon,
+  Clock,
+  MapPin,
+  User,
+  AlertCircle,
+  Plus,
+  Loader2,
+  BookOpen,
+  Trash2,
+  RefreshCw,
+  AlertTriangle,
+  Check,
+  Search,
+  Shuffle,
+  X,
+  Layers,
+  Users,
   ShieldAlert,
   Edit
 } from 'lucide-react';
@@ -65,6 +65,9 @@ export default function AdminTimetablePage() {
   const [facultiesLoaded, setFacultiesLoaded] = useState(false);
   const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
   const [loadingCanvas, setLoadingCanvas] = useState(false);
+  const [showConfig, setShowConfig] = useState(false);
+  const [isDoneClicked, setIsDoneClicked] = useState(false);
+  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
 
   // Selected section for the grid view
   const [selectedSection, setSelectedSection] = useState('');
@@ -256,22 +259,22 @@ export default function AdminTimetablePage() {
   // Filter sections by selected Year and selected Branch
   const getFilteredSections = useCallback(() => {
     if (!sections || sections.length === 0) return [];
-    
+
     return sections.filter(sec => {
       const batchName = sec.batch?.batchName || '';
-      
+
       const matchesBranch = selectedBranch === 'Computer Science'
         ? (batchName.toLowerCase().includes('cs') || batchName.toLowerCase().includes('computer'))
         : batchName.toLowerCase().includes(selectedBranch.toLowerCase());
-        
+
       const termStartYear = parseInt(term.substring(0, 4)) || 2026;
       const targetGradYear = termStartYear + (4 - parseInt(selectedYear));
-      
-      const matchesYear = batchName.includes(String(targetGradYear)) || 
-                          batchName.includes(String(targetGradYear - 1)) || 
-                          batchName.toLowerCase().includes(`year ${selectedYear}`) ||
-                          batchName.toLowerCase().includes(`yr ${selectedYear}`);
-                          
+
+      const matchesYear = batchName.includes(String(targetGradYear)) ||
+        batchName.includes(String(targetGradYear - 1)) ||
+        batchName.toLowerCase().includes(`year ${selectedYear}`) ||
+        batchName.toLowerCase().includes(`yr ${selectedYear}`);
+
       return matchesBranch && matchesYear;
     });
   }, [sections, selectedBranch, selectedYear, term]);
@@ -279,7 +282,7 @@ export default function AdminTimetablePage() {
   const visibleSections = React.useMemo(() => {
     const filtered = getFilteredSections();
     if (filtered.length > 0) return filtered;
-    
+
     const branchOnly = sections.filter(sec => {
       const batchName = sec.batch?.batchName || '';
       return selectedBranch === 'Computer Science'
@@ -287,9 +290,9 @@ export default function AdminTimetablePage() {
         : batchName.toLowerCase().includes(selectedBranch.toLowerCase());
     });
     if (branchOnly.length > 0) return branchOnly;
-    
+
     if (sections.length > 0) return sections;
-    
+
     return [
       { id: 1, sectionName: "Section A", batch: { id: 1, batchName: `B.Tech ${selectedBranch} Year ${selectedYear}` } }
     ];
@@ -301,19 +304,19 @@ export default function AdminTimetablePage() {
     try {
       const res = await getSectionSchedule(sectionId, term);
       setEntries(res.data || []);
-      
+
       if (!facultiesLoaded) {
         getAllFaculties().then(facRes => {
           setFaculties(facRes.data || []);
           setFacultiesLoaded(true);
         }).catch(err => console.error("Lazy load faculties failed:", err));
       }
-      
+
       getAssignments(term).then(assignsRes => {
         setAssignments(assignsRes.data || []);
         setAssignmentsLoaded(true);
       }).catch(err => console.error("Lazy load assignments failed:", err));
-      
+
     } catch (err) {
       console.error("Error loading lazy canvas:", err);
       toast.error("Failed to load section schedule grid");
@@ -328,19 +331,23 @@ export default function AdminTimetablePage() {
     loadCanvasData(sectionId);
   };
 
-  // Auto-select first section when visibleSections changes
+  // Auto-populate default section in selector when visibleSections list changes
   useEffect(() => {
     if (visibleSections.length > 0) {
       const firstSecId = visibleSections[0].id;
       setActiveSectionId(firstSecId);
       setSelectedSection(String(firstSecId));
-      loadCanvasData(firstSecId);
     } else {
       setActiveSectionId(null);
       setSelectedSection('');
       setEntries([]);
     }
-  }, [visibleSections, loadCanvasData]);
+  }, [visibleSections]);
+
+  // Reset Done state if Year or Branch selections are adjusted
+  useEffect(() => {
+    setIsDoneClicked(false);
+  }, [selectedYear, selectedBranch]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -441,7 +448,7 @@ export default function AdminTimetablePage() {
   const handleCancelSlot = async (slot) => {
     const reason = window.prompt("Reason for cancelling this slot:", "Faculty unavailability");
     if (reason === null) return; // Cancelled prompt
-    
+
     setLoadingAbsSchedule(true);
     try {
       await createOverride({
@@ -470,7 +477,7 @@ export default function AdminTimetablePage() {
     try {
       const startTimeNorm = slot.startTime?.substring(0, 5);
       const endTimeNorm = slot.endTime?.substring(0, 5);
-      
+
       const res = await getFacultyAvailability(
         absDate,
         startTimeNorm,
@@ -516,7 +523,7 @@ export default function AdminTimetablePage() {
   // AOCS: Revert override (Cancel/Soft Delete override)
   const handleRevertOverride = async (overrideId) => {
     if (!window.confirm("Are you sure you want to revert/remove this override? Status will return to template schedule.")) return;
-    
+
     setLoadingAbsSchedule(true);
     try {
       await cancelOverride(overrideId);
@@ -572,7 +579,7 @@ export default function AdminTimetablePage() {
       await createOverride(payload);
       toast.success("Timetable override applied successfully!");
       closeOverrideModal();
-      
+
       if (selectedAbsFaculty) {
         fetchAbsFacultySchedule();
       }
@@ -731,204 +738,151 @@ export default function AdminTimetablePage() {
 
 
         {/* ─── TAB 1: MASTER CANVAS ────────────────────────────────────────── */}
-        {activeTab === 'canvas' && (
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 animate-in fade-in duration-200">
-            
-            {/* Left Column: Assignment Creator */}
-            <div className="xl:col-span-1 space-y-4">
-              <div className="p-4 sm:p-5 bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm">
-                <h3 className="font-semibold text-base mb-4 flex items-center gap-2 text-white">
-                  <BookOpen className="w-4 h-4 text-indigo-500" /> New Assignment
-                </h3>
-
-                <form onSubmit={handleCreateAssignment} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Subject</label>
-                    <select
-                      className="w-full text-sm border border-neutral-800 rounded-lg px-3 py-2 bg-neutral-950 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                      value={formData.subjectId}
-                      onChange={(e) => setFormData({ ...formData, subjectId: e.target.value })}
-                      required
-                    >
-                      <option value="">Select Subject...</option>
-                      {subjects.map(s => <option key={s.id} value={s.id}>{s.code} - {s.name}</option>)}
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Section</label>
-                    <select
-                      className="w-full text-sm border border-neutral-800 rounded-lg px-3 py-2 bg-neutral-950 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                      value={formData.sectionId}
-                      onChange={(e) => setFormData({ ...formData, sectionId: e.target.value })}
-                      required
-                    >
-                      <option value="">Select Section...</option>
-                      {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Faculty</label>
-                    <select
-                      className="w-full text-sm border border-neutral-800 rounded-lg px-3 py-2 bg-neutral-950 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                      value={formData.facultyId}
-                      onChange={(e) => setFormData({ ...formData, facultyId: e.target.value })}
-                      required
-                    >
-                      <option value="">Select Faculty...</option>
-                      {faculties.map(f => (
-                        <option key={f.id} value={f.id}>
-                          {f.name} ({f.department})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between">
-                      Weekly Slots <span>{formData.weeklySlots}</span>
-                    </label>
-                    <input
-                      type="range" min="1" max="8" step="1"
-                      value={formData.weeklySlots}
-                      onChange={(e) => setFormData({ ...formData, weeklySlots: e.target.value })}
-                      className="w-full accent-indigo-500"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting || loading}
-                    className="w-full py-2 bg-indigo-600 hover:bg-indigo-750 text-white text-xs font-semibold rounded-lg transition-colors flex justify-center items-center gap-2 disabled:opacity-50"
-                  >
-                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                    Assign Subject
-                  </button>
-                </form>
+        {activeTab === 'canvas' && !showConfig && (
+          <div className="min-h-[500px] flex items-center justify-center animate-in fade-in zoom-in-95 duration-300">
+            <div className="p-8 max-w-sm w-full bg-white dark:bg-[#161B26] border border-slate-200/50 dark:border-slate-800 rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300 text-center">
+              <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 mb-6 shadow-sm">
+                <CalendarIcon className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
               </div>
-
-              {/* Draft Assignments Log */}
-              <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm max-h-[350px] overflow-y-auto">
-                <h3 className="font-semibold text-xs mb-3 text-slate-400 flex items-center justify-between">
-                  Draft Assignments
-                  <span className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 py-0.5 px-2 rounded-full text-[10px]">
-                    {assignments.length} Total
-                  </span>
-                </h3>
-
-                {loading ? (
-                  <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin text-indigo-500" /></div>
-                ) : assignments.length === 0 ? (
-                  <div className="text-center py-6 border border-dashed border-neutral-800 rounded-lg text-slate-500 text-xs">
-                    No assignments created for this term yet.
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {assignments.map(a => (
-                      <div key={a.id} className="p-2 border border-neutral-800/80 rounded-lg hover:border-indigo-500/30 transition-colors bg-neutral-950/40 group">
-                        <div className="flex justify-between items-start mb-1">
-                          <span className="font-semibold text-xs text-white truncate pr-2" title={a.subjectName}>{a.subjectCode || 'Sub'}</span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-[9px] font-mono bg-neutral-950 border border-neutral-800 px-1 rounded text-slate-400">
-                              {a.weeklySlots} slots
-                            </span>
-                            <button
-                              onClick={() => setDeleteConfirmId(a.id)}
-                              className="p-0.5 rounded text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                              title="Delete assignment"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 text-[9px] text-slate-400">
-                          <span className="flex items-center gap-0.5"><User className="w-2.5 h-2.5" />{a.facultyName || `F${a.facultyId}`}</span>
-                          <span className="flex items-center gap-0.5 font-medium px-1 bg-neutral-800 rounded">{a.sectionName || `S${a.sectionId}`}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <h3 className="text-lg font-bold text-slate-850 dark:text-slate-100 mb-2">Master Schedules</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                Configure and load the drag-and-drop timetable manager for sections, labs, and assignments.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowConfig(true)}
+                className="w-full py-3 bg-indigo-600 hover:bg-indigo-750 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 hover:shadow-indigo-500/20 hover:shadow-lg"
+              >
+                <Plus className="w-4 h-4" /> Create or View Timetable
+              </button>
             </div>
+          </div>
+        )}
 
-            {/* Right Column: Timetable Canvas */}
-            <div className="xl:col-span-3">
-              <div className="p-4 sm:p-5 bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm">
-                
-                {/* Step 1: Focus Selection Control Panel */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl border bg-slate-50/50 dark:bg-[#161B26] border-slate-200/50 dark:border-slate-800 mb-6 text-left">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 1: Academic Year</label>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {['1', '2', '3', '4'].map(yr => (
-                        <button
-                          key={yr}
-                          type="button"
-                          onClick={() => setSelectedYear(yr)}
-                          className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all ${selectedYear === yr 
-                            ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white shadow-sm' 
-                            : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-50 dark:bg-[#0B0F19] dark:border-slate-850 dark:text-slate-400 dark:hover:bg-slate-900/60 dark:hover:text-white'}`}
-                        >
-                          {yr === '1' ? '1st Year' : yr === '2' ? '2nd Year' : yr === '3' ? '3rd Year' : '4th Year'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col gap-1.5 text-left">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Department/Branch</label>
-                    <select
-                      value={selectedBranch}
-                      onChange={e => setSelectedBranch(e.target.value)}
-                      className="text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-1.5 bg-white dark:bg-[#0B0F19] text-slate-700 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer"
-                    >
-                      <option value="Computer Science">Computer Science</option>
-                      <option value="Information Technology">Information Technology</option>
-                      <option value="Electronics Engineering">Electronics Engineering</option>
-                      <option value="Mechanical Engineering">Mechanical Engineering</option>
-                      <option value="Civil Engineering">Civil Engineering</option>
-                    </select>
-                  </div>
+        {activeTab === 'canvas' && showConfig && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+
+            {/* Step 1: Unified Configuration Panel */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 p-4 rounded-xl border bg-white/70 dark:bg-[#161B26] border-slate-200/60 dark:border-slate-800 shadow-sm text-left backdrop-blur-sm">
+              <div className="flex flex-wrap items-end gap-4 w-full md:w-auto">
+                {/* Year Dropdown */}
+                <div className="flex flex-col gap-1.5 min-w-[140px] w-full sm:w-auto">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Academic Year</label>
+                  <select
+                    value={selectedYear}
+                    onChange={e => {
+                      setSelectedYear(e.target.value);
+                      setIsDoneClicked(false);
+                    }}
+                    className="text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 bg-slate-50 dark:bg-[#0B0F19] text-slate-705 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer w-full"
+                  >
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                  </select>
                 </div>
 
-                {/* Step 2: Section Selector Tab Row */}
-                <div className="flex flex-col gap-2 mb-6 text-left">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 2: Section Level</label>
-                  <div className="flex flex-wrap items-center gap-2 border-b border-slate-200/50 dark:border-slate-800 pb-3">
+                {/* Department Dropdown */}
+                <div className="flex flex-col gap-1.5 min-w-[200px] w-full sm:w-auto">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Department/Branch</label>
+                  <select
+                    value={selectedBranch}
+                    onChange={e => {
+                      setSelectedBranch(e.target.value);
+                      setIsDoneClicked(false);
+                    }}
+                    className="text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 bg-slate-50 dark:bg-[#0B0F19] text-slate-705 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer w-full"
+                  >
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics Engineering">Electronics Engineering</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                  </select>
+                </div>
+
+                {/* Section Dropdown inside step 1 config bar */}
+                <div className="flex flex-col gap-1.5 min-w-[160px] w-full sm:w-auto">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Section</label>
+                  <select
+                    value={activeSectionId || ''}
+                    onChange={e => {
+                      const val = e.target.value ? parseInt(e.target.value) : null;
+                      setActiveSectionId(val);
+                      setSelectedSection(e.target.value);
+                      setIsDoneClicked(false);
+                    }}
+                    className="text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 bg-slate-50 dark:bg-[#0B0F19] text-slate-705 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer w-full"
+                  >
+                    <option value="">Select Section...</option>
+                    {visibleSections.map(sec => (
+                      <option key={sec.id} value={sec.id}>{sec.sectionName}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Done Action Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!activeSectionId) {
+                    toast.warning("Please select a section first!");
+                    return;
+                  }
+                  setIsDoneClicked(true);
+                  loadCanvasData(activeSectionId);
+                }}
+                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-750 text-white text-xs font-bold rounded-lg transition-all shadow-md active:scale-95 w-full md:w-auto"
+              >
+                Done
+              </button>
+            </div>
+
+            {/* Step 2: Lazy Loaded Grid Canvas */}
+            {!isDoneClicked ? (
+              // Empty selection state
+              <div className="min-h-[350px] flex flex-col items-center justify-center text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl py-12">
+                <CalendarIcon className="w-12 h-12 text-slate-350 dark:text-slate-700 mb-3 animate-pulse" />
+                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-300">Configure Parameters</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mt-1">
+                  Adjust selectors in the horizontal configuration panel and click <strong className="text-indigo-600 dark:text-indigo-400">Done</strong> to swap canvas view.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4 animate-in fade-in duration-350">
+                {/* Horizontal Section Navigation Tabs right above grid */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/50 dark:border-slate-800 pb-2 text-left">
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
                     {visibleSections.map(sec => (
                       <button
                         key={sec.id}
                         type="button"
                         onClick={() => handleSectionTabClick(sec.id)}
-                        className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all duration-200 ${activeSectionId === sec.id
-                          ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400'
-                          : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-50 dark:bg-[#0B0F19] dark:border-slate-850 dark:text-slate-400 dark:hover:bg-slate-900/60 dark:hover:text-white'}`}
+                        className={`px-4 py-2 text-xs font-bold transition-all relative border-b-2 whitespace-nowrap ${activeSectionId === sec.id
+                          ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                          : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                       >
                         {sec.sectionName}
-                        {sec.batch?.batchName && (
-                          <span className="ml-1.5 opacity-60 font-normal text-[10px]">
-                            ({sec.batch.batchName})
-                          </span>
-                        )}
                       </button>
                     ))}
                   </div>
-                </div>
 
-                {/* Step 3: Lazy Loaded Canvas */}
-                <div className="relative">
-                  <div className="absolute right-0 -top-14">
+                  {/* Top Bar Actions: sleeker + New Slot button */}
+                  <div className="flex items-center gap-2">
                     <button
-                      onClick={() => { if (activeSectionId) loadCanvasData(activeSectionId); else fetchData(); }}
-                      className="p-1.5 hover:bg-neutral-800 rounded-lg text-slate-400 hover:text-white transition-colors"
-                      title="Refresh Schedule"
+                      type="button"
+                      onClick={() => setShowAssignmentModal(true)}
+                      className="px-3.5 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-750 rounded-lg shadow-sm transition-all active:scale-95 flex items-center gap-1 hover:shadow-indigo-500/20 hover:shadow-lg"
                     >
-                      <RefreshCw className="w-4 h-4" />
+                      <Plus className="w-3.5 h-3.5" /> New Slot
                     </button>
                   </div>
+                </div>
 
+                {/* Timetable Grid Canvas */}
+                <div className="relative">
                   {loadingCanvas ? (
                     <div className="min-h-[450px] flex flex-col items-center justify-center text-center py-20 bg-white dark:bg-[#161B26] border border-slate-200/50 dark:border-slate-800 rounded-xl shadow-sm">
                       <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
@@ -936,17 +890,17 @@ export default function AdminTimetablePage() {
                     </div>
                   ) : !activeSectionId ? (
                     <div className="min-h-[450px] flex flex-col items-center justify-center text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl py-20">
-                      <CalendarIcon className="w-16 h-16 text-slate-350 dark:text-slate-700 mb-4 animate-bounce duration-1000" />
+                      <CalendarIcon className="w-16 h-16 text-slate-350 dark:text-slate-700 mb-4" />
                       <h3 className="text-base font-bold text-slate-750 dark:text-slate-300">No Section Available</h3>
                       <p className="text-xs text-slate-550 dark:text-slate-450 max-w-sm mt-2">
-                        Choose a different Academic Year or Branch in Step 1 to populate matching sections.
+                        Choose a different Academic Year or Branch to populate sections.
                       </p>
                     </div>
                   ) : (
                     <div className="animate-in fade-in duration-300">
                       <ScheduleGrid
                         entries={entries}
-                        assignments={gridAssignments}
+                        assignments={assignments.filter(a => String(a.sectionId) === String(selectedSection))}
                         rooms={rooms}
                         term={term}
                         sectionId={parseInt(selectedSection)}
@@ -955,9 +909,8 @@ export default function AdminTimetablePage() {
                     </div>
                   )}
                 </div>
-
               </div>
-            </div>
+            )}
           </div>
         )}
 
@@ -1052,7 +1005,7 @@ export default function AdminTimetablePage() {
 
             {/* Core AOCS Operations Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
+
               {/* Faculty Absence Coordinator */}
               <div className="lg:col-span-2 space-y-4">
                 <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm">
@@ -1060,7 +1013,7 @@ export default function AdminTimetablePage() {
                     <h3 className="font-semibold text-base text-white flex items-center gap-2">
                       <ShieldAlert className="w-4 h-4 text-rose-500" /> Faculty Absence Coordinator
                     </h3>
-                    
+
                     <div className="flex items-center gap-2">
                       <select
                         value={selectedAbsFaculty}
@@ -1070,7 +1023,7 @@ export default function AdminTimetablePage() {
                         <option value="">Select Faculty...</option>
                         {faculties.map(f => <option key={f.id} value={f.id}>{f.name} ({f.department})</option>)}
                       </select>
-                      
+
                       <input
                         type="date"
                         value={absDate}
@@ -1096,17 +1049,17 @@ export default function AdminTimetablePage() {
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
                         Assigned Schedule Exceptions for {absDate}:
                       </p>
-                      
+
                       {absFacultySchedule.map((slot) => {
                         const start = slot.startTime?.substring(0, 5);
                         const end = slot.endTime?.substring(0, 5);
                         const isSlotCancelled = slot.isCancelled;
                         const isSlotSubbed = slot.isSubstituted;
                         const isSlotOverride = slot.isOverride;
-                        
+
                         return (
-                          <div 
-                            key={slot.overrideId || slot.id} 
+                          <div
+                            key={slot.overrideId || slot.id}
                             className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border transition bg-neutral-950/30
                               ${isSlotCancelled ? 'border-red-950 bg-red-950/5' : isSlotSubbed ? 'border-amber-950 bg-amber-950/5' : 'border-neutral-850'}`}
                           >
@@ -1115,7 +1068,7 @@ export default function AdminTimetablePage() {
                                 <span className={`text-xs font-bold ${isSlotCancelled ? 'line-through text-slate-500' : 'text-white'}`}>
                                   {slot.subjectCode} — {slot.subjectName}
                                 </span>
-                                
+
                                 {/* Status badges */}
                                 {isSlotCancelled && (
                                   <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-400">
@@ -1193,15 +1146,15 @@ export default function AdminTimetablePage() {
                       {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
                     </select>
                   </h3>
-                  
+
                   {loadingAbsSchedule ? (
                     <div className="flex justify-center py-8"><Loader2 className="w-4 h-4 animate-spin text-indigo-500" /></div>
                   ) : (
-                    <SectionOverridesList 
-                      sectionId={selectedSection} 
-                      date={absDate} 
-                      term={term} 
-                      onRevert={handleRevertOverride} 
+                    <SectionOverridesList
+                      sectionId={selectedSection}
+                      date={absDate}
+                      term={term}
+                      onRevert={handleRevertOverride}
                     />
                   )}
                 </div>
@@ -1326,12 +1279,12 @@ export default function AdminTimetablePage() {
                         <div className="space-y-2 text-left">
                           <div className="flex justify-between items-start gap-2">
                             <h4 className="font-bold text-base text-white truncate" title={room.name}>{room.name}</h4>
-                            
+
                             {/* Room Status Indicator */}
                             <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1 border
-                              ${isAvailable ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 
-                                isMaintenance ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 
-                                'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}
+                              ${isAvailable ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                                isMaintenance ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
+                                  'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}
                             >
                               {isAvailable && <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>}
                               {room.status}
@@ -1478,7 +1431,7 @@ export default function AdminTimetablePage() {
               {/* Candidates list */}
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ranked Available Faculty</label>
-                
+
                 {loadingCandidates ? (
                   <div className="flex flex-col items-center py-20 space-y-3">
                     <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
@@ -1494,17 +1447,17 @@ export default function AdminTimetablePage() {
                       const isFree = candidate.status === 'FREE';
                       const isExpert = candidate.expertiseRank === 'Direct Expertise';
                       const isDept = candidate.expertiseRank === 'Departmental Match';
-                      
+
                       return (
-                        <div 
-                          key={candidate.facultyId} 
+                        <div
+                          key={candidate.facultyId}
                           className={`p-3 rounded-lg border transition bg-neutral-950/20 flex items-center justify-between gap-3
                             ${isFree ? 'border-neutral-800' : 'border-red-950 bg-red-950/5 opacity-60'}`}
                         >
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="text-xs font-bold text-white">{candidate.facultyName}</span>
-                              
+
                               {/* Expertise badge */}
                               <span className={`text-[7px] font-bold px-1.5 py-0.2 rounded border leading-none
                                 ${isExpert ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : isDept ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-neutral-800 border-neutral-700 text-slate-400'}`}>
@@ -1519,7 +1472,7 @@ export default function AdminTimetablePage() {
                               </span>
                             </div>
                             <p className="text-[10px] text-slate-400">{candidate.department} · {candidate.designation}</p>
-                            
+
                             {!isFree && candidate.conflictDescription && (
                               <p className="text-[9px] text-red-450/80 font-medium font-mono">{candidate.conflictDescription}</p>
                             )}
@@ -1543,7 +1496,7 @@ export default function AdminTimetablePage() {
                 )}
               </div>
             </div>
-            
+
             <div className="pt-4 border-t border-neutral-850 flex gap-2">
               <button
                 onClick={() => setSubstitutionSlot(null)}
@@ -1598,7 +1551,7 @@ export default function AdminTimetablePage() {
                       className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 text-white placeholder-slate-550"
                     />
                   </div>
-                  
+
                   {manualOverrideType !== 'EXTRA_CLASS' && (
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Section</label>
@@ -1640,9 +1593,9 @@ export default function AdminTimetablePage() {
                         const q = slotSearchQuery.toLowerCase().trim();
                         if (!q) return true;
                         return s.subjectCode?.toLowerCase().includes(q) ||
-                               s.subjectName?.toLowerCase().includes(q) ||
-                               s.roomName?.toLowerCase().includes(q) ||
-                               s.facultyName?.toLowerCase().includes(q);
+                          s.subjectName?.toLowerCase().includes(q) ||
+                          s.roomName?.toLowerCase().includes(q) ||
+                          s.facultyName?.toLowerCase().includes(q);
                       });
 
                       return (
@@ -1708,7 +1661,7 @@ export default function AdminTimetablePage() {
                       </select>
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Section ID</label>
                     <select
@@ -2025,6 +1978,197 @@ export default function AdminTimetablePage() {
           </div>
         </div>
       )}
+      {/* ─── MODAL: Subject Assignment Control Center (Blur Backdrop Popup) ─── */}
+      {showAssignmentModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="relative bg-white dark:bg-[#161B26] border border-slate-200/50 dark:border-slate-800 rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <h3 className="text-base font-bold text-slate-850 dark:text-slate-100 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-indigo-500" /> Manage Subject Assignments
+                </h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">Assign subjects and faculty to active term sections.</p>
+              </div>
+              <button
+                onClick={() => setShowAssignmentModal(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-650 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content Body split in grid */}
+            <div className="flex-1 p-6 overflow-y-auto min-h-0 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* Left Side Form */}
+              <div className="space-y-4 text-left">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Create Assignment</h4>
+
+                <form onSubmit={handleCreateAssignment} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Subject</label>
+                    <select
+                      className="w-full text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 bg-slate-50 dark:bg-[#0B0F19] text-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      value={formData.subjectId}
+                      onChange={(e) => setFormData({ ...formData, subjectId: e.target.value })}
+                      required
+                    >
+                      <option value="">Select Subject...</option>
+                      {subjects.map(s => <option key={s.id} value={s.id}>{s.code} - {s.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Section</label>
+                    <select
+                      className="w-full text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 bg-slate-50 dark:bg-[#0B0F19] text-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      value={formData.sectionId}
+                      onChange={(e) => setFormData({ ...formData, sectionId: e.target.value })}
+                      required
+                    >
+                      <option value="">Select Section...</option>
+                      {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Faculty</label>
+                    <select
+                      className="w-full text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 bg-slate-50 dark:bg-[#0B0F19] text-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      value={formData.facultyId}
+                      onChange={(e) => setFormData({ ...formData, facultyId: e.target.value })}
+                      required
+                    >
+                      <option value="">Select Faculty...</option>
+                      {faculties.map(f => (
+                        <option key={f.id} value={f.id}>
+                          {f.name} ({f.department})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between">
+                      Weekly Slots <span>{formData.weeklySlots}</span>
+                    </label>
+                    <input
+                      type="range" min="1" max="8" step="1"
+                      value={formData.weeklySlots}
+                      onChange={(e) => setFormData({ ...formData, weeklySlots: e.target.value })}
+                      className="w-full accent-indigo-500"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || loading}
+                    className="w-full py-2.5 bg-indigo-650 hover:bg-indigo-750 text-white text-xs font-bold rounded-lg transition-colors flex justify-center items-center gap-2 disabled:opacity-50"
+                  >
+                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                    Assign Subject
+                  </button>
+                </form>
+              </div>
+
+              {/* Right Side Active Assignments list */}
+              <div className="space-y-4 text-left border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 md:pl-6 flex flex-col min-h-0">
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Assignments</h4>
+                  <span className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-650 dark:text-indigo-400 py-0.5 px-2.5 rounded-full text-[10px] font-bold">
+                    {assignments.length} Total
+                  </span>
+                </div>
+
+                <div className="flex-1 overflow-y-auto max-h-[350px] pr-1 space-y-2">
+                  {loading ? (
+                    <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-indigo-500" /></div>
+                  ) : assignments.length === 0 ? (
+                    <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-450 dark:text-slate-500 text-xs">
+                      No assignments configured for this term yet.
+                    </div>
+                  ) : (
+                    assignments.map(a => (
+                      <div key={a.id} className="p-3 border border-slate-200/60 dark:border-slate-800 rounded-xl hover:border-indigo-500/30 transition-colors bg-slate-50/40 dark:bg-neutral-950/20 group flex justify-between items-center">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-xs text-slate-800 dark:text-white truncate" title={a.subjectName}>{a.subjectCode || 'Sub'}</span>
+                            <span className="text-[9px] font-mono bg-slate-100 dark:bg-[#111622] px-1.5 py-0.2 rounded text-slate-500 dark:text-slate-400">
+                              {a.weeklySlots} slots
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-x-2 text-[10px] text-slate-400">
+                            <span className="flex items-center gap-0.5"><User className="w-3 h-3" />{a.facultyName || `F${a.facultyId}`}</span>
+                            <span className="px-1 bg-slate-100 dark:bg-neutral-800 rounded">{a.sectionName || `S${a.sectionId}`}</span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setDeleteConfirmId(a.id)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all active:scale-95"
+                          title="Delete assignment"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Delete Assignment Confirmation */}
+            {deleteConfirmId && (
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-10 rounded-3xl">
+                <div className="bg-white dark:bg-[#1A1F2E] border border-slate-200/50 dark:border-slate-800 rounded-2xl shadow-2xl p-6 max-w-xs w-full mx-4 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-red-500/10 border border-red-500/20">
+                      <Trash2 className="w-5 h-5 text-red-400" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm text-slate-800 dark:text-white">Delete Assignment?</div>
+                      <div className="text-xs text-slate-450 dark:text-slate-400">This action cannot be undone.</div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-300 mb-4 leading-relaxed">
+                    Are you sure you want to remove this subject-faculty assignment from the current term?
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setDeleteConfirmId(null)}
+                      className="flex-1 py-1.5 text-xs bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-850 hover:bg-slate-200 dark:hover:bg-neutral-900 rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white font-semibold"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDeleteAssignment}
+                      disabled={isDeleting}
+                      className="flex-1 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="px-6 py-4 bg-slate-50 dark:bg-[#111622]/40 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowAssignmentModal(false)}
+                className="px-5 py-2 bg-slate-200 hover:bg-slate-350 dark:bg-neutral-800 dark:hover:bg-neutral-750 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition"
+              >
+                Close Editor
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -2080,7 +2224,7 @@ function SectionOverridesList({ sectionId, date, term, onRevert }) {
               <span className="text-red-400 font-bold">Class Cancelled</span>
             ) : (
               <>
-                Room: <span className={e.isRoomChanged ? 'text-white font-bold' : ''}>{e.roomName}</span> | 
+                Room: <span className={e.isRoomChanged ? 'text-white font-bold' : ''}>{e.roomName}</span> |
                 Faculty: <span className={e.isSubstituted ? 'text-white font-bold' : ''}>{e.facultyName}</span>
               </>
             )}
