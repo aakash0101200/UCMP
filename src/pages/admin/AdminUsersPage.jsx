@@ -360,15 +360,24 @@ export default function AdminUsersPage() {
   }, [allUsers, searchQuery]);
 
   return (
-    <div className="space-y-6 pb-20 p-6 max-w-7xl mx-auto text-[#1A202C] dark:text-slate-100 transition-colors duration-300">
-      
+    <div className="space-y-6 pb-24 p-6 -mt-6 -mx-6 min-h-[calc(100vh-64px)] bg-[#F8F9FA] dark:bg-[#0B0F19] transition-colors duration-300 text-[#1A202C] dark:text-slate-100 overflow-y-auto w-[calc(100%+3rem)]">
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+
       {/* Header Area */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent p-6 rounded-3xl shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 p-6 rounded-3xl shadow-sm">
         <div>
           <span className="text-xs font-semibold text-indigo-600 dark:text-[#6366F1] tracking-wider uppercase">
             Administrative Command Registry
           </span>
-          <h1 className="text-4xl font-light tracking-tight mt-1">
+          <h1 className="text-4xl font-light tracking-tight mt-1 text-slate-900 dark:text-white">
             User Mindmap Tree
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -381,7 +390,7 @@ export default function AdminUsersPage() {
           <input
             type="text"
             placeholder="Search directory..."
-            className="w-full bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl py-2 pl-10 pr-4 text-xs focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-400"
+            className="w-full bg-slate-55 dark:bg-[#0B0F19]/40 border border-slate-205 dark:border-slate-800/60 rounded-xl py-2 pl-10 pr-4 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 transition-all placeholder:text-slate-400"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -398,7 +407,7 @@ export default function AdminUsersPage() {
       ) : searchQuery.trim() ? (
         /* Flat Search View */
         <div className="space-y-4">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+          <div className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
             Search Matches ({filteredUsers.length})
           </div>
           {loadingAllUsers ? (
@@ -407,7 +416,7 @@ export default function AdminUsersPage() {
               <span className="text-xs text-slate-400">Searching records...</span>
             </div>
           ) : filteredUsers.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent rounded-3xl text-slate-400">
+            <div className="text-center py-16 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl text-slate-450 dark:text-slate-500 shadow-sm">
               No matching records found in database.
             </div>
           ) : (
@@ -415,7 +424,7 @@ export default function AdminUsersPage() {
               {filteredUsers.map(person => (
                 <div
                   key={person.collegeId}
-                  className="p-5 rounded-3xl bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent hover:shadow-md transition-all flex flex-col gap-3 shadow-sm text-xs"
+                  className="p-5 rounded-3xl bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 hover:shadow-md hover:scale-[1.01] transition-all flex flex-col gap-3 shadow-sm text-xs"
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -453,25 +462,25 @@ export default function AdminUsersPage() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex justify-end gap-1.5 border-t border-slate-100 dark:border-slate-800/40 pt-2 mt-1">
+                  <div className="flex justify-end gap-1.5 border-t border-slate-100 dark:border-slate-800/60 pt-2 mt-1">
                     <button
                       title={person.role === 'STUDENT' ? 'Transfer Section' : 'Assign Sections'}
                       onClick={() => openEditModal(person)}
-                      className="p-1.5 rounded-lg hover:bg-indigo-500/10 text-indigo-500 transition-all"
+                      className="p-1.5 rounded-lg hover:bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 transition-all"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       title="Reset Password"
                       onClick={() => setResettingUser(person)}
-                      className="p-1.5 rounded-lg hover:bg-amber-500/10 text-amber-500 transition-all"
+                      className="p-1.5 rounded-lg hover:bg-amber-500/10 text-amber-500 dark:text-amber-400 transition-all"
                     >
                       <KeyRound className="w-3.5 h-3.5" />
                     </button>
                     <button
                       title="Delete User"
                       onClick={() => setDeletingUser(person)}
-                      className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-all"
+                      className="p-1.5 rounded-lg hover:bg-rose-500/10 text-rose-500 dark:text-rose-400 transition-all"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -487,7 +496,7 @@ export default function AdminUsersPage() {
           ref={containerRef}
           onScroll={handleScroll}
           id="mindmap-container" 
-          className="flex overflow-x-auto gap-16 py-12 px-6 relative min-h-[600px] w-full rounded-3xl bg-slate-50/50 dark:bg-[#0B0F19]/25 border border-slate-100 dark:border-slate-800/20 no-scrollbar select-none"
+          className="flex overflow-x-auto gap-16 py-12 px-6 relative min-h-[600px] w-full rounded-3xl bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 no-scrollbar select-none shadow-sm"
         >
           {/* SVG Connections Overlay */}
           <svg className="absolute inset-0 pointer-events-none w-full h-full z-0">
@@ -516,7 +525,7 @@ export default function AdminUsersPage() {
 
           {/* Column 1: Departments */}
           <div className="flex flex-col gap-4 z-10 w-60 shrink-0 justify-center">
-            <div className="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-2">Departments</div>
+            <div className="text-center font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Departments</div>
             {departments.map(dept => {
               const isSelected = activeDept === dept;
               return (
@@ -524,13 +533,13 @@ export default function AdminUsersPage() {
                   key={dept}
                   data-node-id={`dept:${dept}`}
                   onClick={() => handleDeptClick(dept)}
-                  className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-center ${
+                  className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${
                     isSelected
-                      ? 'bg-slate-900 text-white border-indigo-500 shadow-md dark:bg-slate-100 dark:text-slate-900'
-                      : 'bg-white dark:bg-[#161B26] border-slate-100 dark:border-transparent hover:scale-[1.02] text-slate-800 dark:text-slate-200'
+                      ? 'bg-slate-900 text-white dark:bg-slate-105 dark:text-slate-900 border-transparent shadow-md scale-[1.02] font-semibold'
+                      : 'bg-slate-50/80 dark:bg-[#0b0f19]/30 border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:scale-[1.02] text-slate-700 dark:text-slate-300'
                   }`}
                 >
-                  <span className="font-bold text-xs">{dept}</span>
+                  <span className="text-xs font-bold">{dept}</span>
                 </div>
               );
             })}
@@ -539,20 +548,20 @@ export default function AdminUsersPage() {
           {/* Column 2: Branch Types */}
           {activeDept && (
             <div className="flex flex-col gap-8 z-10 w-60 shrink-0 justify-center">
-              <div className="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-2">Branch Categories</div>
+              <div className="text-center font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Branch Categories</div>
               
               {/* Faculty Branch */}
               <div
                 data-node-id="branch:Faculty"
                 data-parent-id={`dept:${activeDept}`}
                 onClick={() => handleBranchTypeClick('Faculty')}
-                className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-center ${
+                className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${
                   activeBranchType === 'Faculty'
-                    ? 'bg-slate-900 text-white border-indigo-500 shadow-md dark:bg-slate-100 dark:text-slate-900'
-                    : 'bg-white dark:bg-[#161B26] border-slate-100 dark:border-transparent hover:scale-[1.02] text-slate-800 dark:text-slate-200'
+                    ? 'bg-slate-900 text-white dark:bg-slate-105 dark:text-slate-900 border-transparent shadow-md scale-[1.02] font-semibold'
+                    : 'bg-slate-50/80 dark:bg-[#0b0f19]/30 border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:scale-[1.02] text-slate-700 dark:text-slate-300'
                 }`}
               >
-                <span className="font-bold text-xs flex items-center justify-center gap-2">
+                <span className="text-xs font-bold flex items-center justify-center gap-2">
                   <Briefcase className="w-3.5 h-3.5" />
                   Faculty staff
                 </span>
@@ -564,13 +573,13 @@ export default function AdminUsersPage() {
                   data-node-id="branch:Sections"
                   data-parent-id={`dept:${activeDept}`}
                   onClick={() => handleBranchTypeClick('Sections')}
-                  className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-center ${
+                  className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${
                     activeBranchType === 'Sections'
-                      ? 'bg-slate-900 text-white border-indigo-500 shadow-md dark:bg-slate-100 dark:text-slate-900'
-                      : 'bg-white dark:bg-[#161B26] border-slate-100 dark:border-transparent hover:scale-[1.02] text-slate-800 dark:text-slate-200'
+                      ? 'bg-slate-900 text-white dark:bg-slate-105 dark:text-slate-900 border-transparent shadow-md scale-[1.02] font-semibold'
+                      : 'bg-slate-50/80 dark:bg-[#0b0f19]/30 border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:scale-[1.02] text-slate-700 dark:text-slate-300'
                   }`}
                 >
-                  <span className="font-bold text-xs flex items-center justify-center gap-2">
+                  <span className="text-xs font-bold flex items-center justify-center gap-2">
                     <Layers className="w-3.5 h-3.5" />
                     Sections list
                   </span>
@@ -582,7 +591,7 @@ export default function AdminUsersPage() {
           {/* Column 3: Sections */}
           {activeDept && activeBranchType === 'Sections' && (
             <div className="flex flex-col gap-4 z-10 w-60 shrink-0 justify-center">
-              <div className="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-2">Sections</div>
+              <div className="text-center font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Sections</div>
               {loadingSections ? (
                 <div className="text-center text-xs text-slate-400">Loading sections...</div>
               ) : sectionsList.length === 0 ? (
@@ -596,13 +605,13 @@ export default function AdminUsersPage() {
                       data-node-id={`sec:${sec.id}`}
                       data-parent-id="branch:Sections"
                       onClick={() => handleSectionClick(sec.id)}
-                      className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-center ${
+                      className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${
                         isSelected
-                          ? 'bg-slate-900 text-white border-indigo-500 shadow-md dark:bg-slate-100 dark:text-slate-900'
-                          : 'bg-white dark:bg-[#161B26] border-slate-100 dark:border-transparent hover:scale-[1.02] text-slate-800 dark:text-slate-200'
+                          ? 'bg-slate-900 text-white dark:bg-slate-105 dark:text-slate-900 border-transparent shadow-md scale-[1.02] font-semibold'
+                          : 'bg-slate-50/80 dark:bg-[#0b0f19]/30 border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:scale-[1.02] text-slate-700 dark:text-slate-300'
                       }`}
                     >
-                      <span className="font-bold text-xs">{sec.sectionName}</span>
+                      <span className="text-xs font-bold">{sec.sectionName}</span>
                     </div>
                   );
                 })
@@ -612,8 +621,8 @@ export default function AdminUsersPage() {
 
           {/* Column 4: Personnel Directory */}
           {((activeDept && activeBranchType === 'Faculty') || (activeBranchType === 'Sections' && activeSectionId)) && (
-            <div className="flex flex-col gap-4 z-10 w-72 shrink-0 max-h-[550px] overflow-y-auto no-scrollbar p-2 border border-slate-100 dark:border-slate-800/40 rounded-3xl bg-slate-50/50 dark:bg-[#0B0F19]/20">
-              <div className="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-1 sticky top-0 py-1 bg-transparent">
+            <div className="flex flex-col gap-4 z-10 w-72 shrink-0 max-h-[550px] overflow-y-auto no-scrollbar p-3 border border-slate-100 dark:border-slate-800/60 rounded-3xl bg-slate-50/60 dark:bg-[#0B0F19]/30 shadow-inner">
+              <div className="text-center font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 sticky top-0 py-1 bg-transparent">
                 {activeBranchType === 'Faculty' ? 'Faculty Directory' : 'Enrolled Students'}
               </div>
               
@@ -628,7 +637,7 @@ export default function AdminUsersPage() {
                       key={person.collegeId}
                       data-node-id={`person:${person.collegeId}`}
                       data-parent-id={activeBranchType === 'Faculty' ? 'branch:Faculty' : `sec:${activeSectionId}`}
-                      className="p-4 rounded-2xl bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent hover:shadow-md hover:scale-[1.01] transition-all flex flex-col gap-2 shadow-sm text-xs"
+                      className="p-4 rounded-2xl bg-white dark:bg-[#161B26] border border-slate-150/80 dark:border-slate-800/50 hover:shadow-md hover:scale-[1.01] transition-all flex flex-col gap-2 shadow-sm text-xs"
                     >
                       <div className="flex justify-between items-start">
                         <div>
@@ -666,25 +675,25 @@ export default function AdminUsersPage() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex justify-end gap-1.5 border-t border-slate-100 dark:border-slate-800/40 pt-2 mt-1">
+                      <div className="flex justify-end gap-1.5 border-t border-slate-100 dark:border-slate-800/60 pt-2 mt-1">
                         <button
                           title={person.role === 'STUDENT' ? 'Transfer Section' : 'Assign Sections'}
                           onClick={() => openEditModal(person)}
-                          className="p-1 rounded hover:bg-indigo-500/10 text-indigo-500 transition-all"
+                          className="p-1 rounded hover:bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 transition-all"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button
                           title="Reset Password"
                           onClick={() => setResettingUser(person)}
-                          className="p-1 rounded hover:bg-amber-500/10 text-amber-500 transition-all"
+                          className="p-1 rounded hover:bg-amber-500/10 text-amber-500 dark:text-amber-400 transition-all"
                         >
                           <KeyRound className="w-3.5 h-3.5" />
                         </button>
                         <button
                           title="Delete User"
                           onClick={() => setDeletingUser(person)}
-                          className="p-1 rounded hover:bg-rose-500/10 text-rose-500 transition-all"
+                          className="p-1 rounded hover:bg-rose-500/10 text-rose-500 dark:text-rose-400 transition-all"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -696,7 +705,7 @@ export default function AdminUsersPage() {
                   {!hasLoadedAll && (
                     <div
                       onClick={handleLoadMore}
-                      className="p-3 text-center border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-500 rounded-2xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-all text-xs font-bold text-indigo-500 dark:text-indigo-400 select-none"
+                      className="p-3 text-center border border-dashed border-slate-200 dark:border-slate-800/60 hover:border-indigo-500 rounded-2xl cursor-pointer hover:bg-white dark:hover:bg-[#161B26] transition-all text-xs font-bold text-indigo-500 dark:text-indigo-400 select-none shadow-sm"
                     >
                       {loadingPersonnel ? (
                         <div className="flex items-center justify-center gap-1">
@@ -718,7 +727,7 @@ export default function AdminUsersPage() {
       {/* Edit Section/Assignments Modal */}
       {editingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent rounded-3xl w-full max-w-lg shadow-2xl p-6 relative animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl w-full max-w-lg shadow-2xl p-6 relative animate-in fade-in duration-200">
             <button 
               onClick={() => setEditingUser(null)}
               className="absolute right-4 top-4 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -731,29 +740,29 @@ export default function AdminUsersPage() {
                 {editingUser.role === 'STUDENT' ? <GraduationCap className="w-6 h-6" /> : <Briefcase className="w-6 h-6" />}
               </div>
               <div>
-                <h3 className="text-xl font-bold">Modify User Access</h3>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Modify User Access</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Adjust attributes for {editingUser.name}</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <span className="text-xs text-slate-400">College ID</span>
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">College ID</span>
                 <p className="font-mono text-sm font-semibold text-indigo-500 dark:text-indigo-400 mt-0.5">{editingUser.collegeId}</p>
               </div>
 
               {/* STUDENT: Section transfer select */}
               {editingUser.role === 'STUDENT' && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Reassign Section</label>
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Reassign Section</label>
                   <select
-                    className="w-full bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100"
+                    className="w-full bg-slate-55 dark:bg-[#0B0F19]/40 border border-slate-205 dark:border-slate-800/60 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                     value={selectedSectionId}
                     onChange={(e) => setSelectedSectionId(e.target.value)}
                   >
-                    <option value="">-- Choose New Section --</option>
+                    <option value="" className="bg-white dark:bg-[#161B26]">-- Choose New Section --</option>
                     {sections.map(sec => (
-                      <option key={sec.id} value={sec.id}>
+                      <option key={sec.id} value={sec.id} className="bg-white dark:bg-[#161B26]">
                         {sec.sectionName} (Batch: {sec.batch?.batchName || 'N/A'})
                       </option>
                     ))}
@@ -767,8 +776,8 @@ export default function AdminUsersPage() {
               {/* FACULTY: Sections checkbox grid */}
               {editingUser.role === 'FACULTY' && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Assign Taught Classes/Sections</label>
-                  <div className="max-h-60 overflow-y-auto border border-slate-200 dark:border-slate-800/60 rounded-xl p-3 bg-slate-50 dark:bg-[#0B0F19]/20 grid grid-cols-2 gap-2.5">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Assign Taught Classes/Sections</label>
+                  <div className="max-h-60 overflow-y-auto border border-slate-205 dark:border-slate-800/60 rounded-xl p-3 bg-slate-55 dark:bg-[#0B0F19]/20 grid grid-cols-2 gap-2.5">
                     {sections.length === 0 ? (
                       <p className="text-xs text-slate-400 col-span-2 text-center py-4">No sections available.</p>
                     ) : (
@@ -780,16 +789,16 @@ export default function AdminUsersPage() {
                             onClick={() => toggleFacultySection(sec.id)}
                             className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer select-none text-xs font-semibold transition-all ${
                               isChecked 
-                                ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400' 
-                                : 'border-slate-200 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/30 text-slate-500'
+                                ? 'bg-indigo-600/10 border-indigo-500 text-indigo-600 dark:text-indigo-400' 
+                                : 'border-slate-200 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/30 text-slate-600 dark:text-slate-400'
                             }`}
                           >
                             <div className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-all ${
-                              isChecked ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-400'
+                              isChecked ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-400 dark:border-slate-600'
                             }`}>
                               {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                             </div>
-                            <span className="truncate">{sec.sectionName}</span>
+                            <span className="truncate text-xs font-normal">{sec.sectionName}</span>
                           </div>
                         );
                       })
@@ -805,13 +814,13 @@ export default function AdminUsersPage() {
             <div className="flex justify-end gap-3 mt-8">
               <button
                 onClick={() => setEditingUser(null)}
-                className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
+                className="px-4 py-2 border border-slate-200 dark:border-slate-800/60 rounded-xl text-xs font-semibold text-slate-650 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={editingUser.role === 'STUDENT' ? handleUpdateStudentSection : handleUpdateFacultySections}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-medium text-white transition-colors"
+                className="px-4 py-2 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
               >
                 Save Changes
               </button>
@@ -823,12 +832,12 @@ export default function AdminUsersPage() {
       {/* Confirmation: Password Reset Modal */}
       {resettingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent rounded-3xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#161B26] border border-slate-105 dark:border-slate-805/60 rounded-3xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500">
                 <KeyRound className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold">Reset User Password</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Reset User Password</h3>
             </div>
 
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -841,13 +850,13 @@ export default function AdminUsersPage() {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setResettingUser(null)}
-                className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
+                className="px-4 py-2 border border-slate-200 dark:border-slate-800/60 rounded-xl text-xs font-semibold text-slate-650 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleResetPassword}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-xl text-xs font-medium text-white transition-colors"
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
               >
                 Confirm Reset
               </button>
@@ -859,12 +868,12 @@ export default function AdminUsersPage() {
       {/* Confirmation: Deletion Modal */}
       {deletingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-transparent rounded-3xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#161B26] border border-slate-105 dark:border-slate-805/60 rounded-3xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-rose-500/10 rounded-xl text-rose-500">
                 <Trash2 className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-rose-500">Delete User Account</h3>
+              <h3 className="text-lg font-semibold text-rose-600 dark:text-rose-500">Delete User Account</h3>
             </div>
 
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -877,13 +886,13 @@ export default function AdminUsersPage() {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setDeletingUser(null)}
-                className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
+                className="px-4 py-2 border border-slate-200 dark:border-slate-800/60 rounded-xl text-xs font-semibold text-slate-650 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteUser}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-500 rounded-xl text-xs font-medium text-white transition-colors"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
               >
                 Delete Permanently
               </button>
