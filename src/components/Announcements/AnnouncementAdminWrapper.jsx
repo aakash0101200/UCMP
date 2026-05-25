@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import API from '../../Services/announcements.jsx'
+import API from '../../Services/announcements.js'
 
 import AnnouncementAdmin from './AnnouncementAdmin';
 

@@ -107,42 +107,42 @@ export default function LiveAttendanceList({ sessionId }) {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center py-12 text-neutral-400">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-2" />
+            <div className="flex flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400">
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-600 dark:text-emerald-500 mb-2" />
                 <p className="text-sm font-medium">Loading session roster...</p>
             </div>
         );
     }
 
     return (
-        <div className="w-full mt-6 bg-neutral-950/40 border border-neutral-800 rounded-2xl p-5 shadow-inner text-left">
+        <div className="w-full mt-6 bg-slate-50/50 dark:bg-[#0D1512]/40 border border-slate-200 dark:border-emerald-950/60 rounded-2xl p-5 shadow-sm text-left">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                    <h4 className="text-lg font-bold text-white">Roster Management</h4>
-                    <p className="text-xs text-neutral-500">Track and manually update attendance status</p>
+                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">Roster Management</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Track and manually update attendance status</p>
                 </div>
                 
                 {/* Search Bar */}
                 <div className="relative max-w-xs w-full">
-                    <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input 
                         type="text"
                         placeholder="Search student..."
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-sm bg-neutral-900 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
+                        className="w-full pl-9 pr-4 py-2 text-sm bg-white dark:bg-[#14221C]/60 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-550"
                     />
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-neutral-800 mb-4">
+            <div className="flex border-b border-slate-200 dark:border-emerald-950/60 mb-4">
                 <button
                     onClick={() => setActiveTab('present')}
                     className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${
                         activeTab === 'present'
-                            ? 'border-emerald-500 text-emerald-400'
-                            : 'border-transparent text-neutral-400 hover:text-neutral-200'
+                            ? 'border-emerald-600 text-emerald-650 dark:text-emerald-400'
+                            : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
                 >
                     <UserCheck className="w-4 h-4" />
@@ -152,8 +152,8 @@ export default function LiveAttendanceList({ sessionId }) {
                     onClick={() => setActiveTab('absent')}
                     className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${
                         activeTab === 'absent'
-                            ? 'border-amber-500 text-amber-400'
-                            : 'border-transparent text-neutral-400 hover:text-neutral-200'
+                            ? 'border-amber-600 text-amber-650 dark:text-amber-400'
+                            : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
                 >
                     <UserX className="w-4 h-4" />
@@ -165,30 +165,30 @@ export default function LiveAttendanceList({ sessionId }) {
             <div className="max-h-[350px] overflow-y-auto pr-1 space-y-2">
                 {activeTab === 'present' ? (
                     filteredPresent.length === 0 ? (
-                        <div className="text-center py-10 text-neutral-500 text-sm">
+                        <div className="text-center py-10 text-slate-405 dark:text-slate-500 text-sm">
                             {searchQuery ? "No matching students found." : "No students have marked present yet."}
                         </div>
                     ) : (
                         filteredPresent.map((record, index) => (
                             <div 
                                 key={record.collegeId || index} 
-                                className="flex items-center justify-between p-3 bg-neutral-900/60 border border-neutral-800/40 rounded-xl hover:border-neutral-700/50 transition duration-200"
+                                className="flex items-center justify-between p-3 bg-white dark:bg-[#14221C]/80 border border-slate-150 dark:border-emerald-950/40 rounded-xl hover:border-slate-300 dark:hover:border-emerald-950/70 transition duration-200"
                             >
                                 <div>
-                                    <div className="font-semibold text-white text-sm">{record.name}</div>
-                                    <div className="text-xs text-neutral-500">{record.collegeId}</div>
+                                    <div className="font-semibold text-slate-900 dark:text-white text-sm">{record.name}</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">{record.collegeId}</div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     {record.markedBy === 'FACULTY_MANUAL' && (
-                                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-indigo-950/50 text-indigo-400 border border-indigo-500/20">
+                                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                             Manual
                                         </span>
                                     )}
                                     <div className="text-right">
-                                        <div className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                                        <div className="text-xs text-emerald-650 dark:text-emerald-400 font-semibold flex items-center gap-1">
                                             <Check className="w-3.5 h-3.5" /> Present
                                         </div>
-                                        <div className="text-[10px] text-neutral-500 mt-0.5">
+                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
                                             {record.markedAt ? new Date(record.markedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A'}
                                         </div>
                                     </div>
@@ -198,21 +198,21 @@ export default function LiveAttendanceList({ sessionId }) {
                     )
                 ) : (
                     filteredAbsent.length === 0 ? (
-                        <div className="text-center py-10 text-neutral-500 text-sm">
+                        <div className="text-center py-10 text-slate-405 dark:text-slate-500 text-sm">
                             {searchQuery ? "No matching students found." : "All students are marked present!"}
                         </div>
                     ) : (
                         filteredAbsent.map((student) => (
                             <div 
                                 key={student.collegeId} 
-                                className="flex items-center justify-between p-3 bg-neutral-900/60 border border-neutral-800/40 rounded-xl hover:border-neutral-700/50 transition duration-200"
+                                className="flex items-center justify-between p-3 bg-white dark:bg-[#14221C]/80 border border-slate-150 dark:border-emerald-950/40 rounded-xl hover:border-slate-300 dark:hover:border-emerald-950/70 transition duration-200"
                             >
                                 <div>
-                                    <div className="font-semibold text-neutral-200 text-sm">
+                                    <div className="font-semibold text-slate-900 dark:text-slate-205 text-sm">
                                         {student.name}
-                                        {student.rollNumber && <span className="text-xs text-neutral-500 ml-2 font-normal">Roll: {student.rollNumber}</span>}
+                                        {student.rollNumber && <span className="text-xs text-slate-400 dark:text-slate-500 ml-2 font-normal">Roll: {student.rollNumber}</span>}
                                     </div>
-                                    <div className="text-xs text-neutral-500">
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">
                                         {student.collegeId} {student.sectionName && `· ${student.sectionName}`}
                                     </div>
                                 </div>
@@ -220,7 +220,7 @@ export default function LiveAttendanceList({ sessionId }) {
                                 <button
                                     onClick={() => handleManualMark(student.collegeId)}
                                     disabled={markingIds.has(student.collegeId)}
-                                    className="px-3.5 py-1.5 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-900/50 hover:border-indigo-500 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 disabled:opacity-50"
+                                    className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white dark:bg-emerald-955/30 dark:hover:bg-emerald-500 dark:text-emerald-400 dark:hover:text-white border border-emerald-200 dark:border-emerald-950/60 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 disabled:opacity-50"
                                 >
                                     {markingIds.has(student.collegeId) ? (
                                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
