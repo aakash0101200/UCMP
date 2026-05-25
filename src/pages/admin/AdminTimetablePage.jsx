@@ -683,14 +683,19 @@ export default function AdminTimetablePage() {
     : [];
 
   return (
-    <>
+    <div className="space-y-6 pb-24 p-6 -mt-6 -mx-6 min-h-[calc(100vh-64px)] bg-[#F8F9FA] dark:bg-[#0B0F19] transition-colors duration-300 text-[#1A202C] dark:text-slate-100 overflow-y-auto w-[calc(100%+3rem)] text-left">
       <div className="space-y-6 text-left">
         {/* Title Block */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">Academic Operations Console (AOCS)</h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Manage master templates and real-time live timetable disruptions for term <span className="font-mono bg-neutral-800 text-neutral-200 px-1.5 py-0.5 rounded">{term}</span>.
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase">
+              Academic Operations Console (AOCS)
+            </span>
+            <h1 className="text-4xl font-light text-slate-900 dark:text-white tracking-tight mt-1">
+              Timetable Workspace
+            </h1>
+            <p className="text-sm text-slate-550 dark:text-slate-400 mt-1">
+              Manage master templates and real-time live timetable disruptions for term <span className="font-mono bg-slate-100 dark:bg-neutral-800 text-slate-750 dark:text-neutral-200 px-1.5 py-0.5 rounded">{term}</span>.
             </p>
           </div>
 
@@ -698,16 +703,16 @@ export default function AdminTimetablePage() {
             <select
               value={term}
               onChange={(e) => setTerm(e.target.value)}
-              className="text-sm border border-neutral-800 rounded-lg px-3 py-1.5 bg-neutral-900 text-white shadow-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer"
+              className="text-xs border border-slate-200 dark:border-slate-800/60 rounded-xl px-3 py-1.5 bg-white dark:bg-[#161B26] text-slate-800 dark:text-slate-100 shadow-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer"
             >
               {availableTerms.length > 0 ? (
                 availableTerms.map(t => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t} value={t} className="bg-white dark:bg-[#161B26] text-slate-800 dark:text-slate-100">{t}</option>
                 ))
               ) : (
                 <>
-                  <option value="2026-27-ODD">2026-27 ODD Term</option>
-                  <option value="2026-27-EVEN">2026-27 EVEN Term</option>
+                  <option value="2026-27-ODD" className="bg-white dark:bg-[#161B26] text-slate-800 dark:text-slate-100">2026-27 ODD Term</option>
+                  <option value="2026-27-EVEN" className="bg-white dark:bg-[#161B26] text-slate-800 dark:text-slate-100">2026-27 EVEN Term</option>
                 </>
               )}
             </select>
@@ -715,22 +720,31 @@ export default function AdminTimetablePage() {
         </div>
 
         {/* Tab System Selector */}
-        <div className="flex border-b border-neutral-800">
+        <div className="flex bg-white/80 dark:bg-[#161B26] p-1 rounded-2xl border border-slate-100 dark:border-slate-800/60 w-fit gap-2 shadow-sm">
           <button
             onClick={() => setActiveTab('canvas')}
-            className={`px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'canvas' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 ${activeTab === 'canvas'
+              ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/50'
+              }`}
           >
             Master Timetable Canvas
           </button>
           <button
             onClick={() => setActiveTab('aocs')}
-            className={`px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'aocs' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 ${activeTab === 'aocs'
+              ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/50'
+              }`}
           >
             Disruptions & Smart Substitutions
           </button>
           <button
             onClick={() => setActiveTab('venues')}
-            className={`px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'venues' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 ${activeTab === 'venues'
+              ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/50'
+              }`}
           >
             Manage Venues
           </button>
@@ -763,7 +777,7 @@ export default function AdminTimetablePage() {
           <div className="space-y-6 animate-in fade-in duration-300">
 
             {/* Step 1: Unified Configuration Panel */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 p-4 rounded-xl border bg-white/70 dark:bg-[#161B26] border-slate-200/60 dark:border-slate-800 shadow-sm text-left backdrop-blur-sm">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 p-6 rounded-3xl border bg-white dark:bg-[#161B26] border-slate-100 dark:border-slate-800/60 shadow-sm text-left">
               <div className="flex flex-wrap items-end gap-4 w-full md:w-auto">
                 {/* Year Dropdown */}
                 <div className="flex flex-col gap-1.5 min-w-[140px] w-full sm:w-auto">
@@ -774,7 +788,7 @@ export default function AdminTimetablePage() {
                       setSelectedYear(e.target.value);
                       setIsDoneClicked(false);
                     }}
-                    className="text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 bg-slate-50 dark:bg-[#0B0F19] text-slate-705 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer w-full"
+                    className="text-xs border border-slate-200 dark:border-slate-800/60 rounded-xl px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer w-full"
                   >
                     <option value="1">1st Year</option>
                     <option value="2">2nd Year</option>
@@ -792,7 +806,7 @@ export default function AdminTimetablePage() {
                       setSelectedBranch(e.target.value);
                       setIsDoneClicked(false);
                     }}
-                    className="text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 bg-slate-50 dark:bg-[#0B0F19] text-slate-705 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer w-full"
+                    className="text-xs border border-slate-200 dark:border-slate-800/60 rounded-xl px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer w-full"
                   >
                     <option value="Computer Science">Computer Science</option>
                     <option value="Information Technology">Information Technology</option>
@@ -813,7 +827,7 @@ export default function AdminTimetablePage() {
                       setSelectedSection(e.target.value);
                       setIsDoneClicked(false);
                     }}
-                    className="text-xs border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 bg-slate-50 dark:bg-[#0B0F19] text-slate-705 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer w-full"
+                    className="text-xs border border-slate-200 dark:border-slate-800/60 rounded-xl px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer w-full"
                   >
                     <option value="">Select Section...</option>
                     {visibleSections.map(sec => (
@@ -834,7 +848,7 @@ export default function AdminTimetablePage() {
                   setIsDoneClicked(true);
                   loadCanvasData(activeSectionId);
                 }}
-                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-750 text-white text-xs font-bold rounded-lg transition-all shadow-md active:scale-95 w-full md:w-auto"
+                className="px-6 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 w-full md:w-auto hover:shadow-lg"
               >
                 Done
               </button>
@@ -843,7 +857,7 @@ export default function AdminTimetablePage() {
             {/* Step 2: Lazy Loaded Grid Canvas */}
             {!isDoneClicked ? (
               // Empty selection state
-              <div className="min-h-[350px] flex flex-col items-center justify-center text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl py-12">
+              <div className="min-h-[350px] flex flex-col items-center justify-center text-center border border-dashed border-slate-200 dark:border-slate-800/60 rounded-3xl bg-white/50 dark:bg-[#161B26]/30 py-12">
                 <CalendarIcon className="w-12 h-12 text-slate-350 dark:text-slate-700 mb-3 animate-pulse" />
                 <h3 className="text-sm font-bold text-slate-800 dark:text-slate-300">Configure Parameters</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mt-1">
@@ -932,7 +946,7 @@ export default function AdminTimetablePage() {
                 }}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-750 active:scale-95 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-2 self-start sm:self-auto hover:shadow-indigo-500/20 hover:shadow-lg"
               >
-                <Plus className="w-4 h-4" /> Apply Manual Override
+                Manual Override
               </button>
             </div>
 
@@ -940,65 +954,65 @@ export default function AdminTimetablePage() {
             {loadingMetrics ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="p-4 bg-neutral-900/60 border border-neutral-850/80 rounded-xl animate-pulse h-[110px] flex flex-col justify-between">
-                    <div className="h-3 bg-neutral-800 rounded w-2/3"></div>
-                    <div className="h-6 bg-neutral-800 rounded w-1/3 mt-2"></div>
-                    <div className="h-2 bg-neutral-800 rounded w-5/6 mt-2"></div>
+                  <div key={i} className="p-5 bg-white dark:bg-[#161B26]/60 border border-slate-100 dark:border-slate-800/60 rounded-3xl animate-pulse h-[110px] flex flex-col justify-between shadow-sm">
+                    <div className="h-3 bg-slate-200 dark:bg-neutral-800 rounded w-2/3"></div>
+                    <div className="h-6 bg-slate-200 dark:bg-neutral-800 rounded w-1/3 mt-2"></div>
+                    <div className="h-2 bg-slate-200 dark:bg-neutral-800 rounded w-5/6 mt-2"></div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {/* Active Overrides Today */}
-                <div className="p-4 bg-neutral-900 border border-neutral-850 rounded-xl hover:scale-[1.02] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Active Overrides Today</span>
-                    <Layers className="w-4 h-4 text-purple-400" />
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Active Overrides Today</span>
+                    <Layers className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                   </div>
-                  <div className="text-2xl font-black text-white mt-2">{metrics?.activeOverridesCount ?? 0}</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Exceptional routing rules active</div>
+                  <div className="text-3xl font-light text-slate-900 dark:text-white mt-2">{metrics?.activeOverridesCount ?? 0}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Exceptional routing rules active</div>
                 </div>
 
                 {/* Pending Substitutions */}
-                <div className="p-4 bg-neutral-900 border border-neutral-850 rounded-xl hover:scale-[1.02] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Pending Substitutions</span>
-                    <Shuffle className="w-4 h-4 text-amber-400" />
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Pending Substitutions</span>
+                    <Shuffle className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                   </div>
-                  <div className="text-2xl font-black text-white mt-2">{metrics?.pendingReplacementsCount ?? 0}</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Requires action / assignment</div>
+                  <div className="text-3xl font-light text-slate-900 dark:text-white mt-2">{metrics?.pendingReplacementsCount ?? 0}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Requires action / assignment</div>
                 </div>
 
                 {/* Faculty Utilization Rate */}
-                <div className="p-4 bg-neutral-900 border border-neutral-850 rounded-xl hover:scale-[1.02] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Faculty Utilization</span>
-                    <Users className="w-4 h-4 text-indigo-400" />
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Faculty Utilization</span>
+                    <Users className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                   </div>
-                  <div className="text-2xl font-black text-white mt-2">
+                  <div className="text-3xl font-light text-slate-900 dark:text-white mt-2">
                     {metrics?.facultyUtilizationRate !== undefined ? `${metrics.facultyUtilizationRate}%` : '0%'}
                   </div>
-                  <div className="text-[10px] text-slate-500 mt-1">Of total active faculty teaching today</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Of total active faculty teaching today</div>
                 </div>
 
                 {/* Cancelled Classes Today */}
-                <div className="p-4 bg-neutral-900 border border-neutral-850 rounded-xl hover:scale-[1.02] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Cancelled Classes Today</span>
-                    <X className="w-4 h-4 text-rose-400" />
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Cancelled Classes Today</span>
+                    <X className="w-4 h-4 text-rose-500 dark:text-rose-400" />
                   </div>
-                  <div className="text-2xl font-black text-white mt-2">{metrics?.cancelledClassesCount ?? 0}</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Total scheduled hours cancelled</div>
+                  <div className="text-3xl font-light text-slate-900 dark:text-white mt-2">{metrics?.cancelledClassesCount ?? 0}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Total scheduled hours cancelled</div>
                 </div>
 
                 {/* Live Ongoing Lectures */}
-                <div className="p-4 bg-neutral-900 border border-neutral-850 rounded-xl hover:scale-[1.02] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Live Ongoing Lectures</span>
-                    <Clock className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Live Ongoing Lectures</span>
+                    <Clock className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                   </div>
-                  <div className="text-2xl font-black text-white mt-2">{metrics?.liveOngoingLecturesCount ?? 0}</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Currently active class sessions</div>
+                  <div className="text-3xl font-light text-slate-900 dark:text-white mt-2">{metrics?.liveOngoingLecturesCount ?? 0}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Currently active class sessions</div>
                 </div>
               </div>
             )}
@@ -1008,9 +1022,9 @@ export default function AdminTimetablePage() {
 
               {/* Faculty Absence Coordinator */}
               <div className="lg:col-span-2 space-y-4">
-                <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-neutral-800 pb-3">
-                    <h3 className="font-semibold text-base text-white flex items-center gap-2">
+                <div className="p-6 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl shadow-sm text-left">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <h3 className="font-semibold text-base text-slate-900 dark:text-white flex items-center gap-2">
                       <ShieldAlert className="w-4 h-4 text-rose-500" /> Faculty Absence Coordinator
                     </h3>
 
@@ -1018,17 +1032,17 @@ export default function AdminTimetablePage() {
                       <select
                         value={selectedAbsFaculty}
                         onChange={e => setSelectedAbsFaculty(e.target.value)}
-                        className="text-xs border border-neutral-800 rounded-lg px-2 py-1 bg-neutral-950 text-white focus:ring-1 focus:ring-indigo-500 outline-none"
+                        className="text-xs border border-slate-200 dark:border-slate-800/60 rounded-xl px-2.5 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 focus:ring-1 focus:ring-indigo-500 outline-none cursor-pointer"
                       >
-                        <option value="">Select Faculty...</option>
-                        {faculties.map(f => <option key={f.id} value={f.id}>{f.name} ({f.department})</option>)}
+                        <option value="" className="bg-white dark:bg-[#161B26] text-slate-800 dark:text-slate-100">Select Faculty...</option>
+                        {faculties.map(f => <option key={f.id} value={f.id} className="bg-white dark:bg-[#161B26] text-slate-800 dark:text-slate-100">{f.name} ({f.department})</option>)}
                       </select>
 
                       <input
                         type="date"
                         value={absDate}
                         onChange={e => setAbsDate(e.target.value)}
-                        className="text-xs border border-neutral-800 rounded-lg px-2 py-1 bg-neutral-950 text-white focus:ring-1 focus:ring-indigo-500 outline-none"
+                        className="text-xs border border-slate-200 dark:border-slate-800/60 rounded-xl px-2.5 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 focus:ring-1 focus:ring-indigo-500 outline-none"
                       />
                     </div>
                   </div>
@@ -1041,7 +1055,7 @@ export default function AdminTimetablePage() {
                       Select a faculty member above to begin coordinating academic scheduling disruptions.
                     </div>
                   ) : absFacultySchedule.length === 0 ? (
-                    <div className="py-20 text-center border border-dashed border-neutral-850 rounded-xl text-slate-500 text-sm">
+                    <div className="py-20 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 text-sm bg-slate-50/50 dark:bg-[#0B0F19]/10">
                       No slots scheduled for this faculty member on {absDate}.
                     </div>
                   ) : (
@@ -1060,39 +1074,43 @@ export default function AdminTimetablePage() {
                         return (
                           <div
                             key={slot.overrideId || slot.id}
-                            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border transition bg-neutral-950/30
-                              ${isSlotCancelled ? 'border-red-950 bg-red-950/5' : isSlotSubbed ? 'border-amber-950 bg-amber-950/5' : 'border-neutral-850'}`}
+                            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border transition
+                              ${isSlotCancelled 
+                                ? 'border-red-200 bg-red-500/5 dark:border-red-950/60 dark:bg-red-950/10' 
+                                : isSlotSubbed 
+                                  ? 'border-amber-200 bg-amber-500/5 dark:border-amber-950/60 dark:bg-amber-950/10' 
+                                  : 'border-slate-100 dark:border-slate-800/40 bg-slate-50/40 dark:bg-neutral-950/20'}`}
                           >
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className={`text-xs font-bold ${isSlotCancelled ? 'line-through text-slate-500' : 'text-white'}`}>
+                                <span className={`text-xs font-bold ${isSlotCancelled ? 'line-through text-slate-400' : 'text-slate-800 dark:text-white'}`}>
                                   {slot.subjectCode} — {slot.subjectName}
                                 </span>
 
                                 {/* Status badges */}
                                 {isSlotCancelled && (
-                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-400">
+                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-650 dark:text-red-400">
                                     Cancelled
                                   </span>
                                 )}
                                 {isSlotSubbed && (
-                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400">
+                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400">
                                     Substitute: {slot.facultyName}
                                   </span>
                                 )}
                                 {isSlotOverride && !isSlotCancelled && !isSlotSubbed && (
-                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">
+                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-650 dark:text-indigo-400">
                                     Override Applied
                                   </span>
                                 )}
                               </div>
-                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-400">
-                                <span className="flex items-center gap-0.5"><Clock className="w-3.5 h-3.5 text-indigo-400" />{start} - {end}</span>
-                                <span className="flex items-center gap-0.5"><MapPin className="w-3.5 h-3.5 text-emerald-400" />{slot.roomName}</span>
-                                <span className="flex items-center gap-0.5"><Users className="w-3.5 h-3.5 text-blue-400" />Section: {slot.sectionName}</span>
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 dark:text-slate-400">
+                                <span className="flex items-center gap-0.5"><Clock className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />{start} - {end}</span>
+                                <span className="flex items-center gap-0.5"><MapPin className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />{slot.roomName}</span>
+                                <span className="flex items-center gap-0.5"><Users className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />Section: {slot.sectionName}</span>
                               </div>
                               {slot.overrideReason && (
-                                <p className="text-[9px] text-slate-500 italic mt-1 font-mono">"Reason: {slot.overrideReason}"</p>
+                                <p className="text-[9px] text-slate-450 dark:text-slate-500 italic mt-1 font-mono">"Reason: {slot.overrideReason}"</p>
                               )}
                             </div>
 
@@ -1102,13 +1120,13 @@ export default function AdminTimetablePage() {
                                 <>
                                   <button
                                     onClick={() => handleCancelSlot(slot)}
-                                    className="px-2.5 py-1 text-[10px] bg-red-950/40 hover:bg-red-950/80 border border-red-900/40 hover:border-red-650 text-red-400 font-semibold rounded transition"
+                                    className="px-2.5 py-1 text-[10px] bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-650 dark:text-red-400 font-semibold rounded transition"
                                   >
                                     Cancel Class
                                   </button>
                                   <button
                                     onClick={() => handleOpenSubstitutionSmartSelector(slot)}
-                                    className="px-2.5 py-1 text-[10px] bg-indigo-650 hover:bg-indigo-750 text-white font-semibold rounded transition flex items-center gap-1"
+                                    className="px-2.5 py-1 text-[10px] bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded transition flex items-center gap-1 shadow-sm"
                                   >
                                     <Shuffle className="w-3 h-3" /> Find Substitution
                                   </button>
@@ -1118,7 +1136,7 @@ export default function AdminTimetablePage() {
                                 slot.overrideId && (
                                   <button
                                     onClick={() => handleRevertOverride(slot.overrideId)}
-                                    className="px-2.5 py-1 text-[10px] bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-slate-300 rounded transition font-semibold"
+                                    className="px-2.5 py-1 text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 dark:hover:bg-neutral-900 border border-slate-200 dark:border-neutral-850 text-slate-700 dark:text-slate-350 rounded transition font-semibold"
                                   >
                                     Revert Override
                                   </button>
@@ -1135,13 +1153,13 @@ export default function AdminTimetablePage() {
 
               {/* Active Overrides for Selected Section Log */}
               <div className="lg:col-span-1 space-y-4">
-                <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm">
-                  <h3 className="font-semibold text-sm text-white mb-3 flex items-center justify-between border-b border-neutral-800 pb-2">
+                <div className="p-6 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl shadow-sm text-left">
+                  <h3 className="font-semibold text-sm text-slate-805 dark:text-white mb-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
                     Section Resolved Logs
                     <select
-                      value={selectedSection}
+                      value={selectedSection || ''}
                       onChange={e => setSelectedSection(e.target.value)}
-                      className="text-[10px] border border-neutral-800 rounded px-1.5 py-0.5 bg-neutral-950 text-white font-medium outline-none"
+                      className="text-[10px] border border-slate-200 dark:border-slate-800/60 rounded-lg px-2 py-1 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer"
                     >
                       {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
                     </select>
@@ -1168,12 +1186,12 @@ export default function AdminTimetablePage() {
         {activeTab === 'venues' && (
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* Header Control Panel */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-neutral-800 pb-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
               <div>
-                <h3 className="font-semibold text-lg text-white flex items-center gap-2">
+                <h3 className="font-semibold text-lg text-slate-900 dark:text-white flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-indigo-500" /> Venue & Classroom Management
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5 font-medium">Create and configure classrooms, laboratories, and seminar halls.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Create and configure classrooms, laboratories, and seminar halls.</p>
               </div>
               <button
                 onClick={() => {
@@ -1187,65 +1205,66 @@ export default function AdminTimetablePage() {
                   });
                   setShowRoomModal(true);
                 }}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-750 active:scale-95 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-2 self-start md:self-auto hover:shadow-indigo-500/20 hover:shadow-lg cursor-pointer"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-2 self-start md:self-auto hover:shadow-indigo-500/20 hover:shadow-lg cursor-pointer"
               >
                 <Plus className="w-4 h-4" /> Add New Room
               </button>
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
+            <div className="p-6 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
               <div className="relative w-full md:w-80 text-left">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-450" />
+                <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Search by name or building..."
                   value={roomSearchQuery}
                   onChange={(e) => setRoomSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 text-xs border border-neutral-800 rounded-lg bg-neutral-950 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full pl-10 pr-4 py-2 text-xs border border-slate-200 dark:border-slate-800/60 rounded-xl bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
               <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                   <span>Type:</span>
                   <select
                     value={roomFilterType}
                     onChange={(e) => setRoomFilterType(e.target.value)}
-                    className="border border-neutral-800 rounded-lg px-2.5 py-1.5 bg-neutral-950 text-white text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                    className="border border-slate-200 dark:border-slate-800/60 rounded-xl px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
                   >
-                    <option value="ALL">All Types</option>
-                    <option value="LECTURE_HALL">Lecture Hall</option>
-                    <option value="CS_LAB">CS Lab</option>
-                    <option value="PHYSICS_LAB">Physics Lab</option>
-                    <option value="CHEMISTRY_LAB">Chemistry Lab</option>
-                    <option value="ELECTRONICS_LAB">Electronics Lab</option>
-                    <option value="SEMINAR_HALL">Seminar Hall</option>
-                    <option value="ANY">Any Type</option>
+                    <option value="ALL" className="bg-white dark:bg-[#161B26]">All Types</option>
+                    <option value="LECTURE_HALL" className="bg-white dark:bg-[#161B26]">Lecture Hall</option>
+                    <option value="CS_LAB" className="bg-white dark:bg-[#161B26]">CS Lab</option>
+                    <option value="PHYSICS_LAB" className="bg-white dark:bg-[#161B26]">Physics Lab</option>
+                    <option value="CHEMISTRY_LAB" className="bg-white dark:bg-[#161B26]">Chemistry Lab</option>
+                    <option value="ELECTRONICS_LAB" className="bg-white dark:bg-[#161B26]">Electronics Lab</option>
+                    <option value="SEMINAR_HALL" className="bg-white dark:bg-[#161B26]">Seminar Hall</option>
+                    <option value="ANY" className="bg-white dark:bg-[#161B26]">Any Type</option>
                   </select>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                   <span>Status:</span>
                   <select
                     value={roomFilterStatus}
                     onChange={(e) => setRoomFilterStatus(e.target.value)}
-                    className="border border-neutral-800 rounded-lg px-2.5 py-1.5 bg-neutral-950 text-white text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                    className="border border-slate-200 dark:border-slate-800/60 rounded-xl px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
                   >
-                    <option value="ALL">All Statuses</option>
-                    <option value="AVAILABLE">Available</option>
-                    <option value="MAINTENANCE">Maintenance</option>
-                    <option value="RESERVED">Reserved</option>
+                    <option value="ALL" className="bg-white dark:bg-[#161B26]">All Statuses</option>
+                    <option value="AVAILABLE" className="bg-white dark:bg-[#161B26]">Available</option>
+                    <option value="MAINTENANCE" className="bg-white dark:bg-[#161B26]">Maintenance</option>
+                    <option value="RESERVED" className="bg-white dark:bg-[#161B26]">Reserved</option>
                   </select>
                 </div>
               </div>
             </div>
 
+
             {/* Room Cards Grid */}
             {loading ? (
               <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>
             ) : rooms.length === 0 ? (
-              <div className="text-center py-20 border border-dashed border-neutral-850 rounded-xl text-slate-500 text-sm">
+              <div className="text-center py-20 border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 text-sm bg-white/50 dark:bg-[#161B26]/30 shadow-sm">
                 No venues configured. Click "+ Add New Room" to create one.
               </div>
             ) : (() => {
@@ -1259,7 +1278,7 @@ export default function AdminTimetablePage() {
 
               if (filteredRooms.length === 0) {
                 return (
-                  <div className="text-center py-20 border border-dashed border-neutral-850 rounded-xl text-slate-500 text-sm">
+                  <div className="text-center py-20 border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 text-sm bg-white/50 dark:bg-[#161B26]/30 shadow-sm">
                     No venues match your search or filter settings.
                   </div>
                 );
@@ -1274,49 +1293,49 @@ export default function AdminTimetablePage() {
                     return (
                       <div
                         key={room.id}
-                        className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 flex flex-col justify-between hover:scale-[1.02] hover:shadow-lg hover:border-indigo-500/30 transition-all duration-300 min-h-[160px]"
+                        className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl p-5 flex flex-col justify-between hover:scale-[1.02] hover:shadow-md hover:border-indigo-500/30 transition-all duration-300 min-h-[160px] shadow-sm"
                       >
                         <div className="space-y-2 text-left">
                           <div className="flex justify-between items-start gap-2">
-                            <h4 className="font-bold text-base text-white truncate" title={room.name}>{room.name}</h4>
+                            <h4 className="font-bold text-base text-slate-800 dark:text-white truncate" title={room.name}>{room.name}</h4>
 
                             {/* Room Status Indicator */}
                             <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1 border
-                              ${isAvailable ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
-                                isMaintenance ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
-                                  'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}
+                              ${isAvailable ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' :
+                                isMaintenance ? 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400' :
+                                  'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'}`}
                             >
-                              {isAvailable && <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>}
+                              {isAvailable && <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>}
                               {room.status}
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-1 text-slate-400 text-xs font-medium">
-                            <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-                            <span className="truncate text-slate-300" title={room.building}>{room.building}</span>
+                          <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-xs font-medium">
+                            <MapPin className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+                            <span className="truncate text-slate-650 dark:text-slate-300" title={room.building}>{room.building}</span>
                           </div>
 
                           <div className="flex flex-wrap gap-1.5 pt-1.5">
-                            <span className="text-[9px] font-mono bg-neutral-950 border border-neutral-800 px-2 py-0.5 rounded text-slate-350 flex items-center gap-1">
-                              <Users className="w-2.5 h-2.5 text-indigo-400" /> {room.capacity} capacity
+                            <span className="text-[9px] font-mono bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-805 px-2 py-0.5 rounded text-slate-600 dark:text-slate-350 flex items-center gap-1">
+                              <Users className="w-2.5 h-2.5 text-indigo-500 dark:text-indigo-400" /> {room.capacity} capacity
                             </span>
-                            <span className="text-[9px] font-bold bg-neutral-950 border border-neutral-850 px-2 py-0.5 rounded text-indigo-400">
+                            <span className="text-[9px] font-bold bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-805 px-2 py-0.5 rounded text-indigo-650 dark:text-indigo-400">
                               {room.type?.replace('_', ' ')}
                             </span>
                           </div>
                         </div>
 
                         {/* Action buttons */}
-                        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-neutral-850">
+                        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60">
                           <button
                             onClick={() => handleEditRoomClick(room)}
-                            className="flex-1 py-1.5 bg-neutral-950 border border-neutral-850 hover:bg-neutral-800 text-slate-300 hover:text-white text-[10px] font-bold rounded-lg transition flex items-center justify-center gap-1 cursor-pointer"
+                            className="flex-1 py-1.5 bg-slate-50 border border-slate-200 dark:bg-neutral-950 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-neutral-900 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-white text-[10px] font-bold rounded-lg transition flex items-center justify-center gap-1 cursor-pointer"
                           >
-                            <Edit className="w-3 h-3 text-indigo-400" /> Edit Details
+                            <Edit className="w-3 h-3 text-indigo-500 dark:text-indigo-400" /> Edit Details
                           </button>
                           <button
                             onClick={() => setDeleteRoomConfirmId(room.id)}
-                            className="p-1.5 bg-neutral-950 border border-neutral-850 hover:bg-red-500/10 hover:border-red-500/30 text-slate-400 hover:text-red-400 rounded-lg transition cursor-pointer"
+                            className="p-1.5 bg-slate-50 border border-slate-200 dark:bg-neutral-950 dark:border-slate-800 hover:bg-red-500/10 hover:border-red-500/30 text-slate-400 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 rounded-lg transition cursor-pointer"
                             title="Delete Room"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1371,66 +1390,66 @@ export default function AdminTimetablePage() {
       {/* ─── DRAWER MODAL: Smart Substitution Ranked Candidates selector ────── */}
       {substitutionSlot && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/65 backdrop-blur-sm">
-          <div className="w-full max-w-lg h-full bg-neutral-900 border-l border-neutral-800 shadow-2xl p-6 overflow-y-auto animate-in slide-in-from-right text-left flex flex-col justify-between">
+          <div className="w-full max-w-lg h-full bg-white dark:bg-[#161B26] border-l border-slate-200 dark:border-slate-800/60 shadow-2xl p-6 overflow-y-auto animate-in slide-in-from-right text-left flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="flex justify-between items-start border-b border-neutral-850 pb-3">
+              <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    <Shuffle className="w-4 h-4 text-indigo-400" /> Smart Substitution Finder
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Shuffle className="w-4 h-4 text-indigo-500" /> Smart Substitution Finder
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1">Ranked candidate recommendations for scheduled slot</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Ranked candidate recommendations for scheduled slot</p>
                 </div>
                 <button
                   onClick={() => setSubstitutionSlot(null)}
-                  className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-neutral-800 transition"
+                  className="p-1.5 text-slate-400 hover:text-slate-650 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-neutral-800 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Slot metadata */}
-              <div className="p-3 bg-neutral-950 border border-neutral-850 rounded-xl space-y-2 text-xs">
+              <div className="p-4 bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-2 text-xs">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold">Subject Class</span>
-                    <p className="font-bold text-white">{substitutionSlot.subjectName} ({substitutionSlot.subjectCode})</p>
+                    <span className="text-[10px] text-slate-450 dark:text-slate-500 uppercase font-semibold">Subject Class</span>
+                    <p className="font-bold text-slate-800 dark:text-white">{substitutionSlot.subjectName} ({substitutionSlot.subjectCode})</p>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold">Original Faculty</span>
-                    <p className="font-bold text-white">{selectedAbsFaculty ? faculties.find(f => String(f.id) === String(selectedAbsFaculty))?.name : 'Original'}</p>
+                    <span className="text-[10px] text-slate-455 dark:text-slate-500 uppercase font-semibold">Original Faculty</span>
+                    <p className="font-bold text-slate-800 dark:text-white">{selectedAbsFaculty ? faculties.find(f => String(f.id) === String(selectedAbsFaculty))?.name : 'Original'}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-1 pt-1 border-t border-neutral-850">
+                <div className="grid grid-cols-3 gap-1 pt-2 border-t border-slate-200/60 dark:border-slate-805">
                   <div>
-                    <span className="text-[9px] text-slate-500">Date</span>
-                    <p className="font-semibold text-slate-300">{absDate}</p>
+                    <span className="text-[9px] text-slate-450 dark:text-slate-500">Date</span>
+                    <p className="font-semibold text-slate-650 dark:text-slate-300">{absDate}</p>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500">Time</span>
-                    <p className="font-semibold text-slate-300 font-mono">{substitutionSlot.startTime?.substring(0, 5)} - {substitutionSlot.endTime?.substring(0, 5)}</p>
+                    <span className="text-[9px] text-slate-450 dark:text-slate-500">Time</span>
+                    <p className="font-semibold text-slate-650 dark:text-slate-300 font-mono">{substitutionSlot.startTime?.substring(0, 5)} - {substitutionSlot.endTime?.substring(0, 5)}</p>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500">Section</span>
-                    <p className="font-semibold text-slate-300">{substitutionSlot.sectionName}</p>
+                    <span className="text-[9px] text-slate-455 dark:text-slate-500">Section</span>
+                    <p className="font-semibold text-slate-650 dark:text-slate-300">{substitutionSlot.sectionName}</p>
                   </div>
                 </div>
               </div>
 
               {/* Reason form */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Override Reason</label>
+                <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">Override Reason</label>
                 <input
                   type="text"
                   value={customReason}
                   onChange={e => setCustomReason(e.target.value)}
-                  className="w-full text-xs border border-neutral-800 rounded-lg px-3 py-2 bg-neutral-950 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full text-xs border border-slate-200 dark:border-slate-800/60 rounded-xl px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                   placeholder="e.g. Faculty absence, medical leave..."
                 />
               </div>
 
               {/* Candidates list */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ranked Available Faculty</label>
+                <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider block">Ranked Available Faculty</label>
 
                 {loadingCandidates ? (
                   <div className="flex flex-col items-center py-20 space-y-3">
@@ -1438,7 +1457,7 @@ export default function AdminTimetablePage() {
                     <span className="text-xs text-slate-500">Evaluating workload & expertise metrics...</span>
                   </div>
                 ) : availableCandidates.length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-neutral-850 rounded-xl text-slate-500 text-xs">
+                  <div className="text-center py-10 border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 text-xs bg-slate-50/50 dark:bg-[#0B0F19]/10">
                     No matching faculty candidates available for this slot.
                   </div>
                 ) : (
@@ -1451,33 +1470,33 @@ export default function AdminTimetablePage() {
                       return (
                         <div
                           key={candidate.facultyId}
-                          className={`p-3 rounded-lg border transition bg-neutral-950/20 flex items-center justify-between gap-3
-                            ${isFree ? 'border-neutral-800' : 'border-red-950 bg-red-950/5 opacity-60'}`}
+                          className={`p-3 rounded-xl border transition flex items-center justify-between gap-3 bg-slate-50/40 dark:bg-neutral-950/20
+                            ${isFree ? 'border-slate-150 dark:border-slate-800/60' : 'border-red-200 dark:border-red-950 bg-red-500/5 opacity-60'}`}
                         >
                           <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-white">{candidate.facultyName}</span>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs font-bold text-slate-850 dark:text-white">{candidate.facultyName}</span>
 
                               {/* Expertise badge */}
                               <span className={`text-[7px] font-bold px-1.5 py-0.2 rounded border leading-none
-                                ${isExpert ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : isDept ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-neutral-800 border-neutral-700 text-slate-400'}`}>
+                                ${isExpert ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-650 dark:text-emerald-400' : isDept ? 'bg-blue-500/10 border-blue-500/20 text-blue-650 dark:text-blue-400' : 'bg-slate-100 dark:bg-neutral-800 border-slate-200 dark:border-neutral-700 text-slate-500 dark:text-slate-400'}`}>
                                 {candidate.expertiseRank}
                               </span>
 
                               {/* Availability state */}
                               <span className={`text-[7px] font-bold px-1.5 py-0.2 rounded border leading-none flex items-center gap-0.5
-                                ${isFree ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                                ${isFree ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-650 dark:text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-650 dark:text-red-400'}`}>
                                 {isFree ? <Check className="w-2 h-2" /> : <AlertTriangle className="w-2 h-2" />}
                                 {candidate.status}
                               </span>
                             </div>
-                            <p className="text-[10px] text-slate-400">{candidate.department} · {candidate.designation}</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">{candidate.department} · {candidate.designation}</p>
 
                             {!isFree && candidate.conflictDescription && (
-                              <p className="text-[9px] text-red-450/80 font-medium font-mono">{candidate.conflictDescription}</p>
+                              <p className="text-[9px] text-red-600/80 font-medium font-mono">{candidate.conflictDescription}</p>
                             )}
 
-                            <div className="text-[9px] text-slate-500 font-mono">
+                            <div className="text-[9px] text-slate-450 dark:text-slate-500 font-mono">
                               Workload Load: {candidate.weeklyWorkloadSlots} slots | Subs: {candidate.recentSubstitutionCount}
                             </div>
                           </div>
@@ -1485,7 +1504,7 @@ export default function AdminTimetablePage() {
                           <button
                             onClick={() => handleConfirmSubstitution(candidate.facultyId)}
                             disabled={!isFree || submittingOverride}
-                            className="px-2.5 py-1 text-[10px] bg-indigo-600 hover:bg-indigo-750 text-white rounded transition disabled:opacity-50 font-semibold"
+                            className="px-2.5 py-1 text-[10px] bg-indigo-600 hover:bg-indigo-750 text-white rounded-lg transition disabled:opacity-50 font-semibold"
                           >
                             {submittingOverride ? "Assigning..." : "Assign"}
                           </button>
@@ -1497,10 +1516,10 @@ export default function AdminTimetablePage() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-neutral-850 flex gap-2">
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex gap-2">
               <button
                 onClick={() => setSubstitutionSlot(null)}
-                className="flex-1 py-2 text-xs bg-neutral-950 border border-neutral-800 hover:bg-neutral-900 rounded-lg text-slate-400 hover:text-white font-semibold transition"
+                className="flex-1 py-2 text-xs bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-805 hover:bg-slate-200 dark:hover:bg-neutral-900 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white font-semibold transition"
               >
                 Close Smart Finder
               </button>
@@ -1512,35 +1531,35 @@ export default function AdminTimetablePage() {
       {/* ─── GENERAL OVERRIDE MODAL ────────────────────────────────────── */}
       {showOverrideModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 text-left animate-in fade-in zoom-in-95">
-            <div className="flex justify-between items-start mb-4 border-b border-neutral-805 pb-2">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Layers className="w-4 h-4 text-indigo-400" /> Apply Timetable Override
+          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl shadow-2xl p-6 w-full max-w-md mx-4 text-left animate-in fade-in zoom-in-95">
+            <div className="flex justify-between items-start mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Layers className="w-4 h-4 text-indigo-500" /> Apply Timetable Override
               </h3>
-              <button onClick={closeOverrideModal} className="text-slate-400 hover:text-white transition">
+              <button onClick={closeOverrideModal} className="text-slate-400 hover:text-slate-650 dark:hover:text-white transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleManualOverrideSubmit} className="space-y-4 text-xs text-white">
+            <form onSubmit={handleManualOverrideSubmit} className="space-y-4 text-xs text-slate-850 dark:text-white">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Override Type</label>
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Override Type</label>
                 <select
                   value={manualOverrideType}
                   onChange={e => setManualOverrideType(e.target.value)}
-                  className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                 >
-                  <option value="ROOM_CHANGE">Room Change Shift</option>
-                  <option value="TIME_CHANGE">Time Change Shift</option>
-                  <option value="MERGED_CLASS">Merge Sections</option>
-                  <option value="EXTRA_CLASS">Schedule Extra Class Exception</option>
+                  <option value="ROOM_CHANGE" className="bg-white dark:bg-[#161B26]">Room Change Shift</option>
+                  <option value="TIME_CHANGE" className="bg-white dark:bg-[#161B26]">Time Change Shift</option>
+                  <option value="MERGED_CLASS" className="bg-white dark:bg-[#161B26]">Merge Sections</option>
+                  <option value="EXTRA_CLASS" className="bg-white dark:bg-[#161B26]">Schedule Extra Class Exception</option>
                 </select>
               </div>
 
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Date</label>
+                    <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Target Date</label>
                     <input
                       type="date"
                       required
@@ -1548,13 +1567,13 @@ export default function AdminTimetablePage() {
                       onChange={e => {
                         setManualOverrideForm({ ...manualOverrideForm, date: e.target.value, timetableEntryId: '' });
                       }}
-                      className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 text-white placeholder-slate-550"
+                      className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 placeholder-slate-400"
                     />
                   </div>
 
                   {manualOverrideType !== 'EXTRA_CLASS' && (
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Section</label>
+                      <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Target Section</label>
                       <select
                         required
                         value={manualOverrideSectionId}
@@ -1562,10 +1581,10 @@ export default function AdminTimetablePage() {
                           setManualOverrideSectionId(e.target.value);
                           setManualOverrideForm(prev => ({ ...prev, timetableEntryId: '' }));
                         }}
-                        className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 text-white"
+                        className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                       >
-                        <option value="">Select Section...</option>
-                        {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
+                        <option value="" className="bg-white dark:bg-[#161B26]">Select Section...</option>
+                        {sections.map(s => <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">{s.sectionName}</option>)}
                       </select>
                     </div>
                   )}
@@ -1574,18 +1593,18 @@ export default function AdminTimetablePage() {
                 {/* For non-extra classes, select the static Template entry being modified using a searchable picker */}
                 {manualOverrideType !== 'EXTRA_CLASS' && (
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Class / Slot</label>
+                    <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Select Class / Slot</label>
                     {loadingSlots ? (
-                      <div className="flex items-center gap-2 py-2 px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-slate-400">
+                      <div className="flex items-center gap-2 py-2 px-3 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl text-slate-400">
                         <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-500" />
                         <span>Loading section schedule...</span>
                       </div>
                     ) : !manualOverrideSectionId ? (
-                      <div className="py-2 px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-slate-500 italic">
+                      <div className="py-2 px-3 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-805 rounded-xl text-slate-450 italic">
                         Select a section above to view slots
                       </div>
                     ) : availableSlots.length === 0 ? (
-                      <div className="py-2 px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-rose-400 italic">
+                      <div className="py-2 px-3 bg-slate-50 dark:bg-[#0B0F19]/40 border border-red-200 dark:border-red-950/60 rounded-xl text-rose-500 dark:text-rose-400 italic">
                         No active classes scheduled on this date
                       </div>
                     ) : (() => {
@@ -1602,13 +1621,13 @@ export default function AdminTimetablePage() {
                         <div className="space-y-2">
                           {availableSlots.length > 3 && (
                             <div className="relative">
-                              <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />
+                              <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-400" />
                               <input
                                 type="text"
                                 placeholder="Filter slots by subject, code, room..."
                                 value={slotSearchQuery}
                                 onChange={e => setSlotSearchQuery(e.target.value)}
-                                className="w-full pl-8 pr-3 py-1.5 bg-neutral-950 border border-neutral-850 rounded-lg focus:outline-none focus:border-indigo-500 text-[11px] text-white placeholder-slate-600"
+                                className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-[11px] text-slate-800 dark:text-slate-100 placeholder-slate-400"
                               />
                             </div>
                           )}
@@ -1616,11 +1635,11 @@ export default function AdminTimetablePage() {
                             required
                             value={manualOverrideForm.timetableEntryId}
                             onChange={e => setManualOverrideForm({ ...manualOverrideForm, timetableEntryId: e.target.value })}
-                            className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 text-white"
+                            className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                           >
-                            <option value="">Choose slot...</option>
+                            <option value="" className="bg-white dark:bg-[#161B26]">Choose slot...</option>
                             {filteredSlots.map(slot => (
-                              <option key={slot.id} value={slot.id}>
+                              <option key={slot.id} value={slot.id} className="bg-white dark:bg-[#161B26]">
                                 {slot.subjectCode} - {slot.subjectName} ({slot.startTime?.substring(0, 5)} - {slot.endTime?.substring(0, 5)}) · Room: {slot.roomName} {slot.isCancelled ? '[Cancelled]' : ''}
                               </option>
                             ))}
@@ -1637,41 +1656,41 @@ export default function AdminTimetablePage() {
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Subject</label>
+                      <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Subject</label>
                       <select
                         required
                         value={manualOverrideForm.subjectId}
                         onChange={e => setManualOverrideForm({ ...manualOverrideForm, subjectId: e.target.value })}
-                        className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500"
+                        className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                       >
-                        <option value="">Select...</option>
-                        {subjects.map(s => <option key={s.id} value={s.id}>{s.code}</option>)}
+                        <option value="" className="bg-white dark:bg-[#161B26]">Select...</option>
+                        {subjects.map(s => <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">{s.code}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Faculty</label>
+                      <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Faculty</label>
                       <select
                         required
                         value={manualOverrideForm.newFacultyId}
                         onChange={e => setManualOverrideForm({ ...manualOverrideForm, newFacultyId: e.target.value })}
-                        className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500"
+                        className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                       >
-                        <option value="">Select...</option>
-                        {faculties.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                        <option value="" className="bg-white dark:bg-[#161B26]">Select...</option>
+                        {faculties.map(f => <option key={f.id} value={f.id} className="bg-white dark:bg-[#161B26]">{f.name}</option>)}
                       </select>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Section ID</label>
+                    <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Section ID</label>
                     <select
                       required
                       value={manualOverrideForm.sectionIds[0] || ''}
                       onChange={e => setManualOverrideForm({ ...manualOverrideForm, sectionIds: [e.target.value] })}
-                      className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                     >
-                      <option value="">Select Section...</option>
-                      {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
+                      <option value="" className="bg-white dark:bg-[#161B26]">Select Section...</option>
+                      {sections.map(s => <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">{s.sectionName}</option>)}
                     </select>
                   </div>
                 </div>
@@ -1680,15 +1699,15 @@ export default function AdminTimetablePage() {
               {/* Room Change shifts */}
               {(manualOverrideType === 'ROOM_CHANGE' || manualOverrideType === 'EXTRA_CLASS') && (
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target New Room</label>
+                  <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Target New Room</label>
                   <select
                     required
                     value={manualOverrideForm.newRoomId}
                     onChange={e => setManualOverrideForm({ ...manualOverrideForm, newRoomId: e.target.value })}
-                    className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500"
+                    className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                   >
-                    <option value="">Select Room...</option>
-                    {rooms.map(r => <option key={r.id} value={r.id}>{r.name} ({r.building})</option>)}
+                    <option value="" className="bg-white dark:bg-[#161B26]">Select Room...</option>
+                    {rooms.map(r => <option key={r.id} value={r.id} className="bg-white dark:bg-[#161B26]">{r.name} ({r.building})</option>)}
                   </select>
                 </div>
               )}
@@ -1697,25 +1716,25 @@ export default function AdminTimetablePage() {
               {(manualOverrideType === 'TIME_CHANGE' || manualOverrideType === 'EXTRA_CLASS') && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">New Start Time</label>
+                    <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">New Start Time</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. 09:00"
                       value={manualOverrideForm.newStartTime}
                       onChange={e => setManualOverrideForm({ ...manualOverrideForm, newStartTime: e.target.value })}
-                      className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 font-mono"
+                      className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-slate-800 dark:text-slate-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">New End Time</label>
+                    <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">New End Time</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. 10:00"
                       value={manualOverrideForm.newEndTime}
                       onChange={e => setManualOverrideForm({ ...manualOverrideForm, newEndTime: e.target.value })}
-                      className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 font-mono"
+                      className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-slate-800 dark:text-slate-100"
                     />
                   </div>
                 </div>
@@ -1724,7 +1743,7 @@ export default function AdminTimetablePage() {
               {/* Merge sections */}
               {manualOverrideType === 'MERGED_CLASS' && (
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sections to Merge (Select IDs)</label>
+                  <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Sections to Merge (Select IDs)</label>
                   <select
                     multiple
                     required
@@ -1734,61 +1753,61 @@ export default function AdminTimetablePage() {
                       const selected = options.filter(o => o.selected).map(o => o.value);
                       setManualOverrideForm({ ...manualOverrideForm, sectionIds: selected });
                     }}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 h-20"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 h-20 text-slate-800 dark:text-slate-100 cursor-pointer"
                   >
-                    {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
+                    {sections.map(s => <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">{s.sectionName}</option>)}
                   </select>
                 </div>
               )}
 
               {/* Recurrence Settings */}
-              <div className="space-y-3 p-3 bg-neutral-950 border border-neutral-800 rounded-lg">
+              <div className="space-y-3 p-4 bg-slate-50 dark:bg-neutral-950 border border-slate-150 dark:border-slate-800 rounded-2xl">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     id="isRecurring"
                     checked={manualOverrideForm.isRecurring}
                     onChange={e => setManualOverrideForm({ ...manualOverrideForm, isRecurring: e.target.checked })}
-                    className="rounded bg-neutral-900 border-neutral-800 text-indigo-650 focus:ring-indigo-500"
+                    className="rounded bg-slate-100 dark:bg-neutral-900 border-slate-200 dark:border-slate-800 text-indigo-650 focus:ring-indigo-500 cursor-pointer"
                   />
-                  <label htmlFor="isRecurring" className="text-xs font-semibold text-slate-350 select-none cursor-pointer">
+                  <label htmlFor="isRecurring" className="text-xs font-semibold text-slate-550 dark:text-slate-400 select-none cursor-pointer">
                     Is Recurring Exception?
                   </label>
                 </div>
 
                 {manualOverrideForm.isRecurring && (
-                  <div className="space-y-2.5 pt-1.5 border-t border-neutral-900">
+                  <div className="space-y-2.5 pt-2 border-t border-slate-200 dark:border-neutral-900">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Effective From</label>
+                        <label className="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Effective From</label>
                         <input
                           type="date"
                           required
                           value={manualOverrideForm.effectiveFrom}
                           onChange={e => setManualOverrideForm({ ...manualOverrideForm, effectiveFrom: e.target.value })}
-                          className="w-full px-2 py-1 bg-neutral-900 border border-neutral-800 rounded text-xs focus:outline-none focus:border-indigo-500"
+                          className="w-full px-2 py-1 bg-white dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100"
                         />
                       </div>
                       <div>
-                        <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Effective To</label>
+                        <label className="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Effective To</label>
                         <input
                           type="date"
                           required
                           value={manualOverrideForm.effectiveTo}
                           onChange={e => setManualOverrideForm({ ...manualOverrideForm, effectiveTo: e.target.value })}
-                          className="w-full px-2 py-1 bg-neutral-900 border border-neutral-800 rounded text-xs focus:outline-none focus:border-indigo-500"
+                          className="w-full px-2 py-1 bg-white dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pattern</label>
+                      <label className="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Pattern</label>
                       <select
                         value={manualOverrideForm.recurringPattern}
                         onChange={e => setManualOverrideForm({ ...manualOverrideForm, recurringPattern: e.target.value })}
-                        className="w-full px-2 py-1 bg-neutral-900 border border-neutral-800 rounded text-xs focus:outline-none focus:border-indigo-500"
+                        className="w-full px-2.5 py-1 bg-white dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                       >
-                        <option value="DAILY">DAILY</option>
-                        <option value="WEEKLY">WEEKLY</option>
+                        <option value="DAILY" className="bg-white dark:bg-[#161B26]">DAILY</option>
+                        <option value="WEEKLY" className="bg-white dark:bg-[#161B26]">WEEKLY</option>
                       </select>
                     </div>
                   </div>
@@ -1796,14 +1815,14 @@ export default function AdminTimetablePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Reason for Exception</label>
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Reason for Exception</label>
                 <textarea
                   required
                   placeholder="e.g. Room maintenance, shifted labs..."
                   value={manualOverrideForm.reason}
                   onChange={e => setManualOverrideForm({ ...manualOverrideForm, reason: e.target.value })}
                   rows={2}
-                  className="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 resize-none"
+                  className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 resize-none text-slate-800 dark:text-slate-100 placeholder-slate-400"
                 />
               </div>
 
@@ -1811,14 +1830,14 @@ export default function AdminTimetablePage() {
                 <button
                   type="button"
                   onClick={closeOverrideModal}
-                  className="flex-1 py-2 bg-neutral-950 border border-neutral-850 hover:bg-neutral-900 text-slate-400 hover:text-white rounded-lg font-semibold transition"
+                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-850 text-slate-600 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white rounded-xl font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingOverride}
-                  className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-750 text-white rounded-lg font-bold transition disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl font-bold transition disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   {submittingOverride ? (
                     <>
@@ -1836,44 +1855,44 @@ export default function AdminTimetablePage() {
       {/* ─── MODAL: Add/Edit Room ─────────────────────────────────────── */}
       {showRoomModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 text-left animate-in fade-in zoom-in-95">
-            <div className="flex justify-between items-start mb-4 border-b border-neutral-805 pb-2">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-indigo-400" /> {editingRoom ? 'Edit Venue Details' : 'Add New Venue'}
+          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl shadow-2xl p-6 w-full max-w-md mx-4 text-left animate-in fade-in zoom-in-95">
+            <div className="flex justify-between items-start mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-indigo-500" /> {editingRoom ? 'Edit Venue Details' : 'Add New Venue'}
               </h3>
-              <button onClick={() => setShowRoomModal(false)} className="text-slate-400 hover:text-white transition">
+              <button onClick={() => setShowRoomModal(false)} className="text-slate-400 hover:text-slate-650 dark:hover:text-white transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleRoomFormSubmit} className="space-y-4 text-xs text-white">
+            <form onSubmit={handleRoomFormSubmit} className="space-y-4 text-xs text-slate-850 dark:text-white">
               <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Room Name / Number</label>
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Room Name / Number</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Room 401, CS Lab 2"
                   value={roomForm.name}
                   onChange={e => setRoomForm({ ...roomForm, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 placeholder-slate-400"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Building Name</label>
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Building Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Science Block, Ramanujan Hall"
                   value={roomForm.building}
                   onChange={e => setRoomForm({ ...roomForm, building: e.target.value })}
-                  className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 placeholder-slate-400"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Seating Capacity</label>
+                  <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Seating Capacity</label>
                   <input
                     type="number"
                     required
@@ -1881,38 +1900,38 @@ export default function AdminTimetablePage() {
                     placeholder="e.g. 60"
                     value={roomForm.capacity}
                     onChange={e => setRoomForm({ ...roomForm, capacity: e.target.value })}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 placeholder-slate-400"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Room Type</label>
+                  <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Room Type</label>
                   <select
                     value={roomForm.type}
                     onChange={e => setRoomForm({ ...roomForm, type: e.target.value })}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 text-white"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                   >
-                    <option value="LECTURE_HALL">Lecture Hall</option>
-                    <option value="CS_LAB">CS Lab</option>
-                    <option value="PHYSICS_LAB">Physics Lab</option>
-                    <option value="CHEMISTRY_LAB">Chemistry Lab</option>
-                    <option value="ELECTRONICS_LAB">Electronics Lab</option>
-                    <option value="SEMINAR_HALL">Seminar Hall</option>
-                    <option value="ANY">Any Type</option>
+                    <option value="LECTURE_HALL" className="bg-white dark:bg-[#161B26]">Lecture Hall</option>
+                    <option value="CS_LAB" className="bg-white dark:bg-[#161B26]">CS Lab</option>
+                    <option value="PHYSICS_LAB" className="bg-white dark:bg-[#161B26]">Physics Lab</option>
+                    <option value="CHEMISTRY_LAB" className="bg-white dark:bg-[#161B26]">Chemistry Lab</option>
+                    <option value="ELECTRONICS_LAB" className="bg-white dark:bg-[#161B26]">Electronics Lab</option>
+                    <option value="SEMINAR_HALL" className="bg-white dark:bg-[#161B26]">Seminar Hall</option>
+                    <option value="ANY" className="bg-white dark:bg-[#161B26]">Any Type</option>
                   </select>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Operational Status</label>
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Operational Status</label>
                 <select
                   value={roomForm.status}
                   onChange={e => setRoomForm({ ...roomForm, status: e.target.value })}
-                  className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg focus:outline-none focus:border-indigo-500 text-white"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                 >
-                  <option value="AVAILABLE">Available</option>
-                  <option value="MAINTENANCE">Maintenance</option>
-                  <option value="RESERVED">Reserved</option>
+                  <option value="AVAILABLE" className="bg-white dark:bg-[#161B26]">Available</option>
+                  <option value="MAINTENANCE" className="bg-white dark:bg-[#161B26]">Maintenance</option>
+                  <option value="RESERVED" className="bg-white dark:bg-[#161B26]">Reserved</option>
                 </select>
               </div>
 
@@ -1920,14 +1939,14 @@ export default function AdminTimetablePage() {
                 <button
                   type="button"
                   onClick={() => setShowRoomModal(false)}
-                  className="flex-1 py-2 bg-neutral-950 border border-neutral-850 hover:bg-neutral-900 text-slate-400 hover:text-white rounded-lg font-semibold transition"
+                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-850 text-slate-600 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white rounded-xl font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingRoom}
-                  className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-750 text-white rounded-lg font-bold transition disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl font-bold transition disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   {submittingRoom ? (
                     <>
@@ -1946,23 +1965,23 @@ export default function AdminTimetablePage() {
       {/* ─── MODAL: Delete Room Confirmation ───────────────────────────── */}
       {deleteRoomConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setDeleteRoomConfirmId(null)}>
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl p-5 w-80 mx-4 text-left" onClick={e => e.stopPropagation()}>
+          <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl shadow-2xl p-6 w-80 mx-4 text-left animate-in fade-in zoom-in-95" onClick={e => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-red-500/10 border border-red-500/20">
-                <Trash2 className="w-5 h-5 text-red-400" />
+                <Trash2 className="w-5 h-5 text-red-500 dark:text-red-400" />
               </div>
               <div>
-                <div className="font-semibold text-sm text-white">Delete Venue?</div>
-                <div className="text-xs text-slate-450">This action cannot be undone.</div>
+                <div className="font-semibold text-sm text-slate-800 dark:text-white">Delete Venue?</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">This action cannot be undone.</div>
               </div>
             </div>
-            <p className="text-xs text-slate-300 mb-4 leading-relaxed">
+            <p className="text-xs text-slate-550 dark:text-slate-300 mb-4 leading-relaxed">
               Are you sure you want to delete this venue? Any template schedule entries linked to this room will lose their room assignment.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setDeleteRoomConfirmId(null)}
-                className="flex-1 py-1.5 text-xs bg-neutral-950 border border-neutral-850 hover:bg-neutral-900 rounded-lg transition-all text-slate-400 hover:text-white font-semibold"
+                className="flex-1 py-1.5 text-xs bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-850 hover:bg-slate-200 dark:hover:bg-neutral-900 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white font-semibold"
               >
                 Cancel
               </button>
@@ -2169,7 +2188,7 @@ export default function AdminTimetablePage() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
