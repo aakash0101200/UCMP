@@ -278,7 +278,8 @@ const AdminDashboard = () => {
           email: userForm.email.trim().toLowerCase(),
           password: userForm.password,
           roles: ['ADMIN'],
-          rollNumber: rollNo
+          rollNumber: rollNo,
+          department: userForm.department.trim() || null
         };
         await register(payload);
         toast.success(`Successfully registered Admin: ${userForm.name}! 🎉`);
@@ -1097,6 +1098,21 @@ const AdminDashboard = () => {
                       onChange={handleUserFormChange}
                       placeholder="Minimum 8 characters"
                       required
+                      className="login-input bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-2 px-3 text-xs w-full text-foreground"
+                    />
+                  </div>
+                )}
+
+                {/* Department (Only displayed for Admin, optional) */}
+                {userForm.role === 'ADMIN' && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground">Department / Scope</label>
+                    <input
+                      type="text"
+                      name="department"
+                      value={userForm.department}
+                      onChange={handleUserFormChange}
+                      placeholder="e.g. Computer Science (blank for Super Admin)"
                       className="login-input bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-2 px-3 text-xs w-full text-foreground"
                     />
                   </div>
