@@ -14,6 +14,24 @@ export default function FacultyAttendanceSession() {
     const [selectedSectionId, setSelectedSectionId] = useState('');
     const [selectedSubjectId, setSelectedSubjectId] = useState('');
     const [activeTerm, setActiveTerm] = useState('2026-27-ODD');
+    const [durationInMinutes, setDurationInMinutes] = useState(40);
+
+    // Restore active session state on mount
+    useEffect(() => {
+        API.get('/attendance/active-session')
+            .then(r => {
+                if (r.data) {
+                    setSessionId(r.data.id);
+                    setSelectedSectionId(r.data.sectionId);
+                    setSelectedSubjectId(r.data.subjectId || '');
+                    setSessionActive(true);
+                    fetchCode(r.data.id);
+                }
+            })
+            .catch(() => {
+                // Ignore failure if no active session is running
+            });
+    }, []);
 
     // Fetch available terms and select the latest one
     useEffect(() => {
@@ -68,6 +86,7 @@ export default function FacultyAttendanceSession() {
                         latitude: lat,
                         longitude: lon,
                         radiusInMeters: 50.0,
+                        durationInMinutes: durationInMinutes,
                     });
                     setSessionId(res.data.id);
                     setSessionActive(true);
@@ -115,28 +134,27 @@ export default function FacultyAttendanceSession() {
     const currentSubject = subjects.find(s =>
         String(s.subjectId) === String(selectedSubjectId)
     );
-
     return (
         <div className="
-            mt-4 mb-4 mx-auto w-full max-w-5xl p-4 sm:p-5 lg:p-6
-            bg-neutral-900 rounded-2xl border border-neutral-700 shadow-lg overflow-hidden
+            mt-4 mb-4 mx-auto w-full max-w-5xl p-6 sm:p-8
+            bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-slate-805 dark:text-slate-100 overflow-hidden text-left
         ">
-            <h3 className="text-lg sm:text-xl font-bold text-white mb-5 ml-2">
+            <h3 className="text-xl sm:text-2xl font-light tracking-tight text-slate-900 dark:text-white mb-6 ml-2">
                 Live Class Attendance
             </h3>
 
             {!sessionActive ? (
                 <div className="
-                    flex flex-col items-center py-4 sm:py-6 max-w-3xl mx-auto
+                    flex flex-col items-center py-6 max-w-3xl mx-auto w-full space-y-6
                 ">
 
                     {/* Section */}
                     <div className="max-w-md mx-auto w-full px-2">
                         <label className="
-                            block text-[11px]
-                            text-neutral-400
-                            mb-1.5
-                            font-medium
+                            block text-xs
+                            text-slate-500 dark:text-slate-400
+                            mb-2
+                            font-semibold
                             uppercase
                             tracking-wider
                         ">
@@ -148,23 +166,24 @@ export default function FacultyAttendanceSession() {
                             onChange={e => setSelectedSectionId(e.target.value)}
                             className="
                                 w-full
-                                px-3 sm:px-4
-                                py-2.5 sm:py-3
+                                px-4
+                                py-3
                                 text-sm
-                                bg-neutral-950
-                                text-white
+                                bg-slate-50 dark:bg-[#0D1512]/40
+                                text-slate-900 dark:text-slate-100
                                 rounded-xl
-                                border border-neutral-700
+                                border border-slate-200 dark:border-emerald-950/60
                                 focus:outline-none
-                                focus:border-indigo-500
+                                focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
+                                transition-all cursor-pointer
                             "
                         >
-                            <option value="" disabled>
+                            <option value="" disabled className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">
                                 Select a Section
                             </option>
 
                             {sections.map(s => (
-                                <option key={s.id} value={s.id}>
+                                <option key={s.id} value={s.id} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">
                                     {s.sectionName}
                                 </option>
                             ))}
@@ -172,12 +191,12 @@ export default function FacultyAttendanceSession() {
                     </div>
 
                     {/* Subject */}
-                    <div>
+                    <div className="max-w-md mx-auto w-full px-2">
                         <label className="
-                            block text-[11px]
-                            text-neutral-400
-                            mb-1.5
-                            font-medium
+                            block text-xs
+                            text-slate-500 dark:text-slate-400
+                            mb-2
+                            font-semibold
                             uppercase
                             tracking-wider
                         ">
@@ -190,19 +209,20 @@ export default function FacultyAttendanceSession() {
                             disabled={subjects.length === 0}
                             className="
                                 w-full
-                                px-3 sm:px-4
-                                py-2.5 sm:py-3
+                                px-4
+                                py-3
                                 text-sm
-                                bg-neutral-950
-                                text-white
+                                bg-slate-50 dark:bg-[#0D1512]/40
+                                text-slate-900 dark:text-slate-100
                                 rounded-xl
-                                border border-neutral-700
+                                border border-slate-200 dark:border-emerald-950/60
                                 focus:outline-none
-                                focus:border-indigo-500
+                                focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
+                                transition-all cursor-pointer
                                 disabled:opacity-50
                             "
                         >
-                            <option value="" disabled>
+                            <option value="" disabled className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">
                                 {subjects.length === 0
                                     ? "No subjects found for this section"
                                     : "Select a Subject"}
@@ -212,6 +232,7 @@ export default function FacultyAttendanceSession() {
                                 <option
                                     key={s.subjectId}
                                     value={s.subjectId}
+                                    className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100"
                                 >
                                     {s.subjectCode
                                         ? `${s.subjectCode} — ${s.subjectName}`
@@ -222,13 +243,49 @@ export default function FacultyAttendanceSession() {
 
                         <p className="
                             mt-2
-                            text-[11px]
-                            sm:text-xs
-                            text-neutral-500
+                            text-xs
+                            text-slate-400 dark:text-slate-500
                         ">
-                            Each session is tagged for
-                            subject attendance tracking.
+                            Each session is tagged for subject attendance tracking.
                         </p>
+                    </div>
+
+                    {/* Duration */}
+                    <div className="max-w-md mx-auto w-full px-2">
+                        <label className="
+                            block text-xs
+                            text-slate-500 dark:text-slate-400
+                            mb-2
+                            font-semibold
+                            uppercase
+                            tracking-wider
+                        ">
+                            Session Duration
+                        </label>
+
+                        <select
+                            value={durationInMinutes}
+                            onChange={e => setDurationInMinutes(parseInt(e.target.value))}
+                            className="
+                                w-full
+                                px-4
+                                py-3
+                                text-sm
+                                bg-slate-50 dark:bg-[#0D1512]/40
+                                text-slate-900 dark:text-slate-100
+                                rounded-xl
+                                border border-slate-200 dark:border-emerald-950/60
+                                focus:outline-none
+                                focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
+                                transition-all cursor-pointer
+                            "
+                        >
+                            <option value={30} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">30 Minutes</option>
+                            <option value={40} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">40 Minutes (Default)</option>
+                            <option value={50} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">50 Minutes</option>
+                            <option value={60} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">60 Minutes</option>
+                            <option value={90} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">90 Minutes</option>
+                        </select>
                     </div>
 
                     <button
@@ -236,16 +293,16 @@ export default function FacultyAttendanceSession() {
                         disabled={!selectedSectionId}
                         className="
                             w-full sm:w-auto
-                            px-6 py-3
-                            bg-indigo-600
-                            hover:bg-indigo-500
-                            disabled:bg-neutral-600
+                            px-8 py-3.5
+                            bg-emerald-600
+                            hover:bg-emerald-700
+                            disabled:bg-slate-300 dark:disabled:bg-emerald-950/50
                             disabled:cursor-not-allowed
                             text-white
                             rounded-xl
-                            font-semibold
-                            transition
-                            shadow-lg
+                            font-bold
+                            transition-all
+                            shadow-md shadow-emerald-550/10
                         "
                     >
                         Start Attendance Session
@@ -255,20 +312,20 @@ export default function FacultyAttendanceSession() {
 
             ) : (
 
-                <div className="flex flex-col gap-4 w-full max-w-lg mx-auto">
+                <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto items-center">
 
                     {currentSubject && (
                         <div className="
-                            mb-4
-                            px-3 sm:px-4
-                            py-2
+                            mb-2
+                            px-6
+                            py-3
                             text-center
-                            bg-indigo-950/40
-                            border border-indigo-500/30
-                            rounded-xl
-                            text-xs sm:text-sm
-                            text-indigo-300
-                            font-medium
+                            bg-emerald-50 dark:bg-emerald-950/30
+                            border border-emerald-150/40 dark:border-emerald-950/60
+                            rounded-2xl
+                            text-sm
+                            text-emerald-750 dark:text-emerald-350
+                            font-bold
                             max-w-full
                             break-words
                         ">
@@ -279,12 +336,12 @@ export default function FacultyAttendanceSession() {
                     )}
 
                     <p className="
-                        text-gray-400
-                        mb-4
-                        font-medium
+                        text-slate-400 dark:text-slate-500
+                        mb-2
+                        font-semibold
                         uppercase
                         tracking-wider
-                        text-xs sm:text-sm
+                        text-xs
                         text-center
                     ">
                         Project this code to the class
@@ -293,23 +350,22 @@ export default function FacultyAttendanceSession() {
                     {/* Attendance code */}
                     <div className="
                         w-full
-                        max-w-xl
                         text-center
                         overflow-x-auto
                     ">
                         <div className="
                             inline-block
-                            text-3xl
-                            sm:text-5xl
+                            text-4xl
+                            sm:text-6xl
                             lg:text-7xl
                             font-mono
-                            text-white
+                            text-slate-805 dark:text-white
                             tracking-[0.25em]
-                            bg-neutral-950
-                            px-5 sm:px-8 lg:px-10
-                            py-4 sm:py-6
-                            rounded-2xl
-                            border border-neutral-700
+                            bg-slate-50 dark:bg-[#0D1512]
+                            px-8 sm:px-12 lg:px-16
+                            py-6 sm:py-8
+                            rounded-3xl
+                            border border-slate-200 dark:border-emerald-950/60
                             shadow-inner
                         ">
                             {currentCode
@@ -320,31 +376,31 @@ export default function FacultyAttendanceSession() {
 
                     {/* Timer */}
                     <div className="
-                        mt-6 sm:mt-8
-                        flex flex-wrap
+                        mt-6
+                        flex
                         justify-center
                         items-center
                         gap-3
                         text-center
-                        bg-indigo-950/30
-                        px-4 sm:px-6
+                        bg-emerald-500/10 dark:bg-emerald-950/30
+                        px-6
                         py-3
                         rounded-full
-                        border border-indigo-500/30
+                        border border-emerald-500/20 dark:border-emerald-950/50
                     ">
                         <div className="
-                            w-4 h-4 sm:w-5 sm:h-5
+                            w-4.5 h-4.5
                             rounded-full
                             border-4
-                            border-indigo-500
+                            border-emerald-600 dark:border-emerald-400
                             border-t-transparent
                             animate-spin
                         " />
 
                         <span className="
-                            text-indigo-400
+                            text-emerald-700 dark:text-emerald-300
                             text-sm
-                            font-medium
+                            font-semibold
                         ">
                             Refreshes in {countdown} sec
                         </span>
@@ -353,16 +409,16 @@ export default function FacultyAttendanceSession() {
                     <button
                         onClick={stopSession}
                         className="
-                            mt-6 sm:mt-8
+                            mt-6
                             w-full sm:w-auto
-                            px-6 sm:px-8
+                            px-8
                             py-3
-                            bg-red-600/10
-                            hover:bg-red-600/20
-                            text-red-500
-                            border border-red-900/50
+                            bg-rose-500/10
+                            hover:bg-rose-500/20
+                            text-rose-600 dark:text-rose-450
+                            border border-rose-500/30
                             rounded-xl
-                            font-medium
+                            font-bold
                             transition
                         "
                     >
@@ -371,7 +427,7 @@ export default function FacultyAttendanceSession() {
 
                     <div className="
                         w-full
-                        mt-8 sm:mt-10
+                        mt-8
                         overflow-x-auto
                     ">
                         <LiveAttendanceList

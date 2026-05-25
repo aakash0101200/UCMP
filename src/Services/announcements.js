@@ -1,10 +1,35 @@
 import API from './api';
 
-export const getAnnouncements = () => API.get('/announcements');
-export const getSectionAnnouncements = (sectionId) => API.get(`/announcements/section/${sectionId}`);
-export const getStudentAnnouncements = (collegeId, sectionId) => API.get(`/announcements/student/${collegeId}/section/${sectionId}`);
-export const createAnnouncement = (data) => API.post('/announcements/add', data);
-export const deleteAnnouncement = (id) => API.delete(`/announcements/${id}`);
-export const updateAnnouncement = (id, data) => API.put(`/announcements/${id}`, data);
+const announcementsAPI = {
+  get: (url, config) => {
+    const cleanUrl = url === '/' ? '' : url;
+    const path = cleanUrl.startsWith('/') ? `/announcements${cleanUrl}` : `/announcements/${cleanUrl}`;
+    return API.get(path, config);
+  },
+  post: (url, data, config) => {
+    const path = url.startsWith('/') ? `/announcements${url}` : `/announcements/${url}`;
+    return API.post(path, data, config);
+  },
+  put: (url, data, config) => {
+    const path = url.startsWith('/') ? `/announcements${url}` : `/announcements/${url}`;
+    return API.put(path, data, config);
+  },
+  delete: (url, config) => {
+    const path = url.startsWith('/') ? `/announcements${url}` : `/announcements/${url}`;
+    return API.delete(path, config);
+  },
+  getAll: (url, config) => {
+    const cleanUrl = url === '/' ? '' : url;
+    const path = cleanUrl.startsWith('/') ? `/announcements${cleanUrl}` : `/announcements/${cleanUrl}`;
+    return API.get(path, config);
+  }
+};
 
-export default API;
+export const getAnnouncements = () => announcementsAPI.get('/');
+export const getSectionAnnouncements = (sectionId) => announcementsAPI.get(`/section/${sectionId}`);
+export const getStudentAnnouncements = (collegeId, sectionId) => announcementsAPI.get(`/student/${collegeId}/section/${sectionId}`);
+export const createAnnouncement = (data) => announcementsAPI.post('/add', data);
+export const deleteAnnouncement = (id) => announcementsAPI.delete(`/${id}`);
+export const updateAnnouncement = (id, data) => announcementsAPI.put(`/${id}`, data);
+
+export default announcementsAPI;
