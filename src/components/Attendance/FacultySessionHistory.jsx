@@ -18,11 +18,20 @@ export default function FacultySessionHistory() {
     const [markingIds, setMarkingIds] = useState(new Set());
     const [forceOverride, setForceOverride] = useState(false);
 
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [datePreset, setDatePreset] = useState('last20'); // 'last20' | 'currentMonth' | 'lastMonth' | 'custom'
+
     // Fetch recent sessions
-    const fetchHistory = async () => {
+    const fetchHistory = async (start = startDate, end = endDate, preset = datePreset) => {
         setLoadingHistory(true);
         try {
-            const res = await API.get('/attendance/faculty/session-history');
+            const params = {};
+            if (preset !== 'last20') {
+                if (start) params.startDate = start;
+                if (end) params.endDate = end;
+            }
+            const res = await API.get('/attendance/faculty/session-history', { params });
             setSessions(res.data || []);
         } catch (error) {
             console.error("Failed to fetch session history", error);
@@ -30,6 +39,35 @@ export default function FacultySessionHistory() {
         } finally {
             setLoadingHistory(false);
         }
+    };
+
+    const handlePresetChange = (preset) => {
+        setDatePreset(preset);
+        let start = '';
+        let end = '';
+
+        if (preset === 'currentMonth') {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = now.getMonth();
+            start = new Date(y, m, 1).toLocaleDateString('en-CA'); // YYYY-MM-DD
+            end = new Date(y, m + 1, 0).toLocaleDateString('en-CA');
+        } else if (preset === 'lastMonth') {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = now.getMonth();
+            start = new Date(y, m - 1, 1).toLocaleDateString('en-CA');
+            end = new Date(y, m, 0).toLocaleDateString('en-CA');
+        }
+
+        setStartDate(start);
+        setEndDate(end);
+        fetchHistory(start, end, preset);
+    };
+
+    const handleCustomDateSubmit = (e) => {
+        e.preventDefault();
+        fetchHistory(startDate, endDate, 'custom');
     };
 
     useEffect(() => {
@@ -146,11 +184,98 @@ export default function FacultySessionHistory() {
                         className="space-y-6"
                     >
                         <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800/60 pb-4">
-                            <History className="w-6 h-6 text-emerald-600 dark:text-emerald-550" />
+                            <History className="w-6 h-6 text-emerald-600 dark:text-emerald-555" />
                             <div>
                                 <h3 className="text-xl font-light text-slate-900 dark:text-white tracking-tight">Attendance Session History</h3>
                                 <p className="text-xs text-slate-500 dark:text-slate-400">View recent sessions and edit records</p>
                             </div>
+                        </div>
+
+                        {/* Monthly / Date-Range Filter */}
+                        <div className="bg-slate-50/50 dark:bg-[#0D1512]/30 border border-slate-200/65 dark:border-emerald-950/40 p-4 rounded-2xl space-y-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                    Filter Sessions
+                                </span>
+                                
+                                <div className="flex bg-slate-150/40 dark:bg-[#0D1512]/50 p-1 rounded-xl border border-slate-200/50 dark:border-emerald-950/60 w-fit gap-1 shadow-sm">
+                                    <button
+                                        type="button"
+                                        onClick={() => handlePresetChange('last20')}
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                                            datePreset === 'last20'
+                                                ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm font-semibold'
+                                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                                        }`}
+                                    >
+                                        Recent (Last 20)
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handlePresetChange('currentMonth')}
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                                            datePreset === 'currentMonth'
+                                                ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm font-semibold'
+                                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                                        }`}
+                                    >
+                                        Current Month
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handlePresetChange('lastMonth')}
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                                            datePreset === 'lastMonth'
+                                                ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm font-semibold'
+                                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                                        }`}
+                                    >
+                                        Last Month
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setDatePreset('custom')}
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                                            datePreset === 'custom'
+                                                ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm font-semibold'
+                                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                                        }`}
+                                    >
+                                        Custom Range
+                                    </button>
+                                </div>
+                            </div>
+
+                            {datePreset === 'custom' && (
+                                <form onSubmit={handleCustomDateSubmit} className="flex flex-wrap items-end gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/40">
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Start Date</label>
+                                        <input
+                                            type="date"
+                                            value={startDate}
+                                            onChange={e => setStartDate(e.target.value)}
+                                            required
+                                            className="px-3 py-1.5 text-xs bg-white dark:bg-[#0D1512]/50 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">End Date</label>
+                                        <input
+                                            type="date"
+                                            value={endDate}
+                                            onChange={e => setEndDate(e.target.value)}
+                                            required
+                                            className="px-3 py-1.5 text-xs bg-white dark:bg-[#0D1512]/50 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                                        />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow-sm"
+                                    >
+                                        Apply Filter
+                                    </button>
+                                </form>
+                            )}
                         </div>
 
                         {loadingHistory ? (

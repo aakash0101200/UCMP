@@ -52,7 +52,7 @@ const mapHeaders = (rawHeaders) => {
 
     // Find matching alias key
     const matchKey = Object.keys(headerAliases).find(key =>
-      headerAliases[key].includes(clean) || clean.includes(key.toLowerCase())
+      clean === key.toLowerCase() || headerAliases[key].includes(clean)
     );
     if (matchKey) {
       mapped[rawHeader] = matchKey;
@@ -508,8 +508,9 @@ const AdminDashboard = () => {
 
           // Resolve semicolon-separated sectionNames to array of sectionIds
           const facultySectionIds = [];
-          if (normRow.sectionNames) {
-            const names = normRow.sectionNames.split(';').map(n => n.trim());
+          const rawSectionVal = normRow.sectionNames || normRow.sectionName;
+          if (rawSectionVal) {
+            const names = rawSectionVal.split(';').map(n => n.trim());
             names.forEach(name => {
               if (!name) return;
               const match = findSectionMatch(sections, name);
@@ -529,7 +530,7 @@ const AdminDashboard = () => {
             designation: normRow.designation?.trim(),
             sectionIds: facultySectionIds
           };
-          resolvedDetails = `Dept: ${normRow.department || 'N/A'}, Sections: ${normRow.sectionNames || 'None'}`;
+          resolvedDetails = `Dept: ${normRow.department || 'N/A'}, Sections: ${rawSectionVal || 'None'}`;
         }
 
         return {
