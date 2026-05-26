@@ -8,6 +8,7 @@ import baseAPI from '@/Services/api';
 import { register, adminCreateStudent, adminCreateFaculty } from '@/Services/auth';
 import { getAllBatches } from '@/Services/admin';
 import { getAllSections } from '@/Services/timetable';
+import { getProfile } from '@/Services/profile';
 import {
   LayoutDashboard,
   Megaphone,
@@ -162,14 +163,77 @@ const AdminDashboard = () => {
   });
   const [isSubmittingUser, setIsSubmittingUser] = useState(false);
 
+  // Scoped admin details
+  const [adminProfile, setAdminProfile] = useState(null);
+  const [newSectionName, setNewSectionName] = useState('');
+  const [isAddingSection, setIsAddingSection] = useState(false);
+
+  const isSuperAdmin = !adminProfile?.department || 
+    adminProfile.department.toLowerCase() === 'administration' || 
+    localStorage.getItem("collegeId") === 'ADMIN_001';
+
+  const handleAddSection = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    if (!newSectionName.trim()) {
+      toast.error("Please enter a section name.");
+      return;
+    }
+    
+    const yearToUse = isSuperAdmin ? parseInt(userForm.year) : (adminProfile?.yearScope || parseInt(userForm.year));
+    
+    let batchIdToUse = null;
+    if (isSuperAdmin) {
+      batchIdToUse = userForm.batchId ? parseInt(userForm.batchId) : null;
+    } else {
+      const matchingBatch = findBatchMatch(batches, adminProfile?.department);
+      batchIdToUse = matchingBatch ? matchingBatch.id : (userForm.batchId ? parseInt(userForm.batchId) : null);
+    }
+
+    if (!yearToUse) {
+      toast.error("Please select or configure a Year first.");
+      return;
+    }
+    if (!batchIdToUse) {
+      toast.error("Please select or configure a Batch first.");
+      return;
+    }
+
+    setIsAddingSection(true);
+    try {
+      const res = await baseAPI.post('/sections', {
+        sectionName: newSectionName.trim(),
+        year: yearToUse,
+        batchId: batchIdToUse
+      });
+      toast.success(`Successfully created section: ${newSectionName.trim()}! 🎉`);
+      setNewSectionName('');
+      
+      const newSec = res.data;
+      setSections(prev => [...prev, newSec]);
+      setUserForm(prev => ({ ...prev, sectionId: String(newSec.id) }));
+    } catch (err) {
+      console.error('Failed to create section:', err);
+      const backendMessage = err.response?.data?.message || err.message || "Unknown error";
+      toast.error(`Failed to create section: ${backendMessage}`);
+    } finally {
+      setIsAddingSection(false);
+    }
+  };
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [annRes, batchesRes, sectionsRes, statsRes] = await Promise.allSettled([
+        const loggedInCollegeId = localStorage.getItem("collegeId");
+        const [annRes, batchesRes, sectionsRes, statsRes, profileRes] = await Promise.allSettled([
           API.get('/'),
           getAllBatches(),
           getAllSections(),
-          baseAPI.get('/admin/stats')
+          baseAPI.get('/admin/stats'),
+          getProfile(loggedInCollegeId)
         ]);
 
         if (annRes.status === 'fulfilled') {
@@ -196,6 +260,12 @@ const AdminDashboard = () => {
           console.error('Failed to load stats:', statsRes.reason);
         }
 
+        if (profileRes.status === 'fulfilled') {
+          setAdminProfile(profileRes.value.data || null);
+        } else {
+          console.error('Failed to load admin profile:', profileRes.reason);
+        }
+
         setError(null);
       } catch (err) {
         console.error('Failed to load dashboard resources:', err);
@@ -207,6 +277,29 @@ const AdminDashboard = () => {
 
     fetchDashboardData();
   }, []);
+
+  useEffect(() => {
+    if (adminProfile && batches.length > 0) {
+      const isSuper = !adminProfile.department || 
+        adminProfile.department.toLowerCase() === 'administration' || 
+        localStorage.getItem("collegeId") === 'ADMIN_001';
+      
+      if (!isSuper) {
+        const matchingBatch = findBatchMatch(batches, adminProfile.department);
+        
+        setUserForm(prev => {
+          const next = { ...prev };
+          if (adminProfile.yearScope) {
+            next.year = adminProfile.yearScope.toString();
+          }
+          if (matchingBatch) {
+            next.batchId = matchingBatch.id.toString();
+          }
+          return next;
+        });
+      }
+    }
+  }, [adminProfile, batches]);
 
   const handleUserFormChange = (e) => {
     const { name, value } = e.target;
@@ -278,7 +371,9 @@ const AdminDashboard = () => {
           email: userForm.email.trim().toLowerCase(),
           password: userForm.password,
           roles: ['ADMIN'],
-          rollNumber: rollNo
+          rollNumber: rollNo,
+          department: userForm.department.trim() || null,
+          year: userForm.year ? parseInt(userForm.year) : null
         };
         await register(payload);
         toast.success(`Successfully registered Admin: ${userForm.name}! 🎉`);
@@ -1101,6 +1196,38 @@ const AdminDashboard = () => {
                     />
                   </div>
                 )}
+
+                {/* Department (Only displayed for Admin, optional) */}
+                {userForm.role === 'ADMIN' && (
+                  <>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-foreground">Department / Scope</label>
+                      <input
+                        type="text"
+                        name="department"
+                        value={userForm.department}
+                        onChange={handleUserFormChange}
+                        placeholder="e.g. Computer Science (blank for Super Admin)"
+                        className="login-input bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-205 dark:border-slate-800/60 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-2 px-3 text-xs w-full text-foreground"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-foreground">Year Scope</label>
+                      <select
+                        name="year"
+                        value={userForm.year}
+                        onChange={handleUserFormChange}
+                        className="login-input bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-205 dark:border-slate-800/60 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-2 px-3 text-xs w-full text-foreground dark:text-slate-100"
+                      >
+                        <option value="" className="bg-white dark:bg-[#161B26]">All Years (Super/Global Admin)</option>
+                        <option value="1" className="bg-white dark:bg-[#161B26]">Year 1 Scope</option>
+                        <option value="2" className="bg-white dark:bg-[#161B26]">Year 2 Scope</option>
+                        <option value="3" className="bg-white dark:bg-[#161B26]">Year 3 Scope</option>
+                        <option value="4" className="bg-white dark:bg-[#161B26]">Year 4 Scope</option>
+                      </select>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Password info message for student/faculty */}
@@ -1116,63 +1243,97 @@ const AdminDashboard = () => {
               )}
 
               {/* Conditional Student Details */}
-              {userForm.role === 'STUDENT' && (
-                <div className="p-4 bg-slate-50 dark:bg-[#0B0F19]/60 border border-border/50 rounded-xl space-y-4">
-                  <span className="text-xs font-bold text-indigo-500">Student Profile Information</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Current Year *</label>
-                      <select
-                        name="year"
-                        value={userForm.year}
-                        onChange={handleUserFormChange}
-                        className="login-input bg-background border border-slate-200 dark:border-slate-800 rounded-lg py-1.5 px-2 text-xs w-full text-foreground"
-                      >
-                        <option value="1">1st Year</option>
-                        <option value="2">2nd Year</option>
-                        <option value="3">3rd Year</option>
-                        <option value="4">4th Year</option>
-                      </select>
-                    </div>
+              {userForm.role === 'STUDENT' && (() => {
+                const disableYearSelect = !isSuperAdmin && adminProfile?.yearScope;
+                const matchingBatch = batches.find(b => b.batchName?.toLowerCase() === adminProfile?.department?.toLowerCase());
+                const disableBatchSelect = !isSuperAdmin && adminProfile?.department && matchingBatch;
+                
+                const filteredSections = sections.filter(sec => {
+                  if (userForm.year && sec.year !== parseInt(userForm.year)) return false;
+                  if (userForm.batchId && sec.batchId !== parseInt(userForm.batchId)) return false;
+                  return true;
+                });
 
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Batch *</label>
-                      <select
-                        name="batchId"
-                        value={userForm.batchId}
-                        onChange={handleUserFormChange}
-                        required
-                        className="login-input bg-background border border-slate-200 dark:border-slate-800 rounded-lg py-1.5 px-2 text-xs w-full text-foreground"
-                      >
-                        <option value="">Select Batch</option>
-                        {batches.map(batch => (
-                          <option key={batch.id} value={batch.id}>
-                            {batch.batchName}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                return (
+                  <div className="p-4 bg-slate-50 dark:bg-[#0B0F19]/60 border border-border/50 rounded-xl space-y-4">
+                    <span className="text-xs font-bold text-indigo-500">Student Profile Information</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Current Year *</label>
+                        <select
+                          name="year"
+                          value={userForm.year}
+                          onChange={handleUserFormChange}
+                          disabled={!!disableYearSelect}
+                          className="login-input bg-background border border-slate-200 dark:border-slate-800 rounded-lg py-1.5 px-2 text-xs w-full text-foreground disabled:opacity-75 disabled:bg-slate-100 dark:disabled:bg-slate-800"
+                        >
+                          <option value="1">1st Year</option>
+                          <option value="2">2nd Year</option>
+                          <option value="3">3rd Year</option>
+                          <option value="4">4th Year</option>
+                        </select>
+                      </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Section *</label>
-                      <select
-                        name="sectionId"
-                        value={userForm.sectionId}
-                        required
-                        onChange={handleUserFormChange}
-                        className="login-input bg-background border border-slate-200 dark:border-slate-800 rounded-lg py-1.5 px-2 text-xs w-full text-foreground"
-                      >
-                        <option value="">Select Section</option>
-                        {sections.map(sec => (
-                          <option key={sec.id} value={sec.id}>
-                            {sec.sectionName}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Batch *</label>
+                        <select
+                          name="batchId"
+                          value={userForm.batchId}
+                          onChange={handleUserFormChange}
+                          required
+                          disabled={!!disableBatchSelect}
+                          className="login-input bg-background border border-slate-200 dark:border-slate-800 rounded-lg py-1.5 px-2 text-xs w-full text-foreground disabled:opacity-75 disabled:bg-slate-100 dark:disabled:bg-slate-800"
+                        >
+                          <option value="">Select Batch</option>
+                          {batches.map(batch => (
+                            <option key={batch.id} value={batch.id}>
+                              {batch.batchName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Section *</label>
+                        <select
+                          name="sectionId"
+                          value={userForm.sectionId}
+                          required
+                          onChange={handleUserFormChange}
+                          className="login-input bg-background border border-slate-200 dark:border-slate-800 rounded-lg py-1.5 px-2 text-xs w-full text-foreground"
+                        >
+                          <option value="">Select Section</option>
+                          {filteredSections.map(sec => (
+                            <option key={sec.id} value={sec.id}>
+                              {sec.sectionName}
+                            </option>
+                          ))}
+                        </select>
+                        
+                        {/* Inline Section Creation */}
+                        <div className="flex items-center gap-1.5 mt-2">
+                          <input
+                            type="text"
+                            placeholder="Add new section..."
+                            value={newSectionName}
+                            onChange={(e) => setNewSectionName(e.target.value)}
+                            className="bg-background border border-slate-250 dark:border-slate-800 rounded-lg py-1.5 px-2 text-[11px] w-full text-foreground focus:outline-none focus:border-indigo-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleAddSection}
+                            disabled={isAddingSection}
+                            className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+                            title="Create Section"
+                          >
+                            {isAddingSection ? '...' : '+'}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* Conditional Faculty Details */}
               {userForm.role === 'FACULTY' && (
