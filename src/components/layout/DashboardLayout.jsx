@@ -80,6 +80,44 @@ export default function DashboardLayout({ children, onLogout }) {
   // Subscribe to real-time global notifications
   useWebSocket('/topic/notifications/global', (newNotif) => {
     console.log('Received global notification:', newNotif);
+
+    // Apply role-wise, year-wise, and department scope filters for incoming global alerts
+    const targetRole = newNotif.targetRole;
+    const roleMatch = !targetRole || targetRole.toUpperCase() === activeRole?.toUpperCase();
+    
+    let yearMatch = true;
+    let deptMatch = true;
+
+    if (activeRole?.toLowerCase() === 'student') {
+      const studentYear = profile?.student?.year || localStorage.getItem('year');
+      const studentDept = profile?.student?.batchName || localStorage.getItem('batchName');
+      if (newNotif.targetYear && studentYear && String(newNotif.targetYear) !== String(studentYear)) {
+        yearMatch = false;
+      }
+      if (newNotif.targetDept && studentDept && newNotif.targetDept.toLowerCase() !== studentDept.toLowerCase()) {
+        deptMatch = false;
+      }
+    } else if (activeRole?.toLowerCase() === 'faculty') {
+      const facultyDept = profile?.faculty?.department || profile?.department || localStorage.getItem('department');
+      if (newNotif.targetDept && facultyDept && newNotif.targetDept.toLowerCase() !== facultyDept.toLowerCase()) {
+        deptMatch = false;
+      }
+    } else if (activeRole?.toLowerCase() === 'admin') {
+      const adminDept = profile?.department || localStorage.getItem('department');
+      const adminYear = profile?.yearScope || localStorage.getItem('yearScope');
+      if (newNotif.targetDept && adminDept && newNotif.targetDept.toLowerCase() !== adminDept.toLowerCase()) {
+        deptMatch = false;
+      }
+      if (newNotif.targetYear && adminYear && String(newNotif.targetYear) !== String(adminYear)) {
+        yearMatch = false;
+      }
+    }
+
+    if (!roleMatch || !yearMatch || !deptMatch) {
+      console.log('Global notification is out of scope. Ignoring.', { roleMatch, yearMatch, deptMatch });
+      return;
+    }
+
     const id = newNotif.id || newNotif.announcementId;
     const readIds = getSafeReadNotificationIds();
     setNotifications(prev => {
