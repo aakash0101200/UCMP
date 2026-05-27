@@ -35,6 +35,7 @@ import AdminUsersPage from './pages/admin/AdminUsersPage';
 
 import 'react-toastify/dist/ReactToastify.css';
 import ProfilePage from './components/Profile/ProfilePage';
+import SettingsPage from './components/Profile/SettingsPage';
 
 // Layout to choose between public vs dashboard shells
 function AppShell({ children }) {
@@ -154,7 +155,7 @@ export default function App() {
           path="/settings"
           element={
             isAuthenticated
-              ? <DashboardLayout userRole={(localStorage.getItem("activeRole") || "student").toLowerCase()} onLogout={handleLogout}><NotFoundPage embedded={true} /></DashboardLayout>
+              ? <Navigate to={`/${(localStorage.getItem("activeRole") || "student").toLowerCase()}/settings`} replace />
               : <Navigate to="/login" replace />
           }
         />
@@ -167,6 +168,7 @@ export default function App() {
         }>
           <Route index element={<StudentDashboard />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="settings" element={<SettingsPage userRole="student" />} />
           <Route path="assignment" element={<Assignment />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="courses" element={<Courses />} />
@@ -182,6 +184,7 @@ export default function App() {
         }>
           <Route index element={<FacultyDashboard />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="settings" element={<SettingsPage userRole="faculty" />} />
           <Route path="courses" element={<FacultyCoursesPage />} />
           <Route path="students" element={<FacultyStudentsPage />} />
           <Route path="gradebook" element={<FacultyGradebookPage />} />
@@ -196,6 +199,7 @@ export default function App() {
         }>
           <Route index element={<AdminDashboard />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="settings" element={<SettingsPage userRole="admin" />} />
           <Route path="timetable" element={<AdminTimetablePage />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="courses" element={<NotFoundPage embedded={true} />} />

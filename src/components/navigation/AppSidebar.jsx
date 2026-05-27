@@ -152,7 +152,7 @@ export function AppSidebar({ userRole = 'student', userName = 'User', onLogout }
                   asChild
                   tooltip={isCollapsed ? "Settings" : undefined}
                 >
-                  <Link to="/settings" className='flex items-center gap-2 px-2 py-1'>
+                  <Link to={`/${userRole}/settings`} className='flex items-center gap-2 px-2 py-1'>
                     <Settings className="h-4 w-4" />
                     <span>Settings</span>
                   </Link>

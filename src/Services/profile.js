@@ -7,6 +7,11 @@ export const getProfile = (collegeId) => {
 };
 
 //update
-export const updateProfile =(collegeId, profileData) => {
-    return API.put(`/profile?collegeId=${collegeId}`, profileData);
+export const updateProfile = (profileData) => {
+    return API.put('/profile/update', profileData);
 };
+
+//change password
+export const changePassword = (oldPassword, newPassword) => {
+    return API.put('/profile/change-password', { oldPassword, newPassword });
+};

@@ -6,10 +6,11 @@ import {
 } from 'lucide-react';
 
 export const getProfileMenuItems = (userRole) => {
+  const role = (userRole || 'student').toLowerCase();
   const commonItems = [
-    { to: '/profile', label: 'Profile', icon: User },
-    { to: '/settings', label: 'Settings', icon: Settings },
-    { to: '/help', label: 'Help', icon: HelpCircle }
+    { to: `/${role}/profile`, label: 'Profile', icon: User },
+    { to: `/${role}/settings`, label: 'Settings', icon: Settings },
+    { to: `/${role}/help`, label: 'Help', icon: HelpCircle }
   ];
 
   const roleSpecificItems = {
