@@ -5,14 +5,14 @@ import { getResolvedFacultySchedule, getAcademicTerms } from "../../Services/tim
 import { getAnnouncements } from "../../Services/announcements";
 import API from "../../Services/api";
 import FacultyAttendanceSession from "../../components/Attendance/FacultyAttendanceSession";
-import { 
-  BookOpen, 
-  Calendar, 
-  Clock, 
-  GraduationCap, 
-  FileText, 
-  Bell, 
-  ChevronRight, 
+import {
+  BookOpen,
+  Calendar,
+  Clock,
+  GraduationCap,
+  FileText,
+  Bell,
+  ChevronRight,
   Activity,
   Plus,
   Loader2,
@@ -166,8 +166,8 @@ export default function FacultyDashboard() {
       {/* 2. Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Active Courses */}
-        <Link 
-          to="/faculty/courses" 
+        <Link
+          to="/faculty/courses"
           className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
         >
           <div className="flex items-center justify-between">
@@ -185,8 +185,8 @@ export default function FacultyDashboard() {
         </Link>
 
         {/* Today's Lectures */}
-        <Link 
-          to="/faculty/schedule" 
+        <Link
+          to="/faculty/schedule"
           className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
         >
           <div className="flex items-center justify-between">
@@ -204,8 +204,8 @@ export default function FacultyDashboard() {
         </Link>
 
         {/* Pending Grading */}
-        <Link 
-          to="/faculty/gradebook" 
+        <Link
+          to="/faculty/gradebook"
           className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
         >
           <div className="flex items-center justify-between">
@@ -223,8 +223,8 @@ export default function FacultyDashboard() {
         </Link>
 
         {/* Students Assigned */}
-        <Link 
-          to="/faculty/students" 
+        <Link
+          to="/faculty/students"
           className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
         >
           <div className="flex items-center justify-between">
@@ -325,7 +325,7 @@ export default function FacultyDashboard() {
                 <Activity className="w-4.5 h-4.5 text-emerald-655 dark:text-emerald-400" />
                 Attendance Session
               </h3>
-              <button 
+              <button
                 onClick={() => setShowAttendanceModal(true)}
                 className="text-xs text-emerald-650 dark:text-emerald-400 hover:underline font-semibold flex items-center"
               >
@@ -348,7 +348,7 @@ export default function FacultyDashboard() {
                       Latitude: {activeSession.latitude} / Longitude: {activeSession.longitude}
                     </p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowAttendanceModal(true)}
                     className="w-full py-2.5 bg-emerald-650 hover:bg-emerald-750 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
                   >
@@ -360,7 +360,7 @@ export default function FacultyDashboard() {
                   <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[240px] leading-relaxed">
                     No active check-in running. Create a dynamic verification session to log student attendance.
                   </p>
-                  <button 
+                  <button
                     onClick={() => setShowAttendanceModal(true)}
                     className="px-4 py-2.5 bg-emerald-650 hover:bg-emerald-750 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
                   >
@@ -466,7 +466,7 @@ export default function FacultyDashboard() {
       {showAttendanceModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-5xl bg-[#F9FBFC] dark:bg-[#0D1512] border border-emerald-100/50 dark:border-emerald-950/60 rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
-            <button 
+            <button
               onClick={() => setShowAttendanceModal(false)}
               className="absolute right-4 top-4 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
             >

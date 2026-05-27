@@ -64,7 +64,7 @@ export default function LiveAttendanceList({ sessionId }) {
     // Manual mark handler
     const handleManualMark = async (collegeId) => {
         if (markingIds.has(collegeId)) return;
-        
+
         // Add to marking state to show spinner
         setMarkingIds(prev => {
             const next = new Set(prev);
@@ -77,7 +77,7 @@ export default function LiveAttendanceList({ sessionId }) {
                 studentCollegeIds: [collegeId],
                 reason: "Faculty verified in-class"
             });
-            
+
             toast.success(`Successfully marked ${collegeId} present`);
             // Note: RosterUpdateEvent will broadcast via WebSocket, which automatically 
             // moves the student to the present list and removes them from the absent list.
@@ -151,10 +151,10 @@ export default function LiveAttendanceList({ sessionId }) {
             return;
         }
 
-        const todayStr = new Date().toLocaleDateString(undefined, { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
+        const todayStr = new Date().toLocaleDateString(undefined, {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
             day: 'numeric',
             hour: '2-digit',
             minute: '2-digit'
@@ -171,9 +171,9 @@ export default function LiveAttendanceList({ sessionId }) {
                         padding: 4px 8px;
                         font-size: 11px;
                         border-radius: 6px;
-                        ${item.status === 'Present' 
-                            ? 'background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;' 
-                            : 'background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;'}
+                        ${item.status === 'Present'
+                ? 'background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;'
+                : 'background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;'}
                     ">${escapeHTML(item.status)}</span>
                 </td>
             </tr>
@@ -354,15 +354,15 @@ export default function LiveAttendanceList({ sessionId }) {
     };
 
     // Filtered lists based on search query
-    const filteredPresent = presentRecords.filter(r => 
-        (r.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-         r.collegeId?.toLowerCase().includes(searchQuery.toLowerCase()))
+    const filteredPresent = presentRecords.filter(r =>
+    (r.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.collegeId?.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
-    const filteredAbsent = absentRecords.filter(r => 
-        (r.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-         r.collegeId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         (r.rollNumber && r.rollNumber.toLowerCase().includes(searchQuery.toLowerCase())))
+    const filteredAbsent = absentRecords.filter(r =>
+    (r.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.collegeId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (r.rollNumber && r.rollNumber.toLowerCase().includes(searchQuery.toLowerCase())))
     );
 
     if (loading) {
@@ -381,7 +381,7 @@ export default function LiveAttendanceList({ sessionId }) {
                     <h4 className="text-lg font-bold text-slate-900 dark:text-white">Roster Management</h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400">Track and manually update attendance status</p>
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                     {/* Export Buttons */}
                     <button
@@ -402,7 +402,7 @@ export default function LiveAttendanceList({ sessionId }) {
                     {/* Search Bar */}
                     <div className="relative max-w-xs w-full min-w-[200px]">
                         <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input 
+                        <input
                             type="text"
                             placeholder="Search student..."
                             value={searchQuery}
@@ -417,22 +417,20 @@ export default function LiveAttendanceList({ sessionId }) {
             <div className="flex border-b border-slate-200 dark:border-emerald-950/60 mb-4">
                 <button
                     onClick={() => setActiveTab('present')}
-                    className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${
-                        activeTab === 'present'
-                            ? 'border-emerald-600 text-emerald-650 dark:text-emerald-400'
-                            : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${activeTab === 'present'
+                        ? 'border-emerald-600 text-emerald-650 dark:text-emerald-400'
+                        : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                        }`}
                 >
                     <UserCheck className="w-4 h-4" />
                     Present ({presentRecords.length})
                 </button>
                 <button
                     onClick={() => setActiveTab('absent')}
-                    className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${
-                        activeTab === 'absent'
-                            ? 'border-amber-600 text-amber-650 dark:text-amber-400'
-                            : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${activeTab === 'absent'
+                        ? 'border-amber-600 text-amber-650 dark:text-amber-400'
+                        : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                        }`}
                 >
                     <UserX className="w-4 h-4" />
                     Absent ({absentRecords.length})
@@ -448,8 +446,8 @@ export default function LiveAttendanceList({ sessionId }) {
                         </div>
                     ) : (
                         filteredPresent.map((record, index) => (
-                            <div 
-                                key={record.collegeId || index} 
+                            <div
+                                key={record.collegeId || index}
                                 className="flex items-center justify-between p-3 bg-white dark:bg-[#14221C]/80 border border-slate-150 dark:border-emerald-950/40 rounded-xl hover:border-slate-300 dark:hover:border-emerald-950/70 transition duration-200"
                             >
                                 <div>
@@ -484,8 +482,8 @@ export default function LiveAttendanceList({ sessionId }) {
                         </div>
                     ) : (
                         filteredAbsent.map((student) => (
-                            <div 
-                                key={student.collegeId} 
+                            <div
+                                key={student.collegeId}
                                 className="flex items-center justify-between p-3 bg-white dark:bg-[#14221C]/80 border border-slate-150 dark:border-emerald-950/40 rounded-xl hover:border-slate-300 dark:hover:border-emerald-950/70 transition duration-200"
                             >
                                 <div>
@@ -497,7 +495,7 @@ export default function LiveAttendanceList({ sessionId }) {
                                         {student.collegeId} {student.sectionName && `· ${student.sectionName}`}
                                     </div>
                                 </div>
-                                
+
                                 <button
                                     onClick={() => handleManualMark(student.collegeId)}
                                     disabled={markingIds.has(student.collegeId)}

@@ -13,7 +13,7 @@ import { FileText, Upload, Calendar, Send, Plus, X, Clock } from "lucide-react";
  * ✅ Plain JavaScript for easier integration
  * ✅ API hooks ready for future integration
  */
-export default function AssignmentPublisher({ classname ,compact = false }) {
+export default function AssignmentPublisher({ classname, compact = false }) {
   // Track whether we are creating a new assignment
   const [isCreating, setIsCreating] = useState(false);
 
@@ -294,11 +294,10 @@ export default function AssignmentPublisher({ classname ,compact = false }) {
               Attachments
             </label>
             <div
-              className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all ${
-                isDragging
+              className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all ${isDragging
                   ? "border-emerald-500 bg-emerald-500/5"
                   : "border-slate-200 dark:border-emerald-950/60 bg-slate-50/50 dark:bg-[#0D1512]/10"
-              }`}
+                }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}

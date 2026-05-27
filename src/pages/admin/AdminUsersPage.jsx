@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { 
-  Search, 
-  Users, 
-  GraduationCap, 
-  Briefcase, 
-  Shield, 
-  Mail, 
-  Hash, 
+import {
+  Search,
+  Users,
+  GraduationCap,
+  Briefcase,
+  Shield,
+  Mail,
+  Hash,
   Layers,
   KeyRound,
   Pencil,
@@ -15,10 +15,10 @@ import {
   Check,
   RefreshCw
 } from 'lucide-react';
-import { 
-  resetUserPassword, 
-  updateStudentSection, 
-  updateFacultySections, 
+import {
+  resetUserPassword,
+  updateStudentSection,
+  updateFacultySections,
   deleteUser,
   getDepartments,
   getDepartmentSections,
@@ -34,7 +34,7 @@ export default function AdminUsersPage() {
   const [activeDept, setActiveDept] = useState('');
   const [activeBranchType, setActiveBranchType] = useState(''); // 'Faculty' | 'Sections'
   const [activeSectionId, setActiveSectionId] = useState('');
-  
+
   const [sectionsList, setSectionsList] = useState([]);
   const [personnelList, setPersonnelList] = useState([]);
   const [personnelPage, setPersonnelPage] = useState(0);
@@ -43,21 +43,21 @@ export default function AdminUsersPage() {
   const [loadingDepts, setLoadingDepts] = useState(true);
   const [loadingSections, setLoadingSections] = useState(false);
   const [loadingPersonnel, setLoadingPersonnel] = useState(false);
-  
+
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const [allUsers, setAllUsers] = useState([]);
   const [loadingAllUsers, setLoadingAllUsers] = useState(false);
-  
+
   // Global sections list (for reassignment dropdowns)
   const [sections, setSections] = useState([]);
-  
+
   // Modals state
   const [editingUser, setEditingUser] = useState(null); // student or faculty object
   const [deletingUser, setDeletingUser] = useState(null);
   const [resettingUser, setResettingUser] = useState(null);
   const [resetSuccessPassword, setResetSuccessPassword] = useState('');
-  
+
   // Edit forms state
   const [selectedSectionId, setSelectedSectionId] = useState('');
   const [facultySectionIds, setFacultySectionIds] = useState([]);
@@ -348,7 +348,7 @@ export default function AdminUsersPage() {
   };
 
   const toggleFacultySection = (id) => {
-    setFacultySectionIds(prev => 
+    setFacultySectionIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
   };
@@ -357,7 +357,7 @@ export default function AdminUsersPage() {
   const filteredUsers = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const query = searchQuery.toLowerCase().trim();
-    return allUsers.filter(user => 
+    return allUsers.filter(user =>
       user.name?.toLowerCase().includes(query) ||
       user.collegeId?.toLowerCase().includes(query) ||
       user.email?.toLowerCase().includes(query) ||
@@ -438,13 +438,12 @@ export default function AdminUsersPage() {
                       <h4 className="font-bold text-slate-900 dark:text-white text-sm">{person.name}</h4>
                       <p className="text-[10px] font-mono text-indigo-500 dark:text-indigo-400 mt-0.5">{person.collegeId}</p>
                     </div>
-                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                      person.role === 'ADMIN' 
-                        ? 'bg-amber-500/10 text-amber-500' 
-                        : person.role === 'FACULTY' 
-                          ? 'bg-blue-500/10 text-blue-500' 
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${person.role === 'ADMIN'
+                        ? 'bg-amber-500/10 text-amber-500'
+                        : person.role === 'FACULTY'
+                          ? 'bg-blue-500/10 text-blue-500'
                           : 'bg-emerald-500/10 text-emerald-500'
-                    }`}>
+                      }`}>
                       {person.role}
                     </span>
                   </div>
@@ -499,10 +498,10 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         /* Mindmap Visual Hierarchy Graph */
-        <div 
+        <div
           ref={containerRef}
           onScroll={handleScroll}
-          id="mindmap-container" 
+          id="mindmap-container"
           className="flex overflow-x-auto gap-16 py-12 px-6 relative min-h-[600px] w-full rounded-3xl bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 no-scrollbar select-none shadow-sm"
         >
           {/* SVG Connections Overlay */}
@@ -540,11 +539,10 @@ export default function AdminUsersPage() {
                   key={dept}
                   data-node-id={`dept:${dept}`}
                   onClick={() => handleDeptClick(dept)}
-                  className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${
-                    isSelected
+                  className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${isSelected
                       ? 'bg-slate-900 text-white dark:bg-slate-105 dark:text-slate-900 border-transparent shadow-md scale-[1.02] font-semibold'
                       : 'bg-slate-50/80 dark:bg-[#0b0f19]/30 border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:scale-[1.02] text-slate-700 dark:text-slate-300'
-                  }`}
+                    }`}
                 >
                   <span className="text-xs font-bold">{dept}</span>
                 </div>
@@ -556,17 +554,16 @@ export default function AdminUsersPage() {
           {activeDept && (
             <div className="flex flex-col gap-8 z-10 w-60 shrink-0 justify-center">
               <div className="text-center font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Branch Categories</div>
-              
+
               {/* Faculty Branch */}
               <div
                 data-node-id="branch:Faculty"
                 data-parent-id={`dept:${activeDept}`}
                 onClick={() => handleBranchTypeClick('Faculty')}
-                className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${
-                  activeBranchType === 'Faculty'
+                className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${activeBranchType === 'Faculty'
                     ? 'bg-slate-900 text-white dark:bg-slate-105 dark:text-slate-900 border-transparent shadow-md scale-[1.02] font-semibold'
                     : 'bg-slate-50/80 dark:bg-[#0b0f19]/30 border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:scale-[1.02] text-slate-700 dark:text-slate-300'
-                }`}
+                  }`}
               >
                 <span className="text-xs font-bold flex items-center justify-center gap-2">
                   <Briefcase className="w-3.5 h-3.5" />
@@ -580,11 +577,10 @@ export default function AdminUsersPage() {
                   data-node-id="branch:Sections"
                   data-parent-id={`dept:${activeDept}`}
                   onClick={() => handleBranchTypeClick('Sections')}
-                  className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${
-                    activeBranchType === 'Sections'
+                  className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${activeBranchType === 'Sections'
                       ? 'bg-slate-900 text-white dark:bg-slate-105 dark:text-slate-900 border-transparent shadow-md scale-[1.02] font-semibold'
                       : 'bg-slate-50/80 dark:bg-[#0b0f19]/30 border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:scale-[1.02] text-slate-700 dark:text-slate-300'
-                  }`}
+                    }`}
                 >
                   <span className="text-xs font-bold flex items-center justify-center gap-2">
                     <Layers className="w-3.5 h-3.5" />
@@ -612,11 +608,10 @@ export default function AdminUsersPage() {
                       data-node-id={`sec:${sec.id}`}
                       data-parent-id="branch:Sections"
                       onClick={() => handleSectionClick(sec.id)}
-                      className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${
-                        isSelected
+                      className={`p-4 rounded-2xl border transition-all duration-250 cursor-pointer text-center ${isSelected
                           ? 'bg-slate-900 text-white dark:bg-slate-105 dark:text-slate-900 border-transparent shadow-md scale-[1.02] font-semibold'
                           : 'bg-slate-50/80 dark:bg-[#0b0f19]/30 border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:scale-[1.02] text-slate-700 dark:text-slate-300'
-                      }`}
+                        }`}
                     >
                       <span className="text-xs font-bold">{sec.sectionName}</span>
                     </div>
@@ -632,7 +627,7 @@ export default function AdminUsersPage() {
               <div className="text-center font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 sticky top-0 py-1 bg-transparent">
                 {activeBranchType === 'Faculty' ? 'Faculty Directory' : 'Enrolled Students'}
               </div>
-              
+
               {loadingPersonnel && personnelList.length === 0 ? (
                 <div className="text-center text-xs text-slate-400 py-8">Loading directory...</div>
               ) : personnelList.length === 0 ? (
@@ -651,13 +646,12 @@ export default function AdminUsersPage() {
                           <h4 className="font-bold text-slate-900 dark:text-white text-xs">{person.name}</h4>
                           <p className="text-[9px] font-mono text-indigo-500 dark:text-indigo-400 mt-0.5">{person.collegeId}</p>
                         </div>
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                          person.role === 'ADMIN' 
-                            ? 'bg-amber-500/10 text-amber-500' 
-                            : person.role === 'FACULTY' 
-                              ? 'bg-blue-500/10 text-blue-500' 
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${person.role === 'ADMIN'
+                            ? 'bg-amber-500/10 text-amber-500'
+                            : person.role === 'FACULTY'
+                              ? 'bg-blue-500/10 text-blue-500'
                               : 'bg-emerald-500/10 text-emerald-500'
-                        }`}>
+                          }`}>
                           {person.role}
                         </span>
                       </div>
@@ -735,7 +729,7 @@ export default function AdminUsersPage() {
       {editingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl w-full max-w-lg shadow-2xl p-6 relative animate-in fade-in duration-200">
-            <button 
+            <button
               onClick={() => setEditingUser(null)}
               className="absolute right-4 top-4 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
@@ -791,18 +785,16 @@ export default function AdminUsersPage() {
                       sections.map(sec => {
                         const isChecked = facultySectionIds.includes(sec.id);
                         return (
-                          <div 
-                            key={sec.id} 
+                          <div
+                            key={sec.id}
                             onClick={() => toggleFacultySection(sec.id)}
-                            className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer select-none text-xs font-semibold transition-all ${
-                              isChecked 
-                                ? 'bg-indigo-600/10 border-indigo-500 text-indigo-600 dark:text-indigo-400' 
+                            className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer select-none text-xs font-semibold transition-all ${isChecked
+                                ? 'bg-indigo-600/10 border-indigo-500 text-indigo-600 dark:text-indigo-400'
                                 : 'border-slate-200 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/30 text-slate-600 dark:text-slate-400'
-                            }`}
+                              }`}
                           >
-                            <div className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-all ${
-                              isChecked ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-400 dark:border-slate-600'
-                            }`}>
+                            <div className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-all ${isChecked ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-400 dark:border-slate-600'
+                              }`}>
                               {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                             </div>
                             <span className="truncate text-xs font-normal">{sec.sectionName}</span>
@@ -892,7 +884,7 @@ export default function AdminUsersPage() {
                 </div>
 
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Are you sure you want to reset the password for <strong className="text-slate-800 dark:text-white">{resettingUser.name}</strong> ({resettingUser.collegeId})? 
+                  Are you sure you want to reset the password for <strong className="text-slate-800 dark:text-white">{resettingUser.name}</strong> ({resettingUser.collegeId})?
                 </p>
                 <p className="text-xs text-amber-500 mt-2 font-medium bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20">
                   The password will be reset to a random, lookalike-safe 8-character temporary password.
@@ -933,7 +925,7 @@ export default function AdminUsersPage() {
             </div>
 
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Warning! You are about to permanently delete <strong className="text-slate-800 dark:text-white">{deletingUser.name}</strong> (College ID: <span className="font-mono text-indigo-500 dark:text-indigo-400 font-semibold">{deletingUser.collegeId}</span>). 
+              Warning! You are about to permanently delete <strong className="text-slate-800 dark:text-white">{deletingUser.name}</strong> (College ID: <span className="font-mono text-indigo-500 dark:text-indigo-400 font-semibold">{deletingUser.collegeId}</span>).
             </p>
             <p className="text-xs text-rose-500 mt-2 font-medium bg-rose-500/10 p-2.5 rounded-lg border border-rose-500/20">
               This action is destructive and irreversible. All academic profiles, role associations, and personal settings linked to this user will be removed.

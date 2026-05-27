@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import API from '../../Services/api';
 import { toast } from 'react-toastify';
-import { 
-    History, Calendar, Users, CheckCircle, Clock, AlertCircle, 
+import {
+    History, Calendar, Users, CheckCircle, Clock, AlertCircle,
     ChevronRight, ArrowLeft, Search, UserCheck, Loader2, ShieldAlert
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -113,7 +113,7 @@ export default function FacultySessionHistory() {
             });
 
             toast.success(`Successfully marked ${collegeId} present`);
-            
+
             // Move student from absent to present in local state immediately
             const student = absentStudents.find(s => s.collegeId === collegeId);
             if (student) {
@@ -161,13 +161,13 @@ export default function FacultySessionHistory() {
     };
 
     // Filter absent students
-    const filteredAbsent = absentStudents.filter(s => 
+    const filteredAbsent = absentStudents.filter(s =>
         s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.collegeId?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Filter present students
-    const filteredPresent = presentStudents.filter(s => 
+    const filteredPresent = presentStudents.filter(s =>
         s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.collegeId?.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -197,49 +197,45 @@ export default function FacultySessionHistory() {
                                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                     Filter Sessions
                                 </span>
-                                
+
                                 <div className="flex bg-slate-150/40 dark:bg-[#0D1512]/50 p-1 rounded-xl border border-slate-200/50 dark:border-emerald-950/60 w-fit gap-1 shadow-sm">
                                     <button
                                         type="button"
                                         onClick={() => handlePresetChange('last20')}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
-                                            datePreset === 'last20'
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${datePreset === 'last20'
                                                 ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm font-semibold'
                                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                                        }`}
+                                            }`}
                                     >
                                         Recent (Last 20)
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => handlePresetChange('currentMonth')}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
-                                            datePreset === 'currentMonth'
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${datePreset === 'currentMonth'
                                                 ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm font-semibold'
                                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                                        }`}
+                                            }`}
                                     >
                                         Current Month
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => handlePresetChange('lastMonth')}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
-                                            datePreset === 'lastMonth'
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${datePreset === 'lastMonth'
                                                 ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm font-semibold'
                                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                                        }`}
+                                            }`}
                                     >
                                         Last Month
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setDatePreset('custom')}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
-                                            datePreset === 'custom'
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${datePreset === 'custom'
                                                 ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm font-semibold'
                                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                                        }`}
+                                            }`}
                                     >
                                         Custom Range
                                     </button>
@@ -291,7 +287,7 @@ export default function FacultySessionHistory() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[550px] overflow-y-auto pr-1 scroll-style">
                                 {sessions.map((s) => (
-                                    <div 
+                                    <div
                                         key={s.sessionId}
                                         onClick={() => loadSessionDetails(s)}
                                         className="p-4 bg-slate-50/50 dark:bg-[#0D1512]/40 border border-slate-200 dark:border-emerald-950/60 rounded-xl hover:border-emerald-500/30 transition cursor-pointer flex flex-col justify-between gap-4"
@@ -336,7 +332,7 @@ export default function FacultySessionHistory() {
                             >
                                 <ArrowLeft className="w-4 h-4" /> Back to History
                             </button>
-                            
+
                             <div className="text-left sm:text-right">
                                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">{selectedSession.subjectName}</h3>
                                 <p className="text-xs text-slate-500 dark:text-slate-400">{selectedSession.subjectCode} · {selectedSession.sectionName}</p>
@@ -351,7 +347,7 @@ export default function FacultySessionHistory() {
                                     <div>
                                         <h5 className="text-sm font-semibold text-slate-900 dark:text-white">Manual Marking Window</h5>
                                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                            {selectedSession.manualMarkAllowed 
+                                            {selectedSession.manualMarkAllowed
                                                 ? "Standard grace window is active. You can mark students directly."
                                                 : "Standard grace window has expired. Check 'Force Override' to modify."
                                             }
@@ -417,7 +413,7 @@ export default function FacultySessionHistory() {
                                                 <p className="text-xs text-slate-500 dark:text-slate-400 italic">No absent students found.</p>
                                             ) : (
                                                 filteredAbsent.map(s => (
-                                                    <div 
+                                                    <div
                                                         key={s.collegeId}
                                                         className="p-3 bg-slate-55 dark:bg-[#0D1512]/40 border border-slate-150 dark:border-emerald-950/40 rounded-xl flex items-center justify-between gap-3 hover:border-slate-300 dark:hover:border-emerald-950/70 transition"
                                                     >
@@ -449,7 +445,7 @@ export default function FacultySessionHistory() {
                                                 <p className="text-xs text-slate-500 dark:text-slate-400 italic">No present students found.</p>
                                             ) : (
                                                 filteredPresent.map(s => (
-                                                    <div 
+                                                    <div
                                                         key={s.collegeId}
                                                         className="p-3 bg-slate-55 dark:bg-[#0D1512]/40 border border-slate-150 dark:border-emerald-950/40 rounded-xl flex items-center justify-between gap-3"
                                                     >
