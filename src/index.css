@@ -1,9 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import "tailwindcss";
-
-@import "tw-animate-css";
 @import "tailwind-scrollbar-hide/v4";
+/* @import "tw-animate-css"; */
 
 /* Global smooth scrolling support */
 html {

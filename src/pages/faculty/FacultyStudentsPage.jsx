@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import FacultyAttendanceSession from '../../components/Attendance/FacultyAttendanceSession';
 import FacultySessionHistory from '../../components/Attendance/FacultySessionHistory';
-import { Play, History } from 'lucide-react';
+import DebarredListTracker from '../../components/Attendance/DebarredListTracker';
+import { Play, History, ShieldAlert } from 'lucide-react';
 
 export default function FacultyStudentsPage() {
-  const [activeTab, setActiveTab] = useState('live'); // 'live' | 'history'
+  const [activeTab, setActiveTab] = useState('live'); // 'live' | 'history' | 'debarred'
 
   return (
     <div className="-mt-6 -mx-6 min-h-[calc(100vh-64px)] bg-[#F9FBFC] dark:bg-[#0D1512] transition-colors duration-300 text-slate-800 dark:text-slate-100 overflow-y-auto w-[calc(100%+3rem)] p-6 space-y-6 pb-24 text-left">
@@ -28,7 +29,7 @@ export default function FacultyStudentsPage() {
             className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${
               activeTab === 'live'
                 ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
+                : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
             }`}
           >
             <Play className="w-3.5 h-3.5" /> Live Session
@@ -38,10 +39,20 @@ export default function FacultyStudentsPage() {
             className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${
               activeTab === 'history'
                 ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
+                : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
             }`}
           >
             <History className="w-3.5 h-3.5" /> History & Corrections
+          </button>
+          <button
+            onClick={() => setActiveTab('debarred')}
+            className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${
+              activeTab === 'debarred'
+                ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
+                : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
+            }`}
+          >
+            <ShieldAlert className="w-3.5 h-3.5" /> Debarment Tracker
           </button>
         </div>
       </div>
@@ -49,8 +60,10 @@ export default function FacultyStudentsPage() {
       <div className="mt-4">
         {activeTab === 'live' ? (
           <FacultyAttendanceSession />
-        ) : (
+        ) : activeTab === 'history' ? (
           <FacultySessionHistory />
+        ) : (
+          <DebarredListTracker />
         )}
       </div>
     </div>
