@@ -88,6 +88,13 @@ export default function App() {
     () => !!localStorage.getItem("token")
   );
 
+  React.useEffect(() => {
+    // Fire-and-forget background ping to pre-warm the Render backend
+    // to mitigate free-tier cold-start latency when the app loads.
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
+    fetch(`${apiBase}/auth`).catch(() => { /* ignore error, we just want to wake up the server */ });
+  }, []);
+
   const handleLogout = useCallback(() => {
     // Clear all auth data
     localStorage.removeItem("token");

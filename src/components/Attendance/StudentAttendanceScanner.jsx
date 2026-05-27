@@ -60,8 +60,24 @@ export default function StudentAttendanceScanner() {
             }
         }, (err) => {
             setStatus('error');
-            setMessage("Location access denied. Please enable GPS.");
-        }, { enableHighAccuracy: true });
+            switch (err.code) {
+                case err.PERMISSION_DENIED:
+                    setMessage("Location access denied. Please enable location permissions in your browser and system settings.");
+                    break;
+                case err.POSITION_UNAVAILABLE:
+                    setMessage("Location information is unavailable. Try using a mobile network or check your system location settings.");
+                    break;
+                case err.TIMEOUT:
+                    setMessage("Location request timed out. Please try again or check your internet/GPS connection.");
+                    break;
+                default:
+                    setMessage(err.message || "Failed to retrieve location coordinates.");
+            }
+        }, { 
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        });
     };
 
     return (
