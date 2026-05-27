@@ -19,12 +19,15 @@ import { createRoot } from 'react-dom/client'
 import './index.css'            // Tailwind + your CSS variables
 import App from './App.jsx'
 import { ThemeProvider } from './components/Theme/theme-provider'
+import ErrorBoundary from './components/ui/ErrorBoundary'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* 1. Wrap entire App in ThemeProvider */}
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </ThemeProvider>
   </React.StrictMode>
 )

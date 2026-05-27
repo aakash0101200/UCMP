@@ -21,6 +21,9 @@ export default defineConfig({
       
     },
   },
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   define: {
     global: 'window', // Shims Node.js global to browser window
   },

@@ -22,14 +22,14 @@ const LoginPage = ({ onLogin }) => {
     let password = "";
 
     if (roleType === "STUDENT") {
-      collegeId = "DEMO_2025CS001";
-      password = "Student@123";
+      collegeId = import.meta.env.VITE_DEMO_STUDENT_ID || "DEMO_2025CS001";
+      password = import.meta.env.VITE_DEMO_STUDENT_PWD || "Student@123";
     } else if (roleType === "FACULTY") {
-      collegeId = "DEMO_clg00";
-      password = "Faculty@123";
+      collegeId = import.meta.env.VITE_DEMO_FACULTY_ID || "DEMO_clg00";
+      password = import.meta.env.VITE_DEMO_FACULTY_PWD || "Faculty@123";
     } else if (roleType === "ADMIN") {
-      collegeId = "DEMO_ADMIN_001";
-      password = "Admin@123";
+      collegeId = import.meta.env.VITE_DEMO_ADMIN_ID || "DEMO_ADMIN_001";
+      password = import.meta.env.VITE_DEMO_ADMIN_PWD || "Admin@123";
     }
 
     setFormData({ collegeId, password });

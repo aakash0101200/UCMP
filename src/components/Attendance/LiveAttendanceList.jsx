@@ -123,6 +123,16 @@ export default function LiveAttendanceList({ sessionId }) {
         document.body.removeChild(link);
     };
 
+    const escapeHTML = (str) => {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    };
+
     const exportToPDF = () => {
         const getSortKey = (item) => item.rollNumber || item.collegeId || item.name || '';
         const combined = [
@@ -152,9 +162,9 @@ export default function LiveAttendanceList({ sessionId }) {
 
         const rowsHTML = combined.map((item, index) => `
             <tr style="background-color: ${index % 2 === 0 ? '#f8fafc' : '#ffffff'}; border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px; font-weight: 500; color: #334155;">${item.rollNumber || 'N/A'}</td>
-                <td style="padding: 12px; color: #0f172a; font-weight: 600;">${item.name || 'N/A'}</td>
-                <td style="padding: 12px; color: #64748b;">${item.collegeId || 'N/A'}</td>
+                <td style="padding: 12px; font-weight: 500; color: #334155;">${escapeHTML(item.rollNumber) || 'N/A'}</td>
+                <td style="padding: 12px; color: #0f172a; font-weight: 600;">${escapeHTML(item.name) || 'N/A'}</td>
+                <td style="padding: 12px; color: #64748b;">${escapeHTML(item.collegeId) || 'N/A'}</td>
                 <td style="padding: 12px; font-weight: bold; text-align: center;">
                     <span style="
                         display: inline-block;
@@ -164,7 +174,7 @@ export default function LiveAttendanceList({ sessionId }) {
                         ${item.status === 'Present' 
                             ? 'background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;' 
                             : 'background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;'}
-                    ">${item.status}</span>
+                    ">${escapeHTML(item.status)}</span>
                 </td>
             </tr>
         `).join('');

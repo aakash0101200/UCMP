@@ -4,7 +4,6 @@ import { getProfile } from "../../Services/profile";
 import { getAttendanceSummary } from "../../Services/attendance";
 import { getResolvedSectionSchedule, getAcademicTerms } from "../../Services/timetable";
 import { getStudentAnnouncements, getAnnouncements } from "../../Services/announcements";
-import Calendar from "../Calendar";
 // import BottomNavBar from "../../components/navigation/BottomNavBar";
 import {
   BookOpen,
