@@ -56,6 +56,7 @@ export default function AdminUsersPage() {
   const [editingUser, setEditingUser] = useState(null); // student or faculty object
   const [deletingUser, setDeletingUser] = useState(null);
   const [resettingUser, setResettingUser] = useState(null);
+  const [resetSuccessPassword, setResetSuccessPassword] = useState('');
   
   // Edit forms state
   const [selectedSectionId, setSelectedSectionId] = useState('');
@@ -282,12 +283,18 @@ export default function AdminUsersPage() {
     if (!resettingUser) return;
     try {
       const res = await resetUserPassword(resettingUser.collegeId);
-      toast.success(res.data || 'Password reset successfully.');
-      setResettingUser(null);
+      const tempPass = res.data?.temporaryPassword || '';
+      if (tempPass) {
+        setResetSuccessPassword(tempPass);
+        toast.success(res.data?.message || 'Password reset successfully.');
+      } else {
+        toast.success('Password reset successfully.');
+        setResettingUser(null);
+      }
       refreshActiveData();
     } catch (err) {
       console.error('Password reset failed:', err);
-      toast.error(err.response?.data || 'Failed to reset password.');
+      toast.error(err.response?.data?.message || err.response?.data || 'Failed to reset password.');
     }
   };
 
@@ -833,34 +840,83 @@ export default function AdminUsersPage() {
       {resettingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-[#161B26] border border-slate-105 dark:border-slate-805/60 rounded-3xl w-full max-w-md shadow-2xl p-6 relative animate-in fade-in duration-200">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500">
-                <KeyRound className="w-6 h-6" />
+            {resetSuccessPassword ? (
+              // Success Screen
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-500">
+                    <Check className="w-6 h-6 stroke-[3]" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Temporary Password Generated</h3>
+                </div>
+
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  The password for <strong className="text-slate-800 dark:text-white">{resettingUser.name}</strong> ({resettingUser.collegeId}) has been successfully reset. Provide this temporary password to the user to allow login:
+                </p>
+
+                <div className="flex items-center gap-2 p-3 bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 rounded-xl mt-3 select-text">
+                  <span className="font-mono text-base font-bold tracking-widest text-emerald-600 dark:text-emerald-400 flex-1 text-center">
+                    {resetSuccessPassword}
+                  </span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(resetSuccessPassword);
+                      toast.success("Password copied to clipboard!");
+                    }}
+                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm shrink-0"
+                  >
+                    Copy
+                  </button>
+                </div>
+
+                <div className="flex justify-end pt-3">
+                  <button
+                    onClick={() => {
+                      setResettingUser(null);
+                      setResetSuccessPassword('');
+                    }}
+                    className="px-5 py-2.5 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 hover:opacity-90 rounded-xl text-xs font-bold transition-all shadow-sm"
+                  >
+                    Done
+                  </button>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Reset User Password</h3>
-            </div>
+            ) : (
+              // Confirmation Dialog
+              <>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500">
+                    <KeyRound className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Reset User Password</h3>
+                </div>
 
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Are you sure you want to reset the password for <strong className="text-slate-800 dark:text-white">{resettingUser.name}</strong> ({resettingUser.collegeId})? 
-            </p>
-            <p className="text-xs text-amber-500 mt-2 font-medium bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20">
-              The password will be reset to the role-based default: Student default is <strong>Student@123</strong>, and Faculty default is <strong>Faculty@123</strong>.
-            </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Are you sure you want to reset the password for <strong className="text-slate-800 dark:text-white">{resettingUser.name}</strong> ({resettingUser.collegeId})? 
+                </p>
+                <p className="text-xs text-amber-500 mt-2 font-medium bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20">
+                  The password will be reset to a random, lookalike-safe 8-character temporary password.
+                </p>
 
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setResettingUser(null)}
-                className="px-4 py-2 border border-slate-200 dark:border-slate-800/60 rounded-xl text-xs font-semibold text-slate-650 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleResetPassword}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
-              >
-                Confirm Reset
-              </button>
-            </div>
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    onClick={() => {
+                      setResettingUser(null);
+                      setResetSuccessPassword('');
+                    }}
+                    className="px-4 py-2 border border-slate-200 dark:border-slate-800/60 rounded-xl text-xs font-semibold text-slate-650 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleResetPassword}
+                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+                  >
+                    Confirm Reset
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
