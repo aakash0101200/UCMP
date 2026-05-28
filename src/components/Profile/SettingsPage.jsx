@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { 
-  User, KeyRound, Save, RefreshCw, Eye, EyeOff, Check, X, 
+import {
+  User, KeyRound, Save, RefreshCw, Eye, EyeOff, Check, X,
   MapPin, Phone, Mail, ShieldAlert, BadgeInfo, FileCheck, Info
 } from 'lucide-react';
 import { getProfile, updateProfile, changePassword } from '../../Services/profile';
@@ -99,7 +99,7 @@ export default function SettingsPage({ userRole = 'student' }) {
     digit: /[0-9]/.test(newPassword),
     special: /[@#$%^&+=!]/.test(newPassword)
   };
-  
+
   const isPasswordValid = Object.values(passChecks).every(Boolean);
   const isPasswordMatch = newPassword === confirmPassword;
 
@@ -161,7 +161,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
   return (
     <div className={`space-y-6 pb-24 p-6 -mt-6 -mx-6 min-h-[calc(100vh-64px)] ${theme.bg} transition-colors duration-300 overflow-y-auto w-[calc(100%+3rem)] text-left`}>
-      
+
       {/* Header Area */}
       <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-zinc-800/10 border ${theme.border} p-6 rounded-3xl shadow-sm ${theme.card}`}>
         <div>
@@ -178,18 +178,18 @@ export default function SettingsPage({ userRole = 'student' }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        
+
         {/* Left Column: Profile Card + Navigation Tabs */}
         <div className="lg:col-span-1 space-y-6">
-          
+
           {/* Profile Overview Card */}
           <div className={`border ${theme.border} rounded-3xl p-6 text-center space-y-4 shadow-sm ${theme.card}`}>
             <div className="relative mx-auto w-24 h-24">
               {avatarUrl ? (
-                <img 
-                  src={avatarUrl} 
-                  alt={profile?.name || 'User'} 
-                  className="w-24 h-24 rounded-full object-cover border-2 border-slate-200 dark:border-zinc-700 shadow-inner" 
+                <img
+                  src={avatarUrl}
+                  alt={profile?.name || 'User'}
+                  className="w-24 h-24 rounded-full object-cover border-2 border-slate-200 dark:border-zinc-700 shadow-inner"
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center border-2 border-slate-200 dark:border-zinc-700">
@@ -240,22 +240,20 @@ export default function SettingsPage({ userRole = 'student' }) {
           <div className={`border ${theme.border} rounded-3xl p-2.5 space-y-1 shadow-sm ${theme.card}`}>
             <button
               onClick={() => setActiveTab('profile')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${
-                activeTab === 'profile'
-                  ? theme.accentBg + ' shadow-sm'
-                  : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
-              }`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${activeTab === 'profile'
+                ? theme.accentBg + ' shadow-sm'
+                : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
+                }`}
             >
               <User className="w-4 h-4" />
               <span>Personal Details</span>
             </button>
             <button
               onClick={() => setActiveTab('password')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${
-                activeTab === 'password'
-                  ? theme.accentBg + ' shadow-sm'
-                  : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
-              }`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${activeTab === 'password'
+                ? theme.accentBg + ' shadow-sm'
+                : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
+                }`}
             >
               <KeyRound className="w-4 h-4" />
               <span>Change Password</span>
@@ -265,7 +263,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
         {/* Right Column: Tab View Content */}
         <div className="lg:col-span-3">
-          
+
           {/* TAB 1: Profile Info Form */}
           {activeTab === 'profile' && (
             <div className={`border ${theme.border} rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm ${theme.card}`}>
@@ -280,7 +278,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
               <form onSubmit={handleUpdateProfile} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  
+
                   {/* Name field (READ-ONLY) */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
@@ -461,9 +459,9 @@ export default function SettingsPage({ userRole = 'student' }) {
               </div>
 
               <form onSubmit={handleUpdatePassword} className="space-y-6">
-                
+
                 <div className="space-y-4 max-w-xl">
-                  
+
                   {/* Old Password */}
                   <div className="flex flex-col gap-1.5 relative">
                     <label className="text-[10px] font-bold text-slate-450 dark:text-slate-550 uppercase tracking-wider">
@@ -537,14 +535,14 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                 {/* Password Checklist & Match Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl">
-                  
+
                   {/* Checklist */}
                   <div className={`p-4 rounded-2xl border text-xs space-y-2 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-150 dark:border-zinc-800/40 text-slate-500 dark:text-slate-400`}>
                     <div className="font-bold text-[9px] uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
                       <ShieldAlert className="w-3.5 h-3.5" />
                       <span>Security Strength Checklist</span>
                     </div>
-                    
+
                     <div className="space-y-1.5 text-[11px]">
                       <div className="flex items-center gap-2">
                         {passChecks.length ? (

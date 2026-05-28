@@ -44,7 +44,7 @@ const menuConfigs = {
     { title: 'Assignment', to: '/student/assignment', icon: FileText },
     { title: 'Schedule', to: '/student/schedule', icon: Calendar },
     { title: 'Updates', to: '/student/updates', icon: MessageSquare },
-    { title: 'Attendance', to: '/student/attendance', icon: User},
+    { title: 'Attendance', to: '/student/attendance', icon: User },
 
   ],
   faculty: [
@@ -74,7 +74,7 @@ export function AppSidebar({ userRole = 'student', userName = 'User', onLogout }
   const getRoleTitle = (role) => {
     const titles = {
       student: 'Student Dashboard',
-      faculty: 'Faculty Dashboard', 
+      faculty: 'Faculty Dashboard',
       admin: 'Admin Console'
     };
     return titles[role] || 'Portal';
@@ -87,7 +87,7 @@ export function AppSidebar({ userRole = 'student', userName = 'User', onLogout }
   };
 
   return (
-    <Sidebar variant="inset" collapsible="icon" className= "flex m-0 p-0 ">
+    <Sidebar variant="inset" collapsible="icon" className="flex m-0 p-0 ">
 
       {/* Header Section */}
       <SidebarHeader>
@@ -95,12 +95,12 @@ export function AppSidebar({ userRole = 'student', userName = 'User', onLogout }
           {/* <img src={logo} alt="UCMP Logo" className="h-8 w-8 shrink-0" /> */}
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <div className="font-semibold text-md text-center text-sidebar-foreground"> 
+              <div className="font-semibold text-md text-center text-sidebar-foreground">
                 {getRoleTitle(userRole)} </div>
             </div>
           )}
-          
-         {/* Fix: Wrap SidebarTrigger in a flex container for proper vertical alignment */}
+
+          {/* Fix: Wrap SidebarTrigger in a flex container for proper vertical alignment */}
 
 
           <SidebarTrigger className="absolute right-4 top-1/2 -translate-y-1/2" />
@@ -116,9 +116,9 @@ export function AppSidebar({ userRole = 'student', userName = 'User', onLogout }
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map(({ title, to, icon: Icon }) => {
-                const isActive = location.pathname === to || 
+                const isActive = location.pathname === to ||
                   (to !== '/student' && to !== '/faculty' && to !== '/admin' && location.pathname.startsWith(to));
-                
+
                 return (
                   <SidebarMenuItem key={to}>
                     <SidebarMenuButton
@@ -127,7 +127,7 @@ export function AppSidebar({ userRole = 'student', userName = 'User', onLogout }
                       isActive={isActive}
                       tooltip={isCollapsed ? title : undefined}
                     >
-                      
+
                       <Link to={to}>
                         <Icon className="h-4 w-4" />
                         <span>{title}</span>
@@ -181,7 +181,7 @@ export function AppSidebar({ userRole = 'student', userName = 'User', onLogout }
             <SidebarMenuButton
               asChild
               tooltip={isCollapsed ? userName : undefined}
-              className ="hover:bg-muted/70 px-2 py-1.5 rounded-md w-full"
+              className="hover:bg-muted/70 px-2 py-1.5 rounded-md w-full"
             >
               <div className="flex items-center gap-2 w-full">
 
@@ -191,16 +191,16 @@ export function AppSidebar({ userRole = 'student', userName = 'User', onLogout }
 
                     <div className="text-xs font-semibold">
 
-                  {userName
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .slice(0, 2)}
+                      {userName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()
+                        .slice(0, 2)}
+                    </div>
+                  </div>
                 </div>
-                </div>
-                </div>
-                
+
 
                 {!isCollapsed && (
                   <div className="min-w-0">

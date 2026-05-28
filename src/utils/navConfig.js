@@ -1,6 +1,6 @@
 // utils/navConfig.js
-import { 
-  User, Settings, HelpCircle, BookOpen, 
+import {
+  User, Settings, HelpCircle, BookOpen,
   Users, BarChart3, Calendar, FileText,
   GraduationCap, Award, MessageSquare
 } from 'lucide-react';

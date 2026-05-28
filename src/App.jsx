@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-
+import SettingsPage from './components/Profile/SettingsPage';
 import LandingNavBar from './components/navigation/LandingNavBar';
 import DashboardLayout from './components/layout/DashboardLayout';
 
@@ -34,8 +34,6 @@ import AdminTimetablePage from './pages/admin/AdminTimetablePage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 
 import 'react-toastify/dist/ReactToastify.css';
-import ProfilePage from './components/Profile/ProfilePage';
-import SettingsPage from './components/Profile/SettingsPage';
 
 // Layout to choose between public vs dashboard shells
 function AppShell({ children }) {
@@ -89,6 +87,13 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     () => !!localStorage.getItem("token")
   );
+
+  React.useEffect(() => {
+    // Fire-and-forget background ping to pre-warm the Render backend
+    // to mitigate free-tier cold-start latency when the app loads.
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
+    fetch(`${apiBase}/auth`).catch(() => { /* ignore error, we just want to wake up the server */ });
+  }, []);
 
   const handleLogout = useCallback(() => {
     // Clear all auth data
@@ -167,7 +172,6 @@ export default function App() {
             : <Navigate to="/login" replace />
         }>
           <Route index element={<StudentDashboard />} />
-          <Route path="profile" element={<ProfilePage />} />
           <Route path="settings" element={<SettingsPage userRole="student" />} />
           <Route path="assignment" element={<Assignment />} />
           <Route path="attendance" element={<Attendance />} />
@@ -183,7 +187,6 @@ export default function App() {
             : <Navigate to="/login" replace />
         }>
           <Route index element={<FacultyDashboard />} />
-          <Route path="profile" element={<ProfilePage />} />
           <Route path="settings" element={<SettingsPage userRole="faculty" />} />
           <Route path="courses" element={<FacultyCoursesPage />} />
           <Route path="students" element={<FacultyStudentsPage />} />
@@ -198,7 +201,6 @@ export default function App() {
             : <Navigate to="/login" replace />
         }>
           <Route index element={<AdminDashboard />} />
-          <Route path="profile" element={<ProfilePage />} />
           <Route path="settings" element={<SettingsPage userRole="admin" />} />
           <Route path="timetable" element={<AdminTimetablePage />} />
           <Route path="users" element={<AdminUsersPage />} />

@@ -1075,10 +1075,10 @@ export default function AdminTimetablePage() {
                           <div
                             key={slot.overrideId || slot.id}
                             className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border transition
-                              ${isSlotCancelled 
-                                ? 'border-red-200 bg-red-500/5 dark:border-red-950/60 dark:bg-red-950/10' 
-                                : isSlotSubbed 
-                                  ? 'border-amber-200 bg-amber-500/5 dark:border-amber-950/60 dark:bg-amber-950/10' 
+                              ${isSlotCancelled
+                                ? 'border-red-200 bg-red-500/5 dark:border-red-950/60 dark:bg-red-950/10'
+                                : isSlotSubbed
+                                  ? 'border-amber-200 bg-amber-500/5 dark:border-amber-950/60 dark:bg-amber-950/10'
                                   : 'border-slate-100 dark:border-slate-800/40 bg-slate-50/40 dark:bg-neutral-950/20'}`}
                           >
                             <div className="space-y-1">

@@ -26,31 +26,28 @@ export default function FacultyStudentsPage() {
         <div className="flex bg-slate-150/50 dark:bg-[#0D1512]/60 p-1 rounded-2xl border border-slate-200 dark:border-emerald-950/60 w-fit gap-2 shadow-sm">
           <button
             onClick={() => setActiveTab('live')}
-            className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${
-              activeTab === 'live'
+            className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${activeTab === 'live'
                 ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
                 : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
-            }`}
+              }`}
           >
             <Play className="w-3.5 h-3.5" /> Live Session
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${
-              activeTab === 'history'
+            className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${activeTab === 'history'
                 ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
                 : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
-            }`}
+              }`}
           >
             <History className="w-3.5 h-3.5" /> History & Corrections
           </button>
           <button
             onClick={() => setActiveTab('debarred')}
-            className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${
-              activeTab === 'debarred'
+            className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${activeTab === 'debarred'
                 ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
                 : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
-            }`}
+              }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" /> Debarment Tracker
           </button>

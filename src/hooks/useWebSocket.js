@@ -3,6 +3,9 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
 const getWsUrl = () => {
+  if (import.meta.env.VITE_WS_URL) {
+    return import.meta.env.VITE_WS_URL;
+  }
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
   // Replace trailing /api with /ws for the handshake endpoint
   return apiUrl.replace(/\/api$/, '/ws');

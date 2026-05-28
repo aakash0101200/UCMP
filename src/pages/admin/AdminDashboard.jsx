@@ -168,8 +168,8 @@ const AdminDashboard = () => {
   const [newSectionName, setNewSectionName] = useState('');
   const [isAddingSection, setIsAddingSection] = useState(false);
 
-  const isSuperAdmin = !adminProfile?.department || 
-    adminProfile.department.toLowerCase() === 'administration' || 
+  const isSuperAdmin = !adminProfile?.department ||
+    adminProfile.department.toLowerCase() === 'administration' ||
     localStorage.getItem("collegeId") === 'ADMIN_001';
 
   const handleAddSection = async (e) => {
@@ -182,9 +182,9 @@ const AdminDashboard = () => {
       toast.error("Please enter a section name.");
       return;
     }
-    
+
     const yearToUse = isSuperAdmin ? parseInt(userForm.year) : (adminProfile?.yearScope || parseInt(userForm.year));
-    
+
     let batchIdToUse = null;
     if (isSuperAdmin) {
       batchIdToUse = userForm.batchId ? parseInt(userForm.batchId) : null;
@@ -211,7 +211,7 @@ const AdminDashboard = () => {
       });
       toast.success(`Successfully created section: ${newSectionName.trim()}! 🎉`);
       setNewSectionName('');
-      
+
       const newSec = res.data;
       setSections(prev => [...prev, newSec]);
       setUserForm(prev => ({ ...prev, sectionId: String(newSec.id) }));
@@ -280,13 +280,13 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (adminProfile && batches.length > 0) {
-      const isSuper = !adminProfile.department || 
-        adminProfile.department.toLowerCase() === 'administration' || 
+      const isSuper = !adminProfile.department ||
+        adminProfile.department.toLowerCase() === 'administration' ||
         localStorage.getItem("collegeId") === 'ADMIN_001';
-      
+
       if (!isSuper) {
         const matchingBatch = findBatchMatch(batches, adminProfile.department);
-        
+
         setUserForm(prev => {
           const next = { ...prev };
           if (adminProfile.yearScope) {
@@ -1248,7 +1248,7 @@ const AdminDashboard = () => {
                 const disableYearSelect = !isSuperAdmin && adminProfile?.yearScope;
                 const matchingBatch = batches.find(b => b.batchName?.toLowerCase() === adminProfile?.department?.toLowerCase());
                 const disableBatchSelect = !isSuperAdmin && adminProfile?.department && matchingBatch;
-                
+
                 const filteredSections = sections.filter(sec => {
                   if (userForm.year && sec.year !== parseInt(userForm.year)) return false;
                   if (userForm.batchId && sec.batchId !== parseInt(userForm.batchId)) return false;
@@ -1310,7 +1310,7 @@ const AdminDashboard = () => {
                             </option>
                           ))}
                         </select>
-                        
+
                         {/* Inline Section Creation */}
                         <div className="flex items-center gap-1.5 mt-2">
                           <input

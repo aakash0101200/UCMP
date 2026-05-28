@@ -28,6 +28,16 @@ export default function StudentAttendanceScanner() {
         if (!activeSession) return setMessage("No active session found for your class.");
         if (code.length !== 6) return setMessage("Please enter the 6-digit code.");
         
+        // Transport security check for geolocation access
+        const isSecure = window.location.protocol === 'https:' || 
+                         window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1';
+        if (!isSecure) {
+            setStatus('error');
+            setMessage("Security Error: Geolocation hardware APIs require a secure HTTPS connection.");
+            return;
+        }
+        
         setStatus('loading');
 
         navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -50,8 +60,24 @@ export default function StudentAttendanceScanner() {
             }
         }, (err) => {
             setStatus('error');
-            setMessage("Location access denied. Please enable GPS.");
-        }, { enableHighAccuracy: true });
+            switch (err.code) {
+                case err.PERMISSION_DENIED:
+                    setMessage("Location access denied. Please enable location permissions in your browser and system settings.");
+                    break;
+                case err.POSITION_UNAVAILABLE:
+                    setMessage("Location information is unavailable. Try using a mobile network or check your system location settings.");
+                    break;
+                case err.TIMEOUT:
+                    setMessage("Location request timed out. Please try again or check your internet/GPS connection.");
+                    break;
+                default:
+                    setMessage(err.message || "Failed to retrieve location coordinates.");
+            }
+        }, { 
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        });
     };
 
     return (
@@ -60,7 +86,17 @@ export default function StudentAttendanceScanner() {
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                 <h3 className="text-lg font-bold text-white">Live Class Verification</h3>
             </div>
-            <p className="text-sm text-gray-400 mb-6">Enter the 6-digit code shown on the projector.</p>
+            <p className="text-sm text-gray-400 mb-4">Enter the 6-digit code shown on the projector.</p>
+            
+            {/* Geolocation Privacy & Security Disclosure */}
+            <div className="mb-6 p-3.5 bg-indigo-950/20 border border-indigo-900/30 rounded-xl flex items-start gap-2.5 text-xs text-indigo-200">
+                <svg className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <p className="leading-relaxed">
+                    <strong>Privacy Disclosure:</strong> This scanner requests your device's physical GPS coordinates to verify classroom presence. Coordinates are securely encrypted, compared against the teacher's location in real-time, and are not tracked outside this action.
+                </p>
+            </div>
             
             <div className="flex flex-col items-center">
                 <input 
