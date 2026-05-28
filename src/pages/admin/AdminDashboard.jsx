@@ -104,17 +104,23 @@ const findBatchMatch = (batches, inputName) => {
   return match;
 };
 
-const findSectionMatch = (sections, inputName) => {
+const findSectionMatch = (sections, inputName, batchId = null, year = null) => {
   if (!inputName) return null;
   const cleanInput = inputName.trim().toLowerCase();
 
-  // Try exact match first
-  let match = sections.find(s => s.sectionName?.toLowerCase() === cleanInput);
+  // Filter sections by batchId and year if provided
+  const candidates = sections.filter(s => {
+    if (batchId && s.batchId !== batchId) return false;
+    if (year && s.year !== year) return false;
+    return true;
+  });
+
+  // Try exact match first among candidates
+  let match = candidates.find(s => s.sectionName?.toLowerCase() === cleanInput);
   if (match) return match;
 
-  // Try matching just the letter/ID (e.g., if input is "A" and section is "Section A")
-  // Or vice versa
-  match = sections.find(s => {
+  // Try fallback matching among candidates
+  match = candidates.find(s => {
     const cleanSec = s.sectionName?.toLowerCase() || '';
     return cleanSec === `section ${cleanInput}` ||
       cleanSec === `section-${cleanInput}` ||
@@ -122,7 +128,10 @@ const findSectionMatch = (sections, inputName) => {
       cleanInput === `section-${cleanSec}` ||
       cleanSec.replace(/[^a-z0-9]/g, '') === cleanInput.replace(/[^a-z0-9]/g, '');
   });
-  return match;
+  if (match) return match;
+
+  // If no candidate matches, fallback to search all sections
+  return sections.find(s => s.sectionName?.toLowerCase() === cleanInput);
 };
 
 const AdminDashboard = () => {
@@ -306,6 +315,40 @@ const AdminDashboard = () => {
     setUserForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const resetForm = () => {
+    const defaultForm = {
+      name: '',
+      collegeId: '',
+      email: '',
+      password: '',
+      role: 'STUDENT',
+      rollNumber: '',
+      year: '1',
+      batchId: '',
+      sectionId: '',
+      department: '',
+      designation: '',
+      sectionIds: []
+    };
+
+    if (adminProfile && batches.length > 0) {
+      const isSuper = !adminProfile.department ||
+        adminProfile.department.toLowerCase() === 'administration' ||
+        localStorage.getItem("collegeId") === 'ADMIN_001';
+
+      if (!isSuper) {
+        const matchingBatch = findBatchMatch(batches, adminProfile.department);
+        if (adminProfile.yearScope) {
+          defaultForm.year = adminProfile.yearScope.toString();
+        }
+        if (matchingBatch) {
+          defaultForm.batchId = matchingBatch.id.toString();
+        }
+      }
+    }
+    setUserForm(defaultForm);
+  };
+
   const handleUserSubmit = async (e) => {
     e.preventDefault();
     setIsSubmittingUser(true);
@@ -380,20 +423,7 @@ const AdminDashboard = () => {
       }
 
       // Reset form
-      setUserForm({
-        name: '',
-        collegeId: '',
-        email: '',
-        password: '',
-        role: 'STUDENT',
-        rollNumber: '',
-        year: '1',
-        batchId: '',
-        sectionId: '',
-        department: '',
-        designation: '',
-        sectionIds: []
-      });
+      resetForm();
       // Refresh stats
       baseAPI.get('/admin/stats').then(res => setStats(res.data)).catch(console.error);
     } catch (err) {
@@ -482,7 +512,12 @@ const AdminDashboard = () => {
           // Resolve batchName -> batchId
           const bMatch = findBatchMatch(batches, normRow.batchName);
           // Resolve sectionName -> sectionId
-          const sMatch = findSectionMatch(sections, normRow.sectionName);
+          const sMatch = findSectionMatch(
+            sections,
+            normRow.sectionName,
+            bMatch ? bMatch.id : null,
+            parseInt(normRow.year) || 1
+          );
 
           if (!bMatch && normRow.batchName) errors.push(`Batch '${normRow.batchName}' not found`);
           if (!sMatch && normRow.sectionName) errors.push(`Section '${normRow.sectionName}' not found`);

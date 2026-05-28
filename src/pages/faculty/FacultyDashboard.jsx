@@ -5,6 +5,8 @@ import { getResolvedFacultySchedule, getAcademicTerms } from "../../Services/tim
 import { getAnnouncements } from "../../Services/announcements";
 import API from "../../Services/api";
 import FacultyAttendanceSession from "../../components/Attendance/FacultyAttendanceSession";
+import QuickConnectPanel from "../../components/Announcements/QuickConnectPanel";
+import FacultyOutbox from "../../components/Announcements/FacultyOutbox";
 import {
   BookOpen,
   Calendar,
@@ -17,7 +19,8 @@ import {
   Plus,
   Loader2,
   AlertCircle,
-  X
+  X,
+  MessageSquare
 } from "lucide-react";
 
 export default function FacultyDashboard() {
@@ -31,6 +34,7 @@ export default function FacultyDashboard() {
   const [error, setError] = useState(null);
   const [dashboardTab, setDashboardTab] = useState('schedule'); // 'schedule' | 'attendance' | 'announcements'
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [messageSubTab, setMessageSubTab] = useState('compose'); // 'compose' | 'sent'
 
   useEffect(() => {
     async function loadFacultyDashboard() {
@@ -271,6 +275,16 @@ export default function FacultyDashboard() {
         >
           Announcements
         </button>
+        <button
+          onClick={() => setDashboardTab('messages')}
+          className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${dashboardTab === 'messages'
+            ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
+            : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
+            }`}
+        >
+          <MessageSquare className="w-3.5 h-3.5" />
+          Quick Message
+        </button>
       </div>
 
       {/* 4. Tab Panels */}
@@ -408,6 +422,57 @@ export default function FacultyDashboard() {
                 ))
               )}
             </div>
+          </div>
+        )}
+
+        {/* Messages Tab Content */}
+        {dashboardTab === 'messages' && (
+          <div className="space-y-4">
+            {/* Secondary Sub-tabs */}
+            <div className="flex border-b border-slate-100 dark:border-slate-800/60 pb-1.5 gap-4">
+              <button
+                onClick={() => setMessageSubTab('compose')}
+                className={`text-xs font-bold pb-2 transition-all border-b-2 relative ${
+                  messageSubTab === 'compose'
+                    ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 dark:border-emerald-400'
+                    : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                }`}
+              >
+                Compose Message
+              </button>
+              <button
+                onClick={() => setMessageSubTab('sent')}
+                className={`text-xs font-bold pb-2 transition-all border-b-2 relative flex items-center gap-1.5 ${
+                  messageSubTab === 'sent'
+                    ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 dark:border-emerald-400'
+                    : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                }`}
+              >
+                Sent & Replies
+                {announcements.filter(a => a.type === 'REPLY' && !a.isCompleted && !a.completed).length > 0 && (
+                  <span className="px-1.5 py-0.5 bg-emerald-500 text-white dark:bg-emerald-650 text-[9px] rounded-full font-bold">
+                    {announcements.filter(a => a.type === 'REPLY' && !a.isCompleted && !a.completed).length}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {messageSubTab === 'compose' ? (
+              <QuickConnectPanel sections={sections} profile={profile} />
+            ) : (
+              <FacultyOutbox 
+                sections={sections} 
+                profile={profile} 
+                onRepliesChanged={async () => {
+                  try {
+                    const annRes = await getAnnouncements();
+                    setAnnouncements(annRes.data || []);
+                  } catch (e) {
+                    console.error("Failed to reload announcements:", e);
+                  }
+                }}
+              />
+            )}
           </div>
         )}
       </div>

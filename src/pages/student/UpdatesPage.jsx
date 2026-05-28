@@ -1,16 +1,6 @@
 import React from "react";
-
-import AnnouncementTimeline from "@/components/Announcements/AnnouncementTimeline";
+import StudentInbox from "../../components/Announcements/StudentInbox";
 
 export default function UpdatesPage() {
-  return (
-    <div className="scroll-style ">
-
-      <h2 className="mb-4 text-2xl font-bold">Updates: </h2>
-      < AnnouncementTimeline />
-
-    </div>
-
-
-  );
+  return <StudentInbox />;
 }
