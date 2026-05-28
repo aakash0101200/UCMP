@@ -32,4 +32,10 @@ export const createAnnouncement = (data) => announcementsAPI.post('/add', data);
 export const deleteAnnouncement = (id) => announcementsAPI.delete(`/${id}`);
 export const updateAnnouncement = (id, data) => announcementsAPI.put(`/${id}`, data);
 
+// ─── Quick-Connect Messaging ─────────────────────────────────────────────────
+export const sendFacultyMessage = (data) => announcementsAPI.post('/message', data);
+export const acknowledgeMessage = (id) => API.patch(`/announcements/${id}/ack`);
+export const replyToMessage = (id, reply) => API.patch(`/announcements/${id}/reply`, { reply });
+export const getStudentsInSection = (sectionId) => API.get(`/sections/${sectionId}/students`);
+
 export default announcementsAPI;

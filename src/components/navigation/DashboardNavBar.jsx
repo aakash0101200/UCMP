@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
 
-import { Search, Bell, Settings, User, ChevronDown, LogOut } from 'lucide-react';
+import { Search, Bell, Settings, User, ChevronDown, LogOut, Megaphone, Calendar, AlertTriangle, MessageSquare, Info } from 'lucide-react';
 import { ModeToggle } from '../Theme/ModeToggle';
 import { SidebarTrigger } from '../../components/ui/sidebar';
 import { Button } from '../../components/ui/button';
@@ -52,10 +52,44 @@ export default function DashboardNavBar({
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileSearch, setShowMobileSearch] = useState('false');
+  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'priority' | 'messages'
 
   const allRoles = getAllRoles();
   const activeRole = getActiveRole();
   const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  const filteredNotifications = notifications.filter(n => {
+    if (activeTab === 'priority') {
+      return n.type === 'TIMETABLE' || 
+             n.type === 'SCHEDULE_OVERRIDE' || 
+             n.type === 'SCHEDULE' || 
+             (n.title && (n.title.toLowerCase().includes('urgent') || n.title.toLowerCase().includes('important')));
+    }
+    if (activeTab === 'messages') {
+      return n.type === 'ANNOUNCEMENT' || n.type === 'PERSONAL' || n.type === 'MESSAGE' || n.type === 'PRIORITY_MESSAGE' || n.type === 'REPLY' || !n.type;
+    }
+    return true; // 'all'
+  });
+
+  const getNotificationIcon = (n) => {
+    const type = n.type || '';
+    if (type === 'TIMETABLE') {
+      return <AlertTriangle className="h-4 w-4 text-rose-500 shrink-0 mt-0.5" />;
+    }
+    if (type === 'SCHEDULE_OVERRIDE' || type === 'SCHEDULE') {
+      return <Calendar className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />;
+    }
+    if (type === 'ANNOUNCEMENT') {
+      return <Megaphone className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />;
+    }
+    if (type === 'MESSAGE' || type === 'REPLY') {
+      return <MessageSquare className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" />;
+    }
+    if (type === 'PRIORITY_MESSAGE') {
+      return <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />;
+    }
+    return <Info className="h-4 w-4 text-slate-400 dark:text-slate-500 shrink-0 mt-0.5" />;
+  };
 
   const getRoleTitle = (role) => {
     const titles = {
@@ -156,13 +190,53 @@ const userName = typeof profile.name === 'string'
                     </button>
                   )}
                 </div>
+
+                {/* Tabs Selector */}
+                <div className="flex border-b border-border/40 px-2 py-1 bg-muted/20 dark:bg-zinc-950/20">
+                  {['all', 'priority', 'messages'].map((tab) => {
+                    const count = notifications.filter(n => {
+                      if (tab === 'priority') {
+                        return n.type === 'TIMETABLE' || n.type === 'SCHEDULE_OVERRIDE' || n.type === 'SCHEDULE' || (n.title && (n.title.toLowerCase().includes('urgent') || n.title.toLowerCase().includes('important')));
+                      }
+                      if (tab === 'messages') {
+                        return n.type === 'ANNOUNCEMENT' || n.type === 'PERSONAL' || n.type === 'MESSAGE' || n.type === 'PRIORITY_MESSAGE' || n.type === 'REPLY' || !n.type;
+                      }
+                      return true;
+                    }).filter(n => !n.isRead).length;
+
+                    return (
+                      <button
+                        key={tab}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveTab(tab);
+                        }}
+                        className={`flex-1 py-1.5 text-center text-xs font-bold transition-all relative border-b-2 rounded-t-lg capitalize cursor-pointer ${
+                          activeTab === tab
+                            ? 'border-indigo-600 text-indigo-600 dark:text-[#6366F1] dark:border-[#6366F1] bg-indigo-50/50 dark:bg-indigo-500/5'
+                            : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-accent/40'
+                        }`}
+                      >
+                        {tab}
+                        {count > 0 && (
+                          <span className="ml-1 px-1.5 py-0.2 bg-indigo-500 text-white text-[9px] rounded-full font-bold">
+                            {count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
                 <div className="max-h-[300px] overflow-y-auto mt-1 space-y-1">
-                  {notifications.length === 0 ? (
-                    <div className="py-6 text-center text-xs text-muted-foreground">
-                      No notifications yet
+                  {filteredNotifications.length === 0 ? (
+                    <div className="py-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+                      <Info className="h-6 w-6 text-muted-foreground/45" />
+                      <span>No {activeTab !== 'all' ? activeTab : ''} notifications found</span>
                     </div>
                   ) : (
-                    notifications.map((n) => {
+                    filteredNotifications.map((n) => {
                       const id = n.id || n.announcementId;
                       return (
                         <div
@@ -178,6 +252,7 @@ const userName = typeof profile.name === 'string'
                               : 'hover:bg-accent/60 border-l-2 border-transparent'
                           }`}
                         >
+                          {getNotificationIcon(n)}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">
                               <span className={`text-xs font-semibold truncate ${!n.isRead ? 'text-foreground' : 'text-muted-foreground'}`}>
