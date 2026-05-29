@@ -12,6 +12,7 @@ import {
   getActiveSession, markAttendance
 } from '../../Services/attendance';
 import { useWebSocket } from '../../hooks/useWebSocket';
+import LocationAccessGuard from '../../components/Attendance/LocationAccessGuard';
 
 // ── Colour helpers ─────────────────────────────────────────────────────────
 function getStatusColor(pct) {
@@ -67,6 +68,7 @@ function ScannerPanel({ onSuccess }) {
   const [message, setMessage] = useState('');
   const [activeSession, setActiveSession] = useState(null);
   const [loadingSession, setLoadingSession] = useState(true);
+  const [showLocationGuard, setShowLocationGuard] = useState(false);
 
   const sectionId = localStorage.getItem('sectionId');
   const wsTopic = sectionId ? `/topic/session/${sectionId}` : null;
@@ -107,23 +109,39 @@ function ScannerPanel({ onSuccess }) {
   const handleMark = () => {
     if (!activeSession) return setMessage('No active class session found.');
     if (code.length !== 6) return setMessage('Enter the 6-digit code.');
+    
+    // Check HTTPS or local
+    const isSecure = window.location.protocol === 'https:' || 
+                     window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1';
+    if (!isSecure) {
+      setStatus('error');
+      setMessage("Security Error: Geolocation hardware APIs require a secure HTTPS connection.");
+      return;
+    }
+
+    // Open Location Access Guard modal
+    setShowLocationGuard(true);
+  };
+
+  const handleLocationGranted = async (coords) => {
     setStatus('loading');
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords: { latitude: lat, longitude: lon } }) => {
-        try {
-          await markAttendance({ sessionId: activeSession.id, code, latitude: lat, longitude: lon });
-          setStatus('success');
-          setMessage('Attendance marked successfully!');
-          toast.success('Attendance recorded ✓');
-          onSuccess?.();
-        } catch (err) {
-          setStatus('error');
-          setMessage(err.response?.data?.message || 'Failed to mark attendance.');
-        }
-      },
-      () => { setStatus('error'); setMessage('Location access denied — please enable GPS.'); },
-      { enableHighAccuracy: true }
-    );
+    setMessage('');
+    try {
+      await markAttendance({ 
+        sessionId: activeSession.id, 
+        code, 
+        latitude: coords.latitude, 
+        longitude: coords.longitude 
+      });
+      setStatus('success');
+      setMessage('Attendance marked successfully!');
+      toast.success('Attendance recorded ✓');
+      onSuccess?.();
+    } catch (err) {
+      setStatus('error');
+      setMessage(err.response?.data?.message || 'Failed to mark attendance.');
+    }
   };
 
   return (
@@ -174,6 +192,13 @@ function ScannerPanel({ onSuccess }) {
           </div>
         )}
       </div>
+
+      {/* Location Access Pre-Prompt and Troubleshooting Guard Modal */}
+      <LocationAccessGuard
+        isOpen={showLocationGuard}
+        onClose={() => setShowLocationGuard(false)}
+        onSuccess={handleLocationGranted}
+      />
     </div>
   );
 }
