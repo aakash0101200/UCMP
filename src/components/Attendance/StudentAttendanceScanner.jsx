@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import API from '../../Services/api';
+import LocationAccessGuard from './LocationAccessGuard';
 
 export default function StudentAttendanceScanner() {
     const [code, setCode] = useState('');
     const [status, setStatus] = useState('idle'); // idle, loading, success, error
     const [message, setMessage] = useState('');
     const [activeSession, setActiveSession] = useState(null);
+    const [showLocationGuard, setShowLocationGuard] = useState(false);
     
     useEffect(() => {
         const fetchActiveSession = async () => {
@@ -38,46 +40,28 @@ export default function StudentAttendanceScanner() {
             return;
         }
         
+        // Open Location Access Guard modal
+        setShowLocationGuard(true);
+    };
+
+    const handleLocationGranted = async (coords) => {
         setStatus('loading');
+        setMessage('');
+        try {
+            await API.post(`/attendance/mark`, { 
+                sessionId: activeSession.id, 
+                code: code, 
+                latitude: coords.latitude, 
+                longitude: coords.longitude 
+            });
 
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            try {
-                const { latitude: lat, longitude: lon } = pos.coords;
-                
-                await API.post(`/attendance/mark`, { 
-                    sessionId: activeSession.id, 
-                    code: code, 
-                    latitude: lat, 
-                    longitude: lon 
-                });
-
-                setStatus('success');
-                setMessage("Attendance marked successfully!");
-            } catch (error) {
-                setStatus('error');
-                // Backend might return "Invalid Code", "Too far away", or "Session Expired"
-                setMessage(error.response?.data?.message || "Failed to mark attendance.");
-            }
-        }, (err) => {
+            setStatus('success');
+            setMessage("Attendance marked successfully!");
+        } catch (error) {
             setStatus('error');
-            switch (err.code) {
-                case err.PERMISSION_DENIED:
-                    setMessage("Location access denied. Please enable location permissions in your browser and system settings.");
-                    break;
-                case err.POSITION_UNAVAILABLE:
-                    setMessage("Location information is unavailable. Try using a mobile network or check your system location settings.");
-                    break;
-                case err.TIMEOUT:
-                    setMessage("Location request timed out. Please try again or check your internet/GPS connection.");
-                    break;
-                default:
-                    setMessage(err.message || "Failed to retrieve location coordinates.");
-            }
-        }, { 
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-        });
+            // Backend might return "Invalid Code", "Too far away", or "Session Expired"
+            setMessage(error.response?.data?.message || "Failed to mark attendance.");
+        }
     };
 
     return (
@@ -126,6 +110,13 @@ export default function StudentAttendanceScanner() {
                     </div>
                 )}
             </div>
+
+            {/* Location Access Pre-Prompt and Troubleshooting Guard Modal */}
+            <LocationAccessGuard
+                isOpen={showLocationGuard}
+                onClose={() => setShowLocationGuard(false)}
+                onSuccess={handleLocationGranted}
+            />
         </div>
     );
 }
