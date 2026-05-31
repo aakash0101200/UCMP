@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { login } from "../../Services/auth";
 import { toast } from "react-toastify";
 import i1 from "../../assets/Scroll/i1.webp";
 import { motion, AnimatePresence } from "framer-motion";
-
-const MotionLink = motion(Link);
 
 const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -398,41 +396,14 @@ const LoginPage = ({ onLogin }) => {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border/50"></div>
             </div>
-
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-card px-3 text-muted-foreground">
-                New to UCMP?
-              </span>
-            </div>
           </div>
 
-          <MotionLink
-            to="/register"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="
-            w-full h-11
-            rounded-xl
-            border border-border/60
-            hover:bg-muted
-            flex items-center justify-center
-            text-sm font-medium
-            transition-colors
-          "
-          >
-            Create an account
-          </MotionLink>
-
           <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
-            By continuing, you agree to our{" "}
-            <span className="text-indigo-500 hover:underline cursor-pointer">
-              Terms
+            Don't have an account?{" "}
+            <span className="text-foreground font-medium">
+              Contact your college administration
             </span>{" "}
-            and{" "}
-            <span className="text-indigo-500 hover:underline cursor-pointer">
-              Privacy Policy
-            </span>
-            .
+            to get your credentials.
           </p>
 
         </div>

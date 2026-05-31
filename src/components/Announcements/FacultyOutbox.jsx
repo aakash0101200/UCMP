@@ -49,12 +49,12 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
     try {
       const res = await getAnnouncements();
       const allAnn = res.data || [];
-      
+
       // Filter for sent messages by faculty
       const sent = allAnn.filter(
         (a) => a.type === "MESSAGE" || a.type === "PRIORITY_MESSAGE"
       );
-      
+
       // Filter for replies
       const replies = allAnn.filter((a) => a.type === "REPLY");
 
@@ -83,7 +83,7 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
     setAckingId(replyId);
     try {
       await acknowledgeMessage(replyId);
-      
+
       // Update state locally
       setMessages((prev) =>
         prev.map((msg) => ({
@@ -238,11 +238,10 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
                         return (
                           <div
                             key={replyId}
-                            className={`p-3 rounded-2xl border text-left flex items-start gap-3 transition-all duration-300 ${
-                              !isReplyAcked
-                                ? "bg-emerald-500/5 dark:bg-emerald-500/10 border-emerald-500/20"
-                                : "bg-slate-50/50 dark:bg-slate-800/20 border-slate-205/40 dark:border-slate-800/40"
-                            }`}
+                            className={`p-3 rounded-2xl border text-left flex items-start gap-3 transition-all duration-300 ${!isReplyAcked
+                              ? "bg-emerald-500/5 dark:bg-emerald-500/10 border-emerald-500/20"
+                              : "bg-slate-50/50 dark:bg-slate-800/20 border-slate-205/40 dark:border-slate-800/40"
+                              }`}
                           >
                             {/* Student Avatar */}
                             <div className="w-7 h-7 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">

@@ -109,11 +109,11 @@ function ScannerPanel({ onSuccess }) {
   const handleMark = () => {
     if (!activeSession) return setMessage('No active class session found.');
     if (code.length !== 6) return setMessage('Enter the 6-digit code.');
-    
+
     // Check HTTPS or local
-    const isSecure = window.location.protocol === 'https:' || 
-                     window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1';
+    const isSecure = window.location.protocol === 'https:' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
     if (!isSecure) {
       setStatus('error');
       setMessage("Security Error: Geolocation hardware APIs require a secure HTTPS connection.");
@@ -128,11 +128,11 @@ function ScannerPanel({ onSuccess }) {
     setStatus('loading');
     setMessage('');
     try {
-      await markAttendance({ 
-        sessionId: activeSession.id, 
-        code, 
-        latitude: coords.latitude, 
-        longitude: coords.longitude 
+      await markAttendance({
+        sessionId: activeSession.id,
+        code,
+        latitude: coords.latitude,
+        longitude: coords.longitude
       });
       setStatus('success');
       setMessage('Attendance marked successfully!');
@@ -177,7 +177,7 @@ function ScannerPanel({ onSuccess }) {
           className={`w-full max-w-[220px] py-3 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2
             ${status === 'loading' ? 'bg-indigo-400 cursor-not-allowed'
               : status === 'success' ? 'bg-emerald-600'
-              : 'bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20'}`}
+                : 'bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20'}`}
         >
           {status === 'loading' && <Loader2 className="w-4 h-4 animate-spin" />}
           {status === 'success' && <CheckCircle2 className="w-4 h-4" />}
@@ -224,11 +224,10 @@ function HistoryItem({ record, index }) {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${
-          isManual 
-            ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border-indigo-500/20' 
+        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${isManual
+            ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border-indigo-500/20'
             : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-        }`}>
+          }`}>
           {isManual ? 'Faculty Manual' : 'TOTP Verified'}
         </span>
         <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Present</span>
@@ -268,9 +267,9 @@ export default function AttendancePage() {
     : 0;
   const avgColor = getStatusColor(avg);
 
-  const safeCount    = summary.filter(s => s.percentage >= 75).length;
-  const warnCount    = summary.filter(s => s.percentage >= 60 && s.percentage < 75).length;
-  const dangerCount  = summary.filter(s => s.percentage < 60).length;
+  const safeCount = summary.filter(s => s.percentage >= 75).length;
+  const warnCount = summary.filter(s => s.percentage >= 60 && s.percentage < 75).length;
+  const dangerCount = summary.filter(s => s.percentage < 60).length;
 
   return (
     <div className="space-y-5">
@@ -338,8 +337,8 @@ export default function AttendancePage() {
                   {avg >= 75
                     ? '✓ You meet the 75% requirement'
                     : avg >= 60
-                    ? `⚠ ${(75 - avg).toFixed(1)}% below the requirement`
-                    : '✗ Critical — contact your coordinator'}
+                      ? `⚠ ${(75 - avg).toFixed(1)}% below the requirement`
+                      : '✗ Critical — contact your coordinator'}
                 </p>
               </div>
             )}
@@ -360,11 +359,10 @@ export default function AttendancePage() {
               <button
                 key={key}
                 onClick={() => setTab(key)}
-                className={`px-4 py-2 text-sm font-medium rounded-lg flex items-center gap-1.5 transition-all ${
-                  tab === key
+                className={`px-4 py-2 text-sm font-medium rounded-lg flex items-center gap-1.5 transition-all ${tab === key
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
-                }`}
+                  }`}
               >
                 <Icon className="w-4 h-4" /> {label}
               </button>
@@ -388,7 +386,7 @@ export default function AttendancePage() {
 
                 {loading ? (
                   <div className="space-y-3">
-                    {[1,2,3,4].map(i => (
+                    {[1, 2, 3, 4].map(i => (
                       <div key={i} className="h-14 bg-muted/30 rounded-xl animate-pulse" />
                     ))}
                   </div>
@@ -422,7 +420,7 @@ export default function AttendancePage() {
 
                 {loading ? (
                   <div className="space-y-2">
-                    {[1,2,3].map(i => <div key={i} className="h-10 bg-muted/30 rounded-lg animate-pulse" />)}
+                    {[1, 2, 3].map(i => <div key={i} className="h-10 bg-muted/30 rounded-lg animate-pulse" />)}
                   </div>
                 ) : history.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 text-center">

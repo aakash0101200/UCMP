@@ -12,7 +12,6 @@ import Home from './pages/home/Home';
 import About from './pages/home/about';
 import ContactPage from './pages/home/ContactPage';
 import LoginPage from './pages/home/LoginPage';
-import RegisterPage from './pages/home/RegisterPage';
 import NotFoundPage from './pages/home/NotFoundPage';
 
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -146,14 +145,6 @@ export default function App() {
             isAuthenticated
               ? <Navigate to={`/${(localStorage.getItem("activeRole") || "student").toLowerCase()}`} replace />
               : <AppShell><LoginPage onLogin={handleLogin} /></AppShell>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <AppShell>
-              <RegisterPage />
-            </AppShell>
           }
         />
         <Route
