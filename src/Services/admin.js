@@ -38,3 +38,11 @@ export const getDepartments = () => API.get('/admin/users/departments');
 export const getDepartmentSections = (deptName) => API.get(`/admin/users/departments/${encodeURIComponent(deptName)}/sections`);
 export const getDepartmentFaculty = (deptName, page = 0, size = 30) => API.get(`/admin/users/departments/${encodeURIComponent(deptName)}/faculty?page=${page}&size=${size}`);
 export const getSectionStudents = (sectionId, page = 0, size = 30) => API.get(`/admin/users/sections/${sectionId}/students?page=${page}&size=${size}`);
+
+/**
+ * System developer wipe operations
+ */
+export const wipeTimetable = () => API.post('/admin/system/wipe-timetable');
+export const wipeAttendance = () => API.post('/admin/system/wipe-attendance');
+export const wipeAlerts = () => API.post('/admin/system/wipe-alerts');
+export const wipeDirectory = () => API.post('/admin/system/wipe-directory');

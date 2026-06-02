@@ -33,6 +33,15 @@ export const getAssignments = (term) =>
 export const deleteAssignment = (id) =>
   API.delete(`/timetable/assignment/${id}`);
 
+export const setClassroomLink = (assignmentId, link) =>
+  API.patch(`/timetable/assignment/${assignmentId}/classroom-link`, { link });
+
+export const getMyFacultyAssignments = (term) =>
+  API.get('/timetable/assignment/my', { params: { term } });
+
+export const getAssignmentsForSection = (sectionId, term) =>
+  API.get(`/timetable/assignment/section/${sectionId}`, { params: { term } });
+
 // ─── Rooms ──────────────────────────────────────────────
 export const getAllRooms = () => API.get('/rooms');
 export const getAvailableRooms = () => API.get('/rooms/available');

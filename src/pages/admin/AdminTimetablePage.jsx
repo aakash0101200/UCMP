@@ -831,8 +831,11 @@ export default function AdminTimetablePage() {
                   >
                     <option value="">Select Section...</option>
                     {visibleSections.map(sec => (
-                      <option key={sec.id} value={sec.id}>{sec.sectionName}</option>
+                      <option key={sec.id} value={sec.id}>
+                        {sec.sectionName} ({sec.batchName || sec.batch?.batchName || 'N/A'} - Yr {sec.year})
+                      </option>
                     ))}
+
                   </select>
                 </div>
               </div>
@@ -1584,7 +1587,12 @@ export default function AdminTimetablePage() {
                         className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                       >
                         <option value="" className="bg-white dark:bg-[#161B26]">Select Section...</option>
-                        {sections.map(s => <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">{s.sectionName}</option>)}
+                        {sections.map(s => (
+                          <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">
+                            {s.sectionName} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
+                          </option>
+                        ))}
+
                       </select>
                     </div>
                   )}
@@ -1690,7 +1698,12 @@ export default function AdminTimetablePage() {
                       className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 cursor-pointer"
                     >
                       <option value="" className="bg-white dark:bg-[#161B26]">Select Section...</option>
-                      {sections.map(s => <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">{s.sectionName}</option>)}
+                      {sections.map(s => (
+                        <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">
+                          {s.sectionName} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
+                        </option>
+                      ))}
+
                     </select>
                   </div>
                 </div>
@@ -1755,7 +1768,12 @@ export default function AdminTimetablePage() {
                     }}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800/60 rounded-xl focus:outline-none focus:border-indigo-500 h-20 text-slate-800 dark:text-slate-100 cursor-pointer"
                   >
-                    {sections.map(s => <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">{s.sectionName}</option>)}
+                    {sections.map(s => (
+                      <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">
+                        {s.sectionName} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
+                      </option>
+                    ))}
+
                   </select>
                 </div>
               )}
@@ -2048,7 +2066,12 @@ export default function AdminTimetablePage() {
                       required
                     >
                       <option value="">Select Section...</option>
-                      {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
+                      {sections.map(s => (
+                        <option key={s.id} value={s.id}>
+                          {s.sectionName} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
+                        </option>
+                      ))}
+
                     </select>
                   </div>
 
