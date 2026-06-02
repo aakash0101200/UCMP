@@ -764,9 +764,10 @@ export default function AdminUsersPage() {
                     <option value="" className="bg-white dark:bg-[#161B26]">-- Choose New Section --</option>
                     {sections.map(sec => (
                       <option key={sec.id} value={sec.id} className="bg-white dark:bg-[#161B26]">
-                        {sec.sectionName} (Batch: {sec.batch?.batchName || 'N/A'})
+                        {sec.sectionName} ({sec.batchName || 'N/A'} - Yr {sec.year || ''})
                       </option>
                     ))}
+
                   </select>
                   <p className="text-[11px] text-slate-400">
                     Changing the student's section automatically synchronizes their batch/branch mappings.
@@ -797,7 +798,9 @@ export default function AdminUsersPage() {
                               }`}>
                               {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                             </div>
-                            <span className="truncate text-xs font-normal">{sec.sectionName}</span>
+                            <span className="truncate text-xs font-normal" title={`${sec.sectionName} (${sec.batchName || 'N/A'} - Yr ${sec.year || ''})`}>
+                              {sec.sectionName} ({sec.batchName || 'N/A'} - Yr {sec.year || ''})
+                            </span>
                           </div>
                         );
                       })

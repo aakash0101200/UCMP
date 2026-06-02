@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import {
   User, KeyRound, Save, RefreshCw, Eye, EyeOff, Check, X,
-  MapPin, Phone, Mail, ShieldAlert, BadgeInfo, FileCheck, Info
+  MapPin, Phone, Mail, ShieldAlert, BadgeInfo, FileCheck, Info,
+  AlertTriangle, Trash2, Database
 } from 'lucide-react';
 import { getProfile, updateProfile, changePassword } from '../../Services/profile';
+import { wipeTimetable, wipeAttendance, wipeAlerts, wipeDirectory } from '../../Services/admin';
 
 const themeConfigs = {
   student: {
@@ -66,6 +68,59 @@ export default function SettingsPage({ userRole = 'student' }) {
   const [showOldPass, setShowOldPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
+
+  // Maintenance wipe states
+  const [confirmInputs, setConfirmInputs] = useState({
+    timetable: '',
+    attendance: '',
+    alerts: '',
+    directory: ''
+  });
+  const [wipingState, setWipingState] = useState({
+    timetable: false,
+    attendance: false,
+    alerts: false,
+    directory: false
+  });
+  const [showConfirmField, setShowConfirmField] = useState({
+    timetable: false,
+    attendance: false,
+    alerts: false,
+    directory: false
+  });
+
+  const isSuperAdmin = role === 'admin' || 
+    profile?.roles?.includes('ADMIN') || 
+    profile?.roles?.includes('admin');
+
+  console.log("SettingsPage Render Details:", {
+    role,
+    userRole,
+    profileDepartment: profile?.department,
+    profileCollegeId: profile?.collegeId,
+    isSuperAdmin,
+    activeTab
+  });
+
+  const handleWipeAction = async (actionType, apiCall, label) => {
+    if (confirmInputs[actionType] !== 'WIPE') {
+      toast.error(`Please type "WIPE" to confirm deleting ${label}.`);
+      return;
+    }
+
+    setWipingState(prev => ({ ...prev, [actionType]: true }));
+    try {
+      const res = await apiCall();
+      toast.success(res?.data || `${label} wiped successfully.`);
+      setConfirmInputs(prev => ({ ...prev, [actionType]: '' }));
+      setShowConfirmField(prev => ({ ...prev, [actionType]: false }));
+    } catch (err) {
+      console.error(`Failed to wipe ${actionType}:`, err);
+      toast.error(err.response?.data?.message || err.message || `Failed to wipe ${label}.`);
+    } finally {
+      setWipingState(prev => ({ ...prev, [actionType]: false }));
+    }
+  };
 
   // Load user profile
   useEffect(() => {
@@ -258,6 +313,18 @@ export default function SettingsPage({ userRole = 'student' }) {
               <KeyRound className="w-4 h-4" />
               <span>Change Password</span>
             </button>
+            {isSuperAdmin && (
+              <button
+                onClick={() => setActiveTab('maintenance')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${activeTab === 'maintenance'
+                  ? theme.accentBg + ' shadow-sm'
+                  : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
+                  }`}
+              >
+                <ShieldAlert className="w-4 h-4 text-rose-500" />
+                <span>System Maintenance</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -630,6 +697,244 @@ export default function SettingsPage({ userRole = 'student' }) {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {/* TAB 3: System Maintenance */}
+          {activeTab === 'maintenance' && isSuperAdmin && (
+            <div className={`border ${theme.border} rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm ${theme.card}`}>
+              <div>
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="w-6 h-6 text-rose-500" />
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                    System Developer Maintenance
+                  </h2>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Perform high-impact administrative cleanups and reset options. These operations execute direct database mutations and are strictly meant for testing environments.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {/* 1. Wipe Timetable */}
+                <div className="border border-red-200/40 dark:border-red-950/40 rounded-2xl p-5 space-y-4 bg-red-50/5 dark:bg-red-950/5 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-rose-500">
+                      <Database className="w-4 h-4" />
+                      <span className="font-bold text-xs uppercase tracking-wider">Wipe Timetable Data</span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Deletes all scheduled timetable entries, extra class overrides, cancellations, and class subject assignments.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {showConfirmField.timetable ? (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">
+                          Type "WIPE" to confirm:
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Type WIPE"
+                            value={confirmInputs.timetable}
+                            onChange={(e) => setConfirmInputs(prev => ({ ...prev, timetable: e.target.value }))}
+                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
+                          />
+                          <button
+                            onClick={() => handleWipeAction('timetable', wipeTimetable, 'Timetable data')}
+                            disabled={confirmInputs.timetable !== 'WIPE' || wipingState.timetable}
+                            className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
+                          >
+                            {wipingState.timetable ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                            Wipe
+                          </button>
+                          <button
+                            onClick={() => setShowConfirmField(prev => ({ ...prev, timetable: false }))}
+                            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowConfirmField(prev => ({ ...prev, timetable: true }))}
+                        className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Wipe Timetable Data</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. Wipe Attendance */}
+                <div className="border border-red-200/40 dark:border-red-950/40 rounded-2xl p-5 space-y-4 bg-red-50/5 dark:bg-red-950/5 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-rose-500">
+                      <Database className="w-4 h-4" />
+                      <span className="font-bold text-xs uppercase tracking-wider">Wipe Attendance Data</span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Deletes all student attendance record history, session logs, and class segment records.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {showConfirmField.attendance ? (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">
+                          Type "WIPE" to confirm:
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Type WIPE"
+                            value={confirmInputs.attendance}
+                            onChange={(e) => setConfirmInputs(prev => ({ ...prev, attendance: e.target.value }))}
+                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
+                          />
+                          <button
+                            onClick={() => handleWipeAction('attendance', wipeAttendance, 'Attendance data')}
+                            disabled={confirmInputs.attendance !== 'WIPE' || wipingState.attendance}
+                            className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
+                          >
+                            {wipingState.attendance ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                            Wipe
+                          </button>
+                          <button
+                            onClick={() => setShowConfirmField(prev => ({ ...prev, attendance: false }))}
+                            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowConfirmField(prev => ({ ...prev, attendance: true }))}
+                        className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Wipe Attendance Data</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. Wipe Alerts */}
+                <div className="border border-red-200/40 dark:border-red-950/40 rounded-2xl p-5 space-y-4 bg-red-50/5 dark:bg-red-950/5 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-rose-500">
+                      <Database className="w-4 h-4" />
+                      <span className="font-bold text-xs uppercase tracking-wider">Wipe Communications & Alerts</span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Deletes all global, batch, and section-specific announcements, updates, and notice board logs.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {showConfirmField.alerts ? (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">
+                          Type "WIPE" to confirm:
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Type WIPE"
+                            value={confirmInputs.alerts}
+                            onChange={(e) => setConfirmInputs(prev => ({ ...prev, alerts: e.target.value }))}
+                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-55 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
+                          />
+                          <button
+                            onClick={() => handleWipeAction('alerts', wipeAlerts, 'Announcements and alerts')}
+                            disabled={confirmInputs.alerts !== 'WIPE' || wipingState.alerts}
+                            className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
+                          >
+                            {wipingState.alerts ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                            Wipe
+                          </button>
+                          <button
+                            onClick={() => setShowConfirmField(prev => ({ ...prev, alerts: false }))}
+                            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowConfirmField(prev => ({ ...prev, alerts: true }))}
+                        className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Wipe Alerts & Notices</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* 4. Reset User Directory */}
+                <div className="border border-red-200 dark:border-red-900/60 rounded-2xl p-5 space-y-4 bg-red-50/10 dark:bg-red-950/10 flex flex-col justify-between md:col-span-2">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-rose-600 dark:text-rose-500">
+                      <AlertTriangle className="w-4 h-4 text-red-600" />
+                      <span className="font-bold text-xs uppercase tracking-wider">Reset User Directory (Nuclear Option)</span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Deletes all student registry files, faculty assignments, personal profiles, and login user credentials from the database. 
+                      <strong className="text-red-600 dark:text-red-400 ml-1">Warning:</strong> To protect admin access, this deletes all user classes EXCEPT accounts assigned with the ADMIN role.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {showConfirmField.directory ? (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-red-600 uppercase tracking-wider block">
+                          Type "WIPE" to confirm this full system reset:
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Type WIPE"
+                            value={confirmInputs.directory}
+                            onChange={(e) => setConfirmInputs(prev => ({ ...prev, directory: e.target.value }))}
+                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-300 dark:border-red-900 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600`}
+                          />
+                          <button
+                            onClick={() => handleWipeAction('directory', wipeDirectory, 'User Directory')}
+                            disabled={confirmInputs.directory !== 'WIPE' || wipingState.directory}
+                            className="px-5 py-1.5 bg-rose-700 hover:bg-rose-800 disabled:opacity-40 disabled:hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
+                          >
+                            {wipingState.directory ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                            Full Wipe
+                          </button>
+                          <button
+                            onClick={() => setShowConfirmField(prev => ({ ...prev, directory: false }))}
+                            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowConfirmField(prev => ({ ...prev, directory: true }))}
+                        className="w-full py-2.5 bg-red-600/10 hover:bg-red-600/20 text-red-700 dark:text-red-400 border border-red-600/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <AlertTriangle className="w-4 h-4" />
+                        <span>Reset User Directory (Wipe Students, Faculty & Logins)</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+              </div>
             </div>
           )}
 
