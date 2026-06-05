@@ -71,8 +71,8 @@ export default function FacultyGradebookPage() {
     <div className="-mt-6 -mx-6 min-h-[calc(100vh-64px)] bg-[#F9FBFC] dark:bg-[#0D1512] transition-colors duration-300 text-slate-800 dark:text-slate-100 overflow-y-auto w-[calc(100%+3rem)] p-6 space-y-6 pb-24 text-left">
 
       {/* Page Header */}
-      <div className="bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 p-6 rounded-3xl shadow-sm">
-        <span className="text-xs font-semibold text-emerald-650 dark:text-emerald-400 tracking-wider uppercase">
+      <div className="bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 p-6 rounded-3xl shadow-sm">
+        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">
           Communications & Grading
         </span>
         <h1 className="text-3xl font-light text-slate-900 dark:text-white tracking-tight mt-1">
@@ -84,14 +84,14 @@ export default function FacultyGradebookPage() {
       </div>
 
       {/* Google Classroom Workspace Connector */}
-      <div className="bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 p-6 rounded-3xl shadow-sm space-y-4">
+      <div className="bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 p-6 rounded-3xl shadow-sm space-y-4">
         <div className="flex items-center space-x-2 border-b border-slate-100 dark:border-emerald-950/40 pb-3">
           <Link2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
           <div>
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">
               Connect Google Classroom Workspaces
             </h3>
-            <p className="text-[11px] text-slate-450 dark:text-slate-400 mt-0.5">
+            <p className="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">
               Add links to your section classrooms. Connected links will appear instantly on your students' smart academic launchers.
             </p>
           </div>
@@ -99,11 +99,11 @@ export default function FacultyGradebookPage() {
 
         {loading ? (
           <div className="py-6 flex items-center justify-center space-x-2">
-            <Loader2 className="w-5 h-5 animate-spin text-emerald-600 dark:text-emerald-450" />
-            <span className="text-xs text-slate-450 dark:text-slate-400">Loading assignments...</span>
+            <Loader2 className="w-5 h-5 animate-spin text-emerald-600 dark:text-emerald-400" />
+            <span className="text-xs text-slate-400 dark:text-slate-400">Loading assignments...</span>
           </div>
         ) : assignments.length === 0 ? (
-          <p className="text-xs text-slate-450 dark:text-slate-500 py-2">
+          <p className="text-xs text-slate-400 dark:text-slate-500 py-2">
             You do not have any teaching assignments registered for this semester.
           </p>
         ) : (
@@ -115,7 +115,7 @@ export default function FacultyGradebookPage() {
               return (
                 <div
                   key={a.id}
-                  className="p-4 rounded-2xl border border-slate-150 dark:border-emerald-950/40 bg-slate-50/50 dark:bg-[#0D1512]/30 flex flex-col justify-between hover:border-emerald-250 dark:hover:border-emerald-900/60 transition-all duration-200"
+                  className="p-4 rounded-2xl border border-slate-200 dark:border-emerald-950/40 bg-slate-50/50 dark:bg-[#0D1512]/30 flex flex-col justify-between hover:border-emerald-200 dark:hover:border-emerald-900/60 transition-all duration-200"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -123,7 +123,7 @@ export default function FacultyGradebookPage() {
                         {a.subjectCode}
                       </span>
                       {hasLink && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-450 flex items-center gap-1">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                           <CheckCircle className="w-3 h-3" /> Connected
                         </span>
                       )}
@@ -133,8 +133,8 @@ export default function FacultyGradebookPage() {
                       <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1">
                         {a.subjectName}
                       </h4>
-                      <p className="text-[11px] text-slate-450 dark:text-slate-400 mt-0.5">
-                        Section: <span className="font-semibold text-emerald-650 dark:text-emerald-400">{a.sectionName}</span>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">
+                        Section: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{a.sectionName}</span>
                       </p>
                     </div>
                   </div>
@@ -146,9 +146,9 @@ export default function FacultyGradebookPage() {
                         placeholder="https://classroom.google.com/c/..."
                         value={links[a.id] || ''}
                         onChange={(e) => handleLinkChange(a.id, e.target.value)}
-                        className="bg-white dark:bg-[#0D1512]/50 border border-slate-200 dark:border-emerald-950/60 rounded-xl py-2 px-3 text-xs w-full text-slate-900 dark:text-slate-100 placeholder:text-slate-450 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all pr-8"
+                        className="bg-white dark:bg-[#0D1512]/50 border border-slate-200 dark:border-emerald-950/60 rounded-xl py-2 px-3 text-xs w-full text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all pr-8"
                       />
-                      <Link2 className="w-3.5 h-3.5 text-slate-350 dark:text-slate-550 absolute right-2.5 top-1/2 -translate-y-1/2" />
+                      <Link2 className="w-3.5 h-3.5 text-slate-300 dark:text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2" />
                     </div>
 
                     <button

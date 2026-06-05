@@ -103,20 +103,20 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
   const role = getActiveRole();
   const isFaculty = role === 'FACULTY';
   const theme = {
-    primaryBg: isFaculty ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-indigo-650 dark:bg-indigo-500',
-    primaryText: isFaculty ? 'text-emerald-650 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400',
+    primaryBg: isFaculty ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-indigo-600 dark:bg-indigo-500',
+    primaryText: isFaculty ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400',
     focusRing: isFaculty ? 'focus:ring-emerald-500 focus:border-emerald-500' : 'focus:ring-indigo-500 focus:border-indigo-500',
-    activeDayBg: isFaculty ? 'bg-emerald-500/10 text-emerald-650 dark:text-emerald-450' : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+    activeDayBg: isFaculty ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
     activeDayBtn: isFaculty ? 'bg-emerald-600 text-white font-medium shadow-sm' : 'bg-indigo-500 text-white font-medium shadow-sm',
     activeTabBtn: isFaculty ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold' : 'bg-background shadow-sm font-medium',
-    activeTabWrap: isFaculty ? 'bg-slate-150/50 dark:bg-[#0D1512]/60 p-1 rounded-2xl border border-slate-200 dark:border-emerald-950/60' : 'bg-muted rounded-lg p-1',
-    inactiveTabBtn: isFaculty ? 'text-slate-500 dark:text-slate-400 hover:text-slate-805 dark:hover:text-slate-200' : 'text-muted-foreground hover:text-foreground',
+    activeTabWrap: isFaculty ? 'bg-slate-200/50 dark:bg-[#0D1512]/60 p-1 rounded-2xl border border-slate-200 dark:border-emerald-950/60' : 'bg-muted rounded-lg p-1',
+    inactiveTabBtn: isFaculty ? 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200' : 'text-muted-foreground hover:text-foreground',
     todayColHeader: isFaculty ? 'bg-emerald-500/10 text-emerald-655 dark:text-emerald-400 font-bold' : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold',
     currentSlotRing: isFaculty ? 'ring-2 ring-emerald-500 ring-offset-1 ring-offset-background' : 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-background',
     currentSlotDot: isFaculty ? 'bg-emerald-500' : 'bg-indigo-500',
-    cancellationModal: isFaculty ? 'bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 text-slate-900 dark:text-white shadow-2xl' : 'bg-neutral-900 border border-neutral-800 text-white shadow-2xl',
+    cancellationModal: isFaculty ? 'bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 text-slate-900 dark:text-white shadow-2xl' : 'bg-neutral-900 border border-neutral-800 text-white shadow-2xl',
     modalInput: isFaculty ? 'bg-slate-50 dark:bg-[#0D1512]/40 border border-slate-200 dark:border-emerald-950/60 text-slate-900 dark:text-slate-100 focus:border-emerald-500' : 'bg-neutral-950 border border-neutral-800 text-white focus:border-red-500',
-    cancelKeepBtn: isFaculty ? 'bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-650 dark:bg-[#0D1512]/40 dark:border-emerald-950/60 dark:text-slate-400 dark:hover:text-slate-200' : 'bg-neutral-950 border border-neutral-850 hover:bg-neutral-900 text-neutral-400 hover:text-white',
+    cancelKeepBtn: isFaculty ? 'bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 dark:bg-[#0D1512]/40 dark:border-emerald-950/60 dark:text-slate-400 dark:hover:text-slate-200' : 'bg-neutral-950 border border-neutral-800 hover:bg-neutral-900 text-neutral-400 hover:text-white',
     cellEmptyBg: isFaculty ? 'bg-emerald-500/5' : 'bg-indigo-500/5',
     loaderText: isFaculty ? 'text-emerald-600 dark:text-emerald-500' : 'text-indigo-500'
   };
@@ -342,7 +342,7 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
                         ? theme.activeDayBtn
                         : day === today
                           ? theme.activeDayBg + ' font-medium'
-                          : (isFaculty ? 'bg-slate-100 text-slate-505 hover:bg-slate-200 dark:bg-[#14221C] dark:text-slate-400' : 'bg-muted text-muted-foreground hover:bg-muted/80')}
+                          : (isFaculty ? 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-[#14221C] dark:text-slate-400' : 'bg-muted text-muted-foreground hover:bg-muted/80')}
                   ${!hasClasses ? 'opacity-50' : ''}`}
                   >
                     {DAY_SHORT[day]}
@@ -634,18 +634,18 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
               </button>
             </div>
 
-            <div className={`space-y-3 mb-6 p-4 rounded-xl border ${isFaculty ? 'bg-slate-50/50 dark:bg-[#0D1512]/60 border-slate-200 dark:border-emerald-950/60' : 'bg-neutral-950/60 border-neutral-850'}`}>
+            <div className={`space-y-3 mb-6 p-4 rounded-xl border ${isFaculty ? 'bg-slate-50/50 dark:bg-[#0D1512]/60 border-slate-200 dark:border-emerald-950/60' : 'bg-neutral-950/60 border-neutral-800'}`}>
               <div>
-                <span className="text-[10px] text-slate-505 dark:text-slate-400 uppercase font-semibold">Class</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Class</span>
                 <p className={`text-sm font-bold ${isFaculty ? 'text-slate-900 dark:text-white' : 'text-white'}`}>{selectedEntryForCancel.subjectName} ({selectedEntryForCancel.subjectCode})</p>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <span className="text-[10px] text-slate-505 dark:text-slate-400 uppercase font-semibold">Section</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Section</span>
                   <p className={`text-xs ${isFaculty ? 'text-slate-700 dark:text-slate-300' : 'text-neutral-300'}`}>{selectedEntryForCancel.sectionName}</p>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-505 dark:text-slate-400 uppercase font-semibold">Time</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Time</span>
                   <p className={`text-xs font-mono ${isFaculty ? 'text-slate-700 dark:text-slate-300' : 'text-neutral-300'}`}>{selectedEntryForCancel.startTime?.substring(0, 5)} - {selectedEntryForCancel.endTime?.substring(0, 5)}</p>
                 </div>
               </div>

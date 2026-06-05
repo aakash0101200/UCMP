@@ -344,7 +344,7 @@ export default function DebarredListTracker() {
     const allowedCount = reportData?.students?.filter(s => !s.isDebarred).length || 0;
 
     return (
-        <div className="bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl p-6 shadow-sm text-left text-slate-805 dark:text-slate-105">
+        <div className="bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl p-6 shadow-sm text-left text-slate-800 dark:text-slate-100">
             
             {/* Header info */}
             <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800/60 pb-4 mb-6">
@@ -356,16 +356,16 @@ export default function DebarredListTracker() {
             </div>
 
             {/* Config Form Panel */}
-            <form onSubmit={generateList} className="bg-slate-50/50 dark:bg-[#0D1512]/30 border border-slate-205/60 dark:border-emerald-950/40 p-5 rounded-2xl space-y-4">
+            <form onSubmit={generateList} className="bg-slate-50/50 dark:bg-[#0D1512]/30 border border-slate-200/60 dark:border-emerald-950/40 p-5 rounded-2xl space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Section Selector */}
                     <div>
-                        <label className="block text-[10px] font-bold text-slate-405 dark:text-slate-500 uppercase tracking-wider mb-2">Section</label>
+                        <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Section</label>
                         <select
                             value={selectedSectionId}
                             onChange={e => setSelectedSectionId(e.target.value)}
                             required
-                            className="w-full px-3 py-2 text-xs bg-white dark:bg-[#0D1512]/50 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-850 dark:text-slate-100 focus:outline-none focus:border-emerald-500"
+                            className="w-full px-3 py-2 text-xs bg-white dark:bg-[#0D1512]/50 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"
                         >
                             <option value="" disabled>Select Section</option>
                             {sections.map(s => (
@@ -376,13 +376,13 @@ export default function DebarredListTracker() {
 
                     {/* Subject Selector */}
                     <div>
-                        <label className="block text-[10px] font-bold text-slate-405 dark:text-slate-500 uppercase tracking-wider mb-2">Subject</label>
+                        <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Subject</label>
                         <select
                             value={selectedSubjectId}
                             onChange={e => setSelectedSubjectId(e.target.value)}
                             disabled={subjects.length === 0}
                             required
-                            className="w-full px-3 py-2 text-xs bg-white dark:bg-[#0D1512]/50 border border-slate-205 dark:border-emerald-950/60 rounded-xl text-slate-850 dark:text-slate-100 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+                            className="w-full px-3 py-2 text-xs bg-white dark:bg-[#0D1512]/50 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
                         >
                             <option value="" disabled>
                                 {subjects.length === 0 ? "No assigned subjects" : "Select Subject"}
@@ -397,11 +397,11 @@ export default function DebarredListTracker() {
 
                     {/* Date Presets Selector */}
                     <div>
-                        <label className="block text-[10px] font-bold text-slate-405 dark:text-slate-500 uppercase tracking-wider mb-2">Time Scope Preset</label>
+                        <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Time Scope Preset</label>
                         <select
                             value={datePreset}
                             onChange={e => setDatePreset(e.target.value)}
-                            className="w-full px-3 py-2 text-xs bg-white dark:bg-[#0D1512]/50 border border-slate-205 dark:border-emerald-950/60 rounded-xl text-slate-850 dark:text-slate-100 focus:outline-none focus:border-emerald-500"
+                            className="w-full px-3 py-2 text-xs bg-white dark:bg-[#0D1512]/50 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"
                         >
                             <option value="currentMonth">Current Month Only</option>
                             <option value="lastMonth">Last Month Only</option>
@@ -475,7 +475,7 @@ export default function DebarredListTracker() {
                     <div className="text-center py-20 border border-dashed border-slate-200 dark:border-emerald-950/40 rounded-3xl text-slate-400 dark:text-slate-500">
                         <Users className="w-12 h-12 text-slate-300 dark:text-[#0D1512]/80 mx-auto mb-3" />
                         <p className="font-semibold text-sm text-slate-500 dark:text-slate-400">No report generated yet</p>
-                        <p className="text-xs text-slate-400 dark:text-slate-650 mt-1">Select a subject, section, and date range above to scan student attendance percentages.</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-600 mt-1">Select a subject, section, and date range above to scan student attendance percentages.</p>
                     </div>
                 )}
 
@@ -499,13 +499,13 @@ export default function DebarredListTracker() {
                             <div className="flex flex-wrap gap-2">
                                 <button
                                     onClick={downloadCSV}
-                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#0d1512] dark:hover:bg-emerald-950/20 border border-slate-200 dark:border-emerald-950/60 text-slate-700 dark:text-slate-350 hover:text-slate-900 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition"
+                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#0d1512] dark:hover:bg-emerald-950/20 border border-slate-200 dark:border-emerald-950/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition"
                                 >
                                     <Download className="w-3.5 h-3.5" /> CSV
                                 </button>
                                 <button
                                     onClick={handlePrint}
-                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#0d1512] dark:hover:bg-emerald-950/20 border border-slate-200 dark:border-emerald-950/60 text-slate-700 dark:text-slate-350 hover:text-slate-900 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition"
+                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#0d1512] dark:hover:bg-emerald-950/20 border border-slate-200 dark:border-emerald-950/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition"
                                 >
                                     <Printer className="w-3.5 h-3.5" /> Print Report
                                 </button>
@@ -515,15 +515,15 @@ export default function DebarredListTracker() {
                         {/* Quick metrics cards */}
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                             <div className="p-4 bg-slate-50/40 dark:bg-[#0d1512]/20 border border-slate-200/60 dark:border-emerald-950/30 rounded-xl">
-                                <div className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-450">Active Roster Size</div>
-                                <div className="text-xl font-bold text-slate-850 dark:text-white mt-1">{reportData.students?.length || 0} Students</div>
+                                <div className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">Active Roster Size</div>
+                                <div className="text-xl font-bold text-slate-800 dark:text-white mt-1">{reportData.students?.length || 0} Students</div>
                             </div>
                             <div className="p-4 bg-emerald-500/5 dark:bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
-                                <div className="text-[10px] uppercase font-bold tracking-wider text-emerald-600 dark:text-emerald-450">Allowed (75%+)</div>
-                                <div className="text-xl font-bold text-emerald-650 dark:text-emerald-400 mt-1">{allowedCount} Students</div>
+                                <div className="text-[10px] uppercase font-bold tracking-wider text-emerald-600 dark:text-emerald-400">Allowed (75%+)</div>
+                                <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{allowedCount} Students</div>
                             </div>
                             <div className="p-4 bg-rose-500/5 dark:bg-rose-500/5 border border-rose-500/10 rounded-xl col-span-2 sm:col-span-1">
-                                <div className="text-[10px] uppercase font-bold tracking-wider text-rose-600 dark:text-rose-450">Debarred (Under 75%)</div>
+                                <div className="text-[10px] uppercase font-bold tracking-wider text-rose-600 dark:text-rose-400">Debarred (Under 75%)</div>
                                 <div className="text-xl font-bold text-rose-600 dark:text-rose-400 mt-1">{debarredCount} Students</div>
                             </div>
                         </div>
@@ -546,13 +546,13 @@ export default function DebarredListTracker() {
                                 <table className="w-full text-left border-collapse text-xs">
                                     <thead>
                                         <tr className="bg-slate-50 dark:bg-[#0d1512]/40 border-b border-slate-200 dark:border-emerald-950/60">
-                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-350">Roll No</th>
-                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-350">College ID</th>
-                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-350">Name</th>
-                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-350 text-right">Lectures Held</th>
-                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-350 text-right">Attended</th>
-                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-350 text-right">Percentage</th>
-                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-350 text-center">Status</th>
+                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-300">Roll No</th>
+                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-300">College ID</th>
+                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-300">Name</th>
+                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-300 text-right">Lectures Held</th>
+                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-300 text-right">Attended</th>
+                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-300 text-right">Percentage</th>
+                                            <th className="p-3.5 font-semibold text-slate-700 dark:text-slate-300 text-center">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -568,17 +568,17 @@ export default function DebarredListTracker() {
                                                 >
                                                     <td className="p-3.5 font-medium text-slate-500 dark:text-slate-400 font-mono">{student.rollNumber || 'N/A'}</td>
                                                     <td className="p-3.5 font-medium text-slate-500 dark:text-slate-400 font-mono">{student.collegeId}</td>
-                                                    <td className="p-3.5 font-bold text-slate-850 dark:text-slate-200">{student.name}</td>
-                                                    <td className="p-3.5 text-right font-mono text-slate-500 dark:text-slate-450">{student.classesConducted}</td>
+                                                    <td className="p-3.5 font-bold text-slate-800 dark:text-slate-200">{student.name}</td>
+                                                    <td className="p-3.5 text-right font-mono text-slate-500 dark:text-slate-400">{student.classesConducted}</td>
                                                     <td className="p-3.5 text-right font-mono text-slate-500 dark:text-slate-455">{student.classesAttended}</td>
-                                                    <td className={`p-3.5 text-right font-bold font-mono ${student.isDebarred ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-650 dark:text-emerald-400'}`}>
+                                                    <td className={`p-3.5 text-right font-bold font-mono ${student.isDebarred ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                                                         {student.attendancePercentage.toFixed(1)}%
                                                     </td>
                                                     <td className="p-3.5 text-center">
                                                         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                                                             student.isDebarred 
-                                                                ? 'bg-rose-500/10 text-rose-650 dark:text-rose-400 border border-rose-500/20' 
-                                                                : 'bg-emerald-500/10 text-emerald-650 dark:text-emerald-400 border border-emerald-500/20'
+                                                                ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' 
+                                                                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                                         }`}>
                                                             {student.isDebarred ? (
                                                                 <>

@@ -122,10 +122,10 @@ export default function AssignmentPublisher({ classname, compact = false }) {
   };  // Compact mode (summary only)
   if (compact && !isCreating) {
     return (
-      <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 shadow-sm rounded-3xl">
+      <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 shadow-sm rounded-3xl">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <FileText className="w-6 h-6 text-emerald-600 dark:text-emerald-450" />
+            <FileText className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
               Assignments
             </h3>
@@ -154,7 +154,7 @@ export default function AssignmentPublisher({ classname, compact = false }) {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm font-medium text-emerald-650 dark:text-emerald-400">
+                <div className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
                   {assignment.submissions}
                 </div>
                 <div className="text-xs text-slate-500 dark:text-slate-400">
@@ -170,7 +170,7 @@ export default function AssignmentPublisher({ classname, compact = false }) {
 
   // Full mode (form + recent list)
   return (
-    <div className="p-6 w-full bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-slate-900 dark:text-slate-100">
+    <div className="p-6 w-full bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-slate-900 dark:text-slate-100">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
           <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
@@ -193,7 +193,7 @@ export default function AssignmentPublisher({ classname, compact = false }) {
           {/* Title & Subject */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block mb-1.5 text-xs font-semibold text-slate-705 dark:text-slate-305">
+              <label className="block mb-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Assignment Title *
               </label>
               <input
@@ -209,7 +209,7 @@ export default function AssignmentPublisher({ classname, compact = false }) {
             </div>
 
             <div>
-              <label className="block mb-1.5 text-xs font-semibold text-slate-705 dark:text-slate-305">
+              <label className="block mb-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Subject *
               </label>
               <select
@@ -232,7 +232,7 @@ export default function AssignmentPublisher({ classname, compact = false }) {
 
           {/* Description */}
           <div>
-            <label className="block mb-1.5 text-xs font-semibold text-slate-705 dark:text-slate-305">
+            <label className="block mb-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Description *
             </label>
             <textarea
@@ -253,7 +253,7 @@ export default function AssignmentPublisher({ classname, compact = false }) {
           {/* Due Date & Priority */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block mb-1.5 text-xs font-semibold text-slate-705 dark:text-slate-305">
+              <label className="block mb-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Due Date *
               </label>
               <input
@@ -268,7 +268,7 @@ export default function AssignmentPublisher({ classname, compact = false }) {
             </div>
 
             <div>
-              <label className="block mb-1.5 text-xs font-semibold text-slate-705 dark:text-slate-305">
+              <label className="block mb-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Priority
               </label>
               <select
@@ -290,7 +290,7 @@ export default function AssignmentPublisher({ classname, compact = false }) {
 
           {/* File Upload */}
           <div>
-            <label className="block mb-1.5 text-xs font-semibold text-slate-705 dark:text-slate-305">
+            <label className="block mb-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Attachments
             </label>
             <div
@@ -328,7 +328,7 @@ export default function AssignmentPublisher({ classname, compact = false }) {
                     key={index}
                     className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-[#0D1512]/40 border border-slate-100 dark:border-transparent text-xs"
                   >
-                    <span className="font-medium text-slate-750 dark:text-slate-300">{file.name}</span>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">{file.name}</span>
                     <button
                       type="button"
                       onClick={() => removeFile(index)}
@@ -372,12 +372,12 @@ export default function AssignmentPublisher({ classname, compact = false }) {
 
           {/* Recent Assignments List */}
           <div>
-            <h4 className="mb-3 text-xs font-bold text-slate-705 dark:text-slate-405 uppercase tracking-wider">Recent Assignments</h4>
+            <h4 className="mb-3 text-xs font-bold text-slate-700 dark:text-slate-400 uppercase tracking-wider">Recent Assignments</h4>
             <div className="space-y-3">
               {recentAssignments.map((assignment) => (
                 <div
                   key={assignment.id}
-                  className="flex items-center justify-between p-3.5 border border-slate-150 dark:border-emerald-950/40 rounded-2xl bg-slate-50 dark:bg-[#0D1512]/40 hover:shadow-md hover:scale-[1.01] transition-all duration-200"
+                  className="flex items-center justify-between p-3.5 border border-slate-200 dark:border-emerald-950/40 rounded-2xl bg-slate-50 dark:bg-[#0D1512]/40 hover:shadow-md hover:scale-[1.01] transition-all duration-200"
                 >
                   <div>
                     <div className="font-bold text-sm text-slate-900 dark:text-slate-100">{assignment.title}</div>
@@ -393,10 +393,10 @@ export default function AssignmentPublisher({ classname, compact = false }) {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold text-emerald-650 dark:text-emerald-400">
+                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                       {assignment.submissions}
                     </div>
-                    <div className="text-[10px] text-slate-400 dark:text-slate-505 font-semibold">submissions</div>
+                    <div className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">submissions</div>
                   </div>
                 </div>
               ))}

@@ -44,13 +44,37 @@ html {
   font-family: 'Roboto', sans-serif;
   color-scheme: light dark;
   --radius: 0.625rem;
-  /* Page bg: light gray so cards (white) visually 'float' */
-  --background: oklch(0.962 0.004 264);
-  /* ≈ #F4F6F8 */
+
+  /* ─── Page canvas ─── */
+  /* Slightly blue-tinted gray so white cards feel elevated */
+  --background: oklch(0.955 0.006 264);
+
+  /* ─── Semantic surface tokens (elevation layers) ─── */
+  /* Level 0: page canvas (same as --background) */
+  --surface: oklch(1 0 0);
+  /* Level 1: cards, panels  → pure white */
+  --surface-raised: oklch(1 0 0);
+  /* Level 2: modals, popovers */
+  --surface-subtle: oklch(0.968 0.005 264);
+  /* inner rows, zebra stripes ≈ #F1F4F8 */
+  --surface-border: oklch(0.878 0.008 264);
+  /* card border  ≈ #D8E0EA  */
+  --surface-border-inner: oklch(0.91 0.006 264);
+  /* inner divider ≈ #E6ECF3 */
+  --surface-shadow: 0 1px 4px 0 oklch(0 0 0 / 0.07), 0 3px 12px 0 oklch(0 0 0 / 0.05);
+  --surface-shadow-hover: 0 4px 16px 0 oklch(0 0 0 / 0.11), 0 1px 4px 0 oklch(0 0 0 / 0.06);
+
+  /* ─── Text hierarchy ─── */
   --foreground: oklch(0.145 0 0);
-  /* near-black */
+  --text-primary: oklch(0.18 0.005 264);
+  /* headings */
+  --text-secondary: oklch(0.38 0.01 264);
+  /* subheadings, labels */
+  --text-muted: oklch(0.52 0.01 264);
+  /* captions, placeholders */
+
+  /* ─── Existing token set (kept for Tailwind compat) ─── */
   --card: oklch(1 0 0);
-  /* pure white cards */
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
@@ -59,16 +83,11 @@ html {
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.94 0 0);
-  /* slightly darker muted bg */
-  /* Darkened to #4A5568 equivalent for WCAG 4.5:1 on white */
   --muted-foreground: oklch(0.42 0.01 264);
-  /* ≈ #4A5568 charcoal */
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  /* Slightly stronger border for card separation */
-  --border: oklch(0.878 0.006 264);
-  /* ≈ #E2E8F0 */
+  --border: oklch(0.878 0.008 264);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -76,14 +95,13 @@ html {
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  /* Sidebar stays white in light mode for crisp separation */
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.94 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.878 0.006 264);
+  --sidebar-border: oklch(0.878 0.008 264);
   --sidebar-ring: oklch(0.708 0 0);
 }
 
@@ -94,6 +112,13 @@ html {
   --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-border: var(--surface-border);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -131,8 +156,29 @@ html {
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  --background: oklch(0.1 0.008 255);
+  --foreground: oklch(0.97 0 0);
+
+  /* ─── Semantic surface tokens (dark mode elevation layers) ─── */
+  --surface: oklch(0.165 0.012 258);
+  /* cards, panels */
+  --surface-raised: oklch(0.20 0.014 258);
+  /* modals, dropdowns */
+  --surface-subtle: oklch(0.13 0.01 255);
+  /* inner rows, input bg */
+  --surface-border: oklch(1 0 0 / 9%);
+  /* card border */
+  --surface-border-inner: oklch(1 0 0 / 7%);
+  /* inner divider */
+  --surface-shadow: none;
+  --surface-shadow-hover: none;
+
+  /* ─── Text hierarchy ─── */
+  --text-primary: oklch(0.97 0 0);
+  --text-secondary: oklch(0.72 0.005 264);
+  --text-muted: oklch(0.55 0.008 264);
+
+  /* ─── Existing token set ─── */
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -163,6 +209,7 @@ html {
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
 
 .perspective {
   perspective: 1000px;
@@ -231,6 +278,66 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+/* ===================================================== */
+/* Semantic Surface Utility Classes                       */
+/* Use these instead of hardcoded hex colors in JSX.     */
+/* They automatically adapt between light and dark mode. */
+/* ===================================================== */
+
+/* Level 1 card — white/dark-blue surface with border + shadow */
+.surface-card {
+  background-color: var(--surface);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--surface-shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.surface-card:hover {
+  box-shadow: var(--surface-shadow-hover);
+}
+
+/* Level 1.5 inner row — subtle inset surface (for list rows, inputs inside cards) */
+.surface-subtle {
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--surface-border-inner);
+}
+
+/* Divider that adapts to mode */
+.surface-divider {
+  border-color: var(--surface-border-inner);
+}
+
+/* Page canvas wrapper — used on top-level page containers */
+.page-canvas {
+  background-color: var(--background);
+}
+
+/* ===================================================== */
+/* React Flow Mindmap Container                           */
+/* ===================================================== */
+.rf-mindmap-container {
+  width: 100%;
+  height: 380px;
+}
+
+/* Override React Flow's hardcoded white background so it uses our surface token */
+.rf-mindmap-container .react-flow__renderer,
+.rf-mindmap-container .react-flow__pane,
+.rf-mindmap-container .react-flow {
+  background-color: var(--surface) !important;
+}
+
+/* React Flow controls button theme alignment */
+.rf-mindmap-container .react-flow__controls-button {
+  background-color: var(--surface) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--text-secondary) !important;
+}
+.rf-mindmap-container .react-flow__controls-button:hover {
+  background-color: var(--surface-subtle) !important;
+}
+
 
 /* ======================= */
 /* Login Page Design Tokens */

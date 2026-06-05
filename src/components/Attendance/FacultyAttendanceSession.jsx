@@ -137,7 +137,7 @@ export default function FacultyAttendanceSession() {
     return (
         <div className="
             mt-4 mb-4 mx-auto w-full max-w-5xl p-6 sm:p-8
-            bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-slate-805 dark:text-slate-100 overflow-hidden text-left
+            bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-slate-800 dark:text-slate-100 overflow-hidden text-left
         ">
             <h3 className="text-xl sm:text-2xl font-light tracking-tight text-slate-900 dark:text-white mb-6 ml-2">
                 Live Class Attendance
@@ -302,7 +302,7 @@ export default function FacultyAttendanceSession() {
                             rounded-xl
                             font-bold
                             transition-all
-                            shadow-md shadow-emerald-550/10
+                            shadow-md shadow-emerald-500/10
                         "
                     >
                         Start Attendance Session
@@ -321,10 +321,10 @@ export default function FacultyAttendanceSession() {
                             py-3
                             text-center
                             bg-emerald-50 dark:bg-emerald-950/30
-                            border border-emerald-150/40 dark:border-emerald-950/60
+                            border border-emerald-200/40 dark:border-emerald-950/60
                             rounded-2xl
                             text-sm
-                            text-emerald-750 dark:text-emerald-350
+                            text-emerald-700 dark:text-emerald-300
                             font-bold
                             max-w-full
                             break-words
@@ -359,7 +359,7 @@ export default function FacultyAttendanceSession() {
                             sm:text-6xl
                             lg:text-7xl
                             font-mono
-                            text-slate-805 dark:text-white
+                            text-slate-800 dark:text-white
                             tracking-[0.25em]
                             bg-slate-50 dark:bg-[#0D1512]
                             px-8 sm:px-12 lg:px-16
@@ -415,7 +415,7 @@ export default function FacultyAttendanceSession() {
                             py-3
                             bg-rose-500/10
                             hover:bg-rose-500/20
-                            text-rose-600 dark:text-rose-450
+                            text-rose-600 dark:text-rose-400
                             border border-rose-500/30
                             rounded-xl
                             font-bold

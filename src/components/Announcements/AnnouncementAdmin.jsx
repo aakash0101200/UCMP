@@ -236,7 +236,7 @@ const AnnouncementAdmin = ({ announcements, onAnnouncementsChange }) => {
                 resetForm();        // Clear form
                 setIsComposing(false); // Hide form
               }}
-              className="px-4 py-2 border border-slate-250 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-all"
+              className="px-4 py-2 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-all"
             >
               Cancel
             </button>

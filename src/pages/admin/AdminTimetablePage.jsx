@@ -44,6 +44,12 @@ import {
 
 import ScheduleGrid from '../../components/Timetable/ScheduleGrid';
 
+// Utility helper to clean and extract the base section name
+const getCleanSectionName = (secName) => {
+  if (!secName) return '';
+  return secName.split('(')[0].trim();
+};
+
 export default function AdminTimetablePage() {
   const [term, setTerm] = useState('2026-27-ODD');
   const [availableTerms, setAvailableTerms] = useState([]);
@@ -256,47 +262,49 @@ export default function AdminTimetablePage() {
     }
   }, [term, activeTab, fetchMetrics]);
 
-  // Filter sections by selected Year and selected Branch
-  const getFilteredSections = useCallback(() => {
+  // Filter sections by selected Year and Branch
+  // SectionDTO fields from API: { id, sectionName, year (Integer), batchId, batchName }
+  // NOTE: sec.batch is @JsonIgnore on the backend — never use sec.batch?.batchName here
+  const visibleSections = React.useMemo(() => {
     if (!sections || sections.length === 0) return [];
 
+    const yearInt = parseInt(selectedYear);
+    const branchLower = selectedBranch.toLowerCase();
+
     return sections.filter(sec => {
-      const batchName = sec.batch?.batchName || '';
+      // Get year: try directly, then from name, then from batch
+      let secYear = sec.year;
+      if (secYear === undefined || secYear === null) {
+        const nameMatch = sec.sectionName?.match(/(?:Yr|Year)\s*(\d+)/i);
+        if (nameMatch) {
+          secYear = parseInt(nameMatch[1]);
+        } else {
+          const batchNameStr = sec.batchName || sec.batch?.batchName || '';
+          const batchMatch = batchNameStr.match(/(?:Yr|Year)\s*(\d+)/i);
+          if (batchMatch) {
+            secYear = parseInt(batchMatch[1]);
+          } else if (batchNameStr.includes('2026') || batchNameStr.includes('26')) {
+            // Mock data fallback matching "B.Tech CS 2026" as 3rd year
+            secYear = 3;
+          }
+        }
+      }
 
+      const matchesYear = secYear !== undefined && secYear !== null
+        ? String(secYear) === String(selectedYear)
+        : false; // strictly exclude sections with unresolved years to prevent duplicate tabs
+
+      // Match branch from DTO batchName, sec.batch.batchName, or sectionName itself
+      const batchName = (sec.batchName || sec.batch?.batchName || '').toLowerCase();
+      const sectionNameLower = (sec.sectionName || '').toLowerCase();
       const matchesBranch = selectedBranch === 'Computer Science'
-        ? (batchName.toLowerCase().includes('cs') || batchName.toLowerCase().includes('computer'))
-        : batchName.toLowerCase().includes(selectedBranch.toLowerCase());
+        ? (batchName.includes('cs') || batchName.includes('computer science') || batchName.includes('cse') ||
+          sectionNameLower.includes('cs') || sectionNameLower.includes('computer science') || sectionNameLower.includes('cse'))
+        : (batchName.includes(branchLower) || sectionNameLower.includes(branchLower));
 
-      const termStartYear = parseInt(term.substring(0, 4)) || 2026;
-      const targetGradYear = termStartYear + (4 - parseInt(selectedYear));
-
-      const matchesYear = batchName.includes(String(targetGradYear)) ||
-        batchName.includes(String(targetGradYear - 1)) ||
-        batchName.toLowerCase().includes(`year ${selectedYear}`) ||
-        batchName.toLowerCase().includes(`yr ${selectedYear}`);
-
-      return matchesBranch && matchesYear;
+      return matchesYear && matchesBranch;
     });
-  }, [sections, selectedBranch, selectedYear, term]);
-
-  const visibleSections = React.useMemo(() => {
-    const filtered = getFilteredSections();
-    if (filtered.length > 0) return filtered;
-
-    const branchOnly = sections.filter(sec => {
-      const batchName = sec.batch?.batchName || '';
-      return selectedBranch === 'Computer Science'
-        ? (batchName.toLowerCase().includes('cs') || batchName.toLowerCase().includes('computer'))
-        : batchName.toLowerCase().includes(selectedBranch.toLowerCase());
-    });
-    if (branchOnly.length > 0) return branchOnly;
-
-    if (sections.length > 0) return sections;
-
-    return [
-      { id: 1, sectionName: "Section A", batch: { id: 1, batchName: `B.Tech ${selectedBranch} Year ${selectedYear}` } }
-    ];
-  }, [sections, selectedBranch, selectedYear, getFilteredSections]);
+  }, [sections, selectedBranch, selectedYear]);
 
   const loadCanvasData = useCallback(async (sectionId) => {
     if (!sectionId) return;
@@ -683,7 +691,7 @@ export default function AdminTimetablePage() {
     : [];
 
   return (
-    <div className="space-y-6 pb-24 p-6 -mt-6 -mx-6 min-h-[calc(100vh-64px)] bg-[#F8F9FA] dark:bg-[#0B0F19] transition-colors duration-300 text-[#1A202C] dark:text-slate-100 overflow-y-auto w-[calc(100%+3rem)] text-left">
+    <div className="space-y-6 pb-24 p-6 -mt-6 -mx-6 min-h-[calc(100vh-64px)] page-canvas transition-colors duration-300 text-foreground overflow-y-auto w-[calc(100%+3rem)] text-left">
       <div className="space-y-6 text-left">
         {/* Title Block */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -694,8 +702,8 @@ export default function AdminTimetablePage() {
             <h1 className="text-4xl font-light text-slate-900 dark:text-white tracking-tight mt-1">
               Timetable Workspace
             </h1>
-            <p className="text-sm text-slate-550 dark:text-slate-400 mt-1">
-              Manage master templates and real-time live timetable disruptions for term <span className="font-mono bg-slate-100 dark:bg-neutral-800 text-slate-750 dark:text-neutral-200 px-1.5 py-0.5 rounded">{term}</span>.
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Manage master templates and real-time live timetable disruptions for term <span className="font-mono bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-200 px-1.5 py-0.5 rounded">{term}</span>.
             </p>
           </div>
 
@@ -720,7 +728,7 @@ export default function AdminTimetablePage() {
         </div>
 
         {/* Tab System Selector */}
-        <div className="flex bg-white/80 dark:bg-[#161B26] p-1 rounded-2xl border border-slate-100 dark:border-slate-800/60 w-fit gap-2 shadow-sm">
+        <div className="flex surface-card p-1 rounded-2xl w-fit gap-2 shadow-sm">
           <button
             onClick={() => setActiveTab('canvas')}
             className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 ${activeTab === 'canvas'
@@ -754,18 +762,18 @@ export default function AdminTimetablePage() {
         {/* ─── TAB 1: MASTER CANVAS ────────────────────────────────────────── */}
         {activeTab === 'canvas' && !showConfig && (
           <div className="min-h-[500px] flex items-center justify-center animate-in fade-in zoom-in-95 duration-300">
-            <div className="p-8 max-w-sm w-full bg-white dark:bg-[#161B26] border border-slate-200/50 dark:border-slate-800 rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300 text-center">
+            <div className="p-8 max-w-sm w-full surface-card rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300 text-center">
               <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 mb-6 shadow-sm">
                 <CalendarIcon className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
               </div>
-              <h3 className="text-lg font-bold text-slate-850 dark:text-slate-100 mb-2">Master Schedules</h3>
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Master Schedules</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
                 Configure and load the drag-and-drop timetable manager for sections, labs, and assignments.
               </p>
               <button
                 type="button"
                 onClick={() => setShowConfig(true)}
-                className="w-full py-3 bg-indigo-600 hover:bg-indigo-750 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 hover:shadow-indigo-500/20 hover:shadow-lg"
+                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 hover:shadow-indigo-500/20 hover:shadow-lg"
               >
                 <Plus className="w-4 h-4" /> Create or View Timetable
               </button>
@@ -777,7 +785,7 @@ export default function AdminTimetablePage() {
           <div className="space-y-6 animate-in fade-in duration-300">
 
             {/* Step 1: Unified Configuration Panel */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 p-6 rounded-3xl border bg-white dark:bg-[#161B26] border-slate-100 dark:border-slate-800/60 shadow-sm text-left">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 p-6 rounded-3xl surface-card text-left">
               <div className="flex flex-wrap items-end gap-4 w-full md:w-auto">
                 {/* Year Dropdown */}
                 <div className="flex flex-col gap-1.5 min-w-[140px] w-full sm:w-auto">
@@ -832,10 +840,9 @@ export default function AdminTimetablePage() {
                     <option value="">Select Section...</option>
                     {visibleSections.map(sec => (
                       <option key={sec.id} value={sec.id}>
-                        {sec.sectionName} ({sec.batchName || sec.batch?.batchName || 'N/A'} - Yr {sec.year})
+                        {getCleanSectionName(sec.sectionName)}
                       </option>
                     ))}
-
                   </select>
                 </div>
               </div>
@@ -861,7 +868,7 @@ export default function AdminTimetablePage() {
             {!isDoneClicked ? (
               // Empty selection state
               <div className="min-h-[350px] flex flex-col items-center justify-center text-center border border-dashed border-slate-200 dark:border-slate-800/60 rounded-3xl bg-white/50 dark:bg-[#161B26]/30 py-12">
-                <CalendarIcon className="w-12 h-12 text-slate-350 dark:text-slate-700 mb-3 animate-pulse" />
+                <CalendarIcon className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-3 animate-pulse" />
                 <h3 className="text-sm font-bold text-slate-800 dark:text-slate-300">Configure Parameters</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mt-1">
                   Adjust selectors in the horizontal configuration panel and click <strong className="text-indigo-600 dark:text-indigo-400">Done</strong> to swap canvas view.
@@ -881,7 +888,7 @@ export default function AdminTimetablePage() {
                           ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
                           : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                       >
-                        {sec.sectionName}
+                        {getCleanSectionName(sec.sectionName)}
                       </button>
                     ))}
                   </div>
@@ -891,7 +898,7 @@ export default function AdminTimetablePage() {
                     <button
                       type="button"
                       onClick={() => setShowAssignmentModal(true)}
-                      className="px-3.5 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-750 rounded-lg shadow-sm transition-all active:scale-95 flex items-center gap-1 hover:shadow-indigo-500/20 hover:shadow-lg"
+                      className="px-3.5 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-all active:scale-95 flex items-center gap-1 hover:shadow-indigo-500/20 hover:shadow-lg"
                     >
                       <Plus className="w-3.5 h-3.5" /> New Slot
                     </button>
@@ -903,13 +910,13 @@ export default function AdminTimetablePage() {
                   {loadingCanvas ? (
                     <div className="min-h-[450px] flex flex-col items-center justify-center text-center py-20 bg-white dark:bg-[#161B26] border border-slate-200/50 dark:border-slate-800 rounded-xl shadow-sm">
                       <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
-                      <p className="text-xs text-slate-450">Loading progressive section timetable template...</p>
+                      <p className="text-xs text-slate-400">Loading progressive section timetable template...</p>
                     </div>
                   ) : !activeSectionId ? (
                     <div className="min-h-[450px] flex flex-col items-center justify-center text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl py-20">
-                      <CalendarIcon className="w-16 h-16 text-slate-350 dark:text-slate-700 mb-4" />
-                      <h3 className="text-base font-bold text-slate-750 dark:text-slate-300">No Section Available</h3>
-                      <p className="text-xs text-slate-550 dark:text-slate-450 max-w-sm mt-2">
+                      <CalendarIcon className="w-16 h-16 text-slate-300 dark:text-slate-700 mb-4" />
+                      <h3 className="text-base font-bold text-slate-700 dark:text-slate-300">No Section Available</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-2">
                         Choose a different Academic Year or Branch to populate sections.
                       </p>
                     </div>
@@ -947,7 +954,7 @@ export default function AdminTimetablePage() {
                   setManualOverrideSectionId(selectedSection || '');
                   setShowOverrideModal(true);
                 }}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-750 active:scale-95 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-2 self-start sm:self-auto hover:shadow-indigo-500/20 hover:shadow-lg"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-2 self-start sm:self-auto hover:shadow-indigo-500/20 hover:shadow-lg"
               >
                 Manual Override
               </button>
@@ -957,7 +964,7 @@ export default function AdminTimetablePage() {
             {loadingMetrics ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="p-5 bg-white dark:bg-[#161B26]/60 border border-slate-100 dark:border-slate-800/60 rounded-3xl animate-pulse h-[110px] flex flex-col justify-between shadow-sm">
+                  <div key={i} className="p-5 surface-subtle rounded-3xl animate-pulse h-[110px] flex flex-col justify-between shadow-sm">
                     <div className="h-3 bg-slate-200 dark:bg-neutral-800 rounded w-2/3"></div>
                     <div className="h-6 bg-slate-200 dark:bg-neutral-800 rounded w-1/3 mt-2"></div>
                     <div className="h-2 bg-slate-200 dark:bg-neutral-800 rounded w-5/6 mt-2"></div>
@@ -967,7 +974,7 @@ export default function AdminTimetablePage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {/* Active Overrides Today */}
-                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
+                <div className="p-5 surface-card rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
                     <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Active Overrides Today</span>
                     <Layers className="w-4 h-4 text-purple-500 dark:text-purple-400" />
@@ -977,7 +984,7 @@ export default function AdminTimetablePage() {
                 </div>
 
                 {/* Pending Substitutions */}
-                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
+                <div className="p-5 surface-card rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
                     <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Pending Substitutions</span>
                     <Shuffle className="w-4 h-4 text-amber-500 dark:text-amber-400" />
@@ -987,7 +994,7 @@ export default function AdminTimetablePage() {
                 </div>
 
                 {/* Faculty Utilization Rate */}
-                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
+                <div className="p-5 surface-card rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
                     <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Faculty Utilization</span>
                     <Users className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
@@ -999,7 +1006,7 @@ export default function AdminTimetablePage() {
                 </div>
 
                 {/* Cancelled Classes Today */}
-                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
+                <div className="p-5 surface-card rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
                     <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Cancelled Classes Today</span>
                     <X className="w-4 h-4 text-rose-500 dark:text-rose-400" />
@@ -1009,7 +1016,7 @@ export default function AdminTimetablePage() {
                 </div>
 
                 {/* Live Ongoing Lectures */}
-                <div className="p-5 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
+                <div className="p-5 surface-card rounded-3xl hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[110px] shadow-sm">
                   <div className="flex justify-between items-start">
                     <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Live Ongoing Lectures</span>
                     <Clock className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
@@ -1025,7 +1032,7 @@ export default function AdminTimetablePage() {
 
               {/* Faculty Absence Coordinator */}
               <div className="lg:col-span-2 space-y-4">
-                <div className="p-6 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl shadow-sm text-left">
+                <div className="p-6 surface-card rounded-3xl text-left">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
                     <h3 className="font-semibold text-base text-slate-900 dark:text-white flex items-center gap-2">
                       <ShieldAlert className="w-4 h-4 text-rose-500" /> Faculty Absence Coordinator
@@ -1092,7 +1099,7 @@ export default function AdminTimetablePage() {
 
                                 {/* Status badges */}
                                 {isSlotCancelled && (
-                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-650 dark:text-red-400">
+                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400">
                                     Cancelled
                                   </span>
                                 )}
@@ -1102,7 +1109,7 @@ export default function AdminTimetablePage() {
                                   </span>
                                 )}
                                 {isSlotOverride && !isSlotCancelled && !isSlotSubbed && (
-                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-650 dark:text-indigo-400">
+                                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400">
                                     Override Applied
                                   </span>
                                 )}
@@ -1110,10 +1117,10 @@ export default function AdminTimetablePage() {
                               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 dark:text-slate-400">
                                 <span className="flex items-center gap-0.5"><Clock className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />{start} - {end}</span>
                                 <span className="flex items-center gap-0.5"><MapPin className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />{slot.roomName}</span>
-                                <span className="flex items-center gap-0.5"><Users className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />Section: {slot.sectionName}</span>
+                                <span className="flex items-center gap-0.5"><Users className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />Section: {getCleanSectionName(slot.sectionName)}</span>
                               </div>
                               {slot.overrideReason && (
-                                <p className="text-[9px] text-slate-450 dark:text-slate-500 italic mt-1 font-mono">"Reason: {slot.overrideReason}"</p>
+                                <p className="text-[9px] text-slate-400 dark:text-slate-500 italic mt-1 font-mono">"Reason: {slot.overrideReason}"</p>
                               )}
                             </div>
 
@@ -1123,7 +1130,7 @@ export default function AdminTimetablePage() {
                                 <>
                                   <button
                                     onClick={() => handleCancelSlot(slot)}
-                                    className="px-2.5 py-1 text-[10px] bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-650 dark:text-red-400 font-semibold rounded transition"
+                                    className="px-2.5 py-1 text-[10px] bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-600 dark:text-red-400 font-semibold rounded transition"
                                   >
                                     Cancel Class
                                   </button>
@@ -1139,7 +1146,7 @@ export default function AdminTimetablePage() {
                                 slot.overrideId && (
                                   <button
                                     onClick={() => handleRevertOverride(slot.overrideId)}
-                                    className="px-2.5 py-1 text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 dark:hover:bg-neutral-900 border border-slate-200 dark:border-neutral-850 text-slate-700 dark:text-slate-350 rounded transition font-semibold"
+                                    className="px-2.5 py-1 text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 dark:hover:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-slate-300 rounded transition font-semibold"
                                   >
                                     Revert Override
                                   </button>
@@ -1156,15 +1163,19 @@ export default function AdminTimetablePage() {
 
               {/* Active Overrides for Selected Section Log */}
               <div className="lg:col-span-1 space-y-4">
-                <div className="p-6 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl shadow-sm text-left">
-                  <h3 className="font-semibold text-sm text-slate-805 dark:text-white mb-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                <div className="p-6 surface-card rounded-3xl text-left">
+                  <h3 className="font-semibold text-sm text-slate-800 dark:text-white mb-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
                     Section Resolved Logs
                     <select
                       value={selectedSection || ''}
                       onChange={e => setSelectedSection(e.target.value)}
                       className="text-[10px] border border-slate-200 dark:border-slate-800/60 rounded-lg px-2 py-1 bg-slate-50 dark:bg-[#0B0F19]/40 text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer"
                     >
-                      {sections.map(s => <option key={s.id} value={s.id}>{s.sectionName}</option>)}
+                      {sections.map(s => (
+                        <option key={s.id} value={s.id}>
+                          {getCleanSectionName(s.sectionName)} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
+                        </option>
+                      ))}
                     </select>
                   </h3>
 
@@ -1215,7 +1226,7 @@ export default function AdminTimetablePage() {
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="p-6 bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
+            <div className="p-6 surface-card rounded-3xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
               <div className="relative w-full md:w-80 text-left">
                 <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-slate-400" />
                 <input
@@ -1281,7 +1292,7 @@ export default function AdminTimetablePage() {
 
               if (filteredRooms.length === 0) {
                 return (
-                  <div className="text-center py-20 border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 text-sm bg-white/50 dark:bg-[#161B26]/30 shadow-sm">
+                  <div className="text-center py-20 border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 text-sm surface-subtle shadow-sm">
                     No venues match your search or filter settings.
                   </div>
                 );
@@ -1296,7 +1307,7 @@ export default function AdminTimetablePage() {
                     return (
                       <div
                         key={room.id}
-                        className="bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-3xl p-5 flex flex-col justify-between hover:scale-[1.02] hover:shadow-md hover:border-indigo-500/30 transition-all duration-300 min-h-[160px] shadow-sm"
+                        className="surface-card rounded-3xl p-5 flex flex-col justify-between hover:scale-[1.02] hover:shadow-md hover:border-indigo-500/30 transition-all duration-300 min-h-[160px] shadow-sm"
                       >
                         <div className="space-y-2 text-left">
                           <div className="flex justify-between items-start gap-2">
@@ -1315,14 +1326,14 @@ export default function AdminTimetablePage() {
 
                           <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-xs font-medium">
                             <MapPin className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
-                            <span className="truncate text-slate-650 dark:text-slate-300" title={room.building}>{room.building}</span>
+                            <span className="truncate text-slate-600 dark:text-slate-300" title={room.building}>{room.building}</span>
                           </div>
 
                           <div className="flex flex-wrap gap-1.5 pt-1.5">
-                            <span className="text-[9px] font-mono bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-805 px-2 py-0.5 rounded text-slate-600 dark:text-slate-350 flex items-center gap-1">
+                            <span className="text-[9px] font-mono bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 flex items-center gap-1">
                               <Users className="w-2.5 h-2.5 text-indigo-500 dark:text-indigo-400" /> {room.capacity} capacity
                             </span>
-                            <span className="text-[9px] font-bold bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-805 px-2 py-0.5 rounded text-indigo-650 dark:text-indigo-400">
+                            <span className="text-[9px] font-bold bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-800 px-2 py-0.5 rounded text-indigo-600 dark:text-indigo-400">
                               {room.type?.replace('_', ' ')}
                             </span>
                           </div>
@@ -1362,7 +1373,7 @@ export default function AdminTimetablePage() {
           <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl p-5 w-80 mx-4 text-left" onClick={e => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-red-500/10 border border-red-500/20">
-                <Trash2 className="w-5 h-5 text-red-450" />
+                <Trash2 className="w-5 h-5 text-red-400" />
               </div>
               <div>
                 <div className="font-semibold text-sm text-white">Delete Assignment</div>
@@ -1373,14 +1384,14 @@ export default function AdminTimetablePage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 py-1.5 text-xs bg-neutral-950 border border-neutral-850 hover:bg-neutral-900 rounded-lg transition-all text-slate-400 hover:text-white font-semibold"
+                className="flex-1 py-1.5 text-xs bg-neutral-950 border border-neutral-800 hover:bg-neutral-900 rounded-lg transition-all text-slate-400 hover:text-white font-semibold"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteAssignment}
                 disabled={isDeleting}
-                className="flex-1 py-1.5 text-xs bg-red-650 hover:bg-red-700 text-white rounded-lg font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-1"
+                className="flex-1 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-1"
               >
                 {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                 Delete
@@ -1404,17 +1415,17 @@ export default function AdminTimetablePage() {
                 </div>
                 <button
                   onClick={() => setSubstitutionSlot(null)}
-                  className="p-1.5 text-slate-400 hover:text-slate-650 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-neutral-800 transition"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-neutral-800 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Slot metadata */}
-              <div className="p-4 bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-2 text-xs">
+              <div className="p-4 bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-2 text-xs">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-[10px] text-slate-450 dark:text-slate-500 uppercase font-semibold">Subject Class</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-semibold">Subject Class</span>
                     <p className="font-bold text-slate-800 dark:text-white">{substitutionSlot.subjectName} ({substitutionSlot.subjectCode})</p>
                   </div>
                   <div>
@@ -1422,25 +1433,25 @@ export default function AdminTimetablePage() {
                     <p className="font-bold text-slate-800 dark:text-white">{selectedAbsFaculty ? faculties.find(f => String(f.id) === String(selectedAbsFaculty))?.name : 'Original'}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-1 pt-2 border-t border-slate-200/60 dark:border-slate-805">
+                <div className="grid grid-cols-3 gap-1 pt-2 border-t border-slate-200/60 dark:border-slate-800">
                   <div>
-                    <span className="text-[9px] text-slate-450 dark:text-slate-500">Date</span>
-                    <p className="font-semibold text-slate-650 dark:text-slate-300">{absDate}</p>
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500">Date</span>
+                    <p className="font-semibold text-slate-600 dark:text-slate-300">{absDate}</p>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-450 dark:text-slate-500">Time</span>
-                    <p className="font-semibold text-slate-650 dark:text-slate-300 font-mono">{substitutionSlot.startTime?.substring(0, 5)} - {substitutionSlot.endTime?.substring(0, 5)}</p>
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500">Time</span>
+                    <p className="font-semibold text-slate-600 dark:text-slate-300 font-mono">{substitutionSlot.startTime?.substring(0, 5)} - {substitutionSlot.endTime?.substring(0, 5)}</p>
                   </div>
                   <div>
                     <span className="text-[9px] text-slate-455 dark:text-slate-500">Section</span>
-                    <p className="font-semibold text-slate-650 dark:text-slate-300">{substitutionSlot.sectionName}</p>
+                    <p className="font-semibold text-slate-600 dark:text-slate-300">{getCleanSectionName(substitutionSlot.sectionName)}</p>
                   </div>
                 </div>
               </div>
 
               {/* Reason form */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">Override Reason</label>
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Override Reason</label>
                 <input
                   type="text"
                   value={customReason}
@@ -1452,7 +1463,7 @@ export default function AdminTimetablePage() {
 
               {/* Candidates list */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider block">Ranked Available Faculty</label>
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Ranked Available Faculty</label>
 
                 {loadingCandidates ? (
                   <div className="flex flex-col items-center py-20 space-y-3">
@@ -1474,21 +1485,21 @@ export default function AdminTimetablePage() {
                         <div
                           key={candidate.facultyId}
                           className={`p-3 rounded-xl border transition flex items-center justify-between gap-3 bg-slate-50/40 dark:bg-neutral-950/20
-                            ${isFree ? 'border-slate-150 dark:border-slate-800/60' : 'border-red-200 dark:border-red-950 bg-red-500/5 opacity-60'}`}
+                            ${isFree ? 'border-slate-200 dark:border-slate-800/60' : 'border-red-200 dark:border-red-950 bg-red-500/5 opacity-60'}`}
                         >
                           <div className="space-y-1">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-xs font-bold text-slate-850 dark:text-white">{candidate.facultyName}</span>
+                              <span className="text-xs font-bold text-slate-800 dark:text-white">{candidate.facultyName}</span>
 
                               {/* Expertise badge */}
                               <span className={`text-[7px] font-bold px-1.5 py-0.2 rounded border leading-none
-                                ${isExpert ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-650 dark:text-emerald-400' : isDept ? 'bg-blue-500/10 border-blue-500/20 text-blue-650 dark:text-blue-400' : 'bg-slate-100 dark:bg-neutral-800 border-slate-200 dark:border-neutral-700 text-slate-500 dark:text-slate-400'}`}>
+                                ${isExpert ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' : isDept ? 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-slate-100 dark:bg-neutral-800 border-slate-200 dark:border-neutral-700 text-slate-500 dark:text-slate-400'}`}>
                                 {candidate.expertiseRank}
                               </span>
 
                               {/* Availability state */}
                               <span className={`text-[7px] font-bold px-1.5 py-0.2 rounded border leading-none flex items-center gap-0.5
-                                ${isFree ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-650 dark:text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-650 dark:text-red-400'}`}>
+                                ${isFree ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'}`}>
                                 {isFree ? <Check className="w-2 h-2" /> : <AlertTriangle className="w-2 h-2" />}
                                 {candidate.status}
                               </span>
@@ -1499,7 +1510,7 @@ export default function AdminTimetablePage() {
                               <p className="text-[9px] text-red-600/80 font-medium font-mono">{candidate.conflictDescription}</p>
                             )}
 
-                            <div className="text-[9px] text-slate-450 dark:text-slate-500 font-mono">
+                            <div className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">
                               Workload Load: {candidate.weeklyWorkloadSlots} slots | Subs: {candidate.recentSubstitutionCount}
                             </div>
                           </div>
@@ -1507,7 +1518,7 @@ export default function AdminTimetablePage() {
                           <button
                             onClick={() => handleConfirmSubstitution(candidate.facultyId)}
                             disabled={!isFree || submittingOverride}
-                            className="px-2.5 py-1 text-[10px] bg-indigo-600 hover:bg-indigo-750 text-white rounded-lg transition disabled:opacity-50 font-semibold"
+                            className="px-2.5 py-1 text-[10px] bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition disabled:opacity-50 font-semibold"
                           >
                             {submittingOverride ? "Assigning..." : "Assign"}
                           </button>
@@ -1522,7 +1533,7 @@ export default function AdminTimetablePage() {
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex gap-2">
               <button
                 onClick={() => setSubstitutionSlot(null)}
-                className="flex-1 py-2 text-xs bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-805 hover:bg-slate-200 dark:hover:bg-neutral-900 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white font-semibold transition"
+                className="flex-1 py-2 text-xs bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-900 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white font-semibold transition"
               >
                 Close Smart Finder
               </button>
@@ -1539,12 +1550,12 @@ export default function AdminTimetablePage() {
               <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <Layers className="w-4 h-4 text-indigo-500" /> Apply Timetable Override
               </h3>
-              <button onClick={closeOverrideModal} className="text-slate-400 hover:text-slate-650 dark:hover:text-white transition">
+              <button onClick={closeOverrideModal} className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleManualOverrideSubmit} className="space-y-4 text-xs text-slate-850 dark:text-white">
+            <form onSubmit={handleManualOverrideSubmit} className="space-y-4 text-xs text-slate-800 dark:text-white">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Override Type</label>
                 <select
@@ -1589,10 +1600,9 @@ export default function AdminTimetablePage() {
                         <option value="" className="bg-white dark:bg-[#161B26]">Select Section...</option>
                         {sections.map(s => (
                           <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">
-                            {s.sectionName} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
+                            {getCleanSectionName(s.sectionName)} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
                           </option>
                         ))}
-
                       </select>
                     </div>
                   )}
@@ -1608,7 +1618,7 @@ export default function AdminTimetablePage() {
                         <span>Loading section schedule...</span>
                       </div>
                     ) : !manualOverrideSectionId ? (
-                      <div className="py-2 px-3 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-805 rounded-xl text-slate-450 italic">
+                      <div className="py-2 px-3 bg-slate-50 dark:bg-[#0B0F19]/40 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-400 italic">
                         Select a section above to view slots
                       </div>
                     ) : availableSlots.length === 0 ? (
@@ -1700,7 +1710,7 @@ export default function AdminTimetablePage() {
                       <option value="" className="bg-white dark:bg-[#161B26]">Select Section...</option>
                       {sections.map(s => (
                         <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">
-                          {s.sectionName} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
+                          {getCleanSectionName(s.sectionName)} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
                         </option>
                       ))}
 
@@ -1770,7 +1780,7 @@ export default function AdminTimetablePage() {
                   >
                     {sections.map(s => (
                       <option key={s.id} value={s.id} className="bg-white dark:bg-[#161B26]">
-                        {s.sectionName} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
+                        {getCleanSectionName(s.sectionName)} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
                       </option>
                     ))}
 
@@ -1779,16 +1789,16 @@ export default function AdminTimetablePage() {
               )}
 
               {/* Recurrence Settings */}
-              <div className="space-y-3 p-4 bg-slate-50 dark:bg-neutral-950 border border-slate-150 dark:border-slate-800 rounded-2xl">
+              <div className="space-y-3 p-4 bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-slate-800 rounded-2xl">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     id="isRecurring"
                     checked={manualOverrideForm.isRecurring}
                     onChange={e => setManualOverrideForm({ ...manualOverrideForm, isRecurring: e.target.checked })}
-                    className="rounded bg-slate-100 dark:bg-neutral-900 border-slate-200 dark:border-slate-800 text-indigo-650 focus:ring-indigo-500 cursor-pointer"
+                    className="rounded bg-slate-100 dark:bg-neutral-900 border-slate-200 dark:border-slate-800 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                   />
-                  <label htmlFor="isRecurring" className="text-xs font-semibold text-slate-550 dark:text-slate-400 select-none cursor-pointer">
+                  <label htmlFor="isRecurring" className="text-xs font-semibold text-slate-500 dark:text-slate-400 select-none cursor-pointer">
                     Is Recurring Exception?
                   </label>
                 </div>
@@ -1848,14 +1858,14 @@ export default function AdminTimetablePage() {
                 <button
                   type="button"
                   onClick={closeOverrideModal}
-                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-850 text-slate-600 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white rounded-xl font-semibold transition"
+                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-xl font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingOverride}
-                  className="flex-1 py-2 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl font-bold transition disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm"
+                  className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   {submittingOverride ? (
                     <>
@@ -1878,12 +1888,12 @@ export default function AdminTimetablePage() {
               <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-indigo-500" /> {editingRoom ? 'Edit Venue Details' : 'Add New Venue'}
               </h3>
-              <button onClick={() => setShowRoomModal(false)} className="text-slate-400 hover:text-slate-650 dark:hover:text-white transition">
+              <button onClick={() => setShowRoomModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleRoomFormSubmit} className="space-y-4 text-xs text-slate-850 dark:text-white">
+            <form onSubmit={handleRoomFormSubmit} className="space-y-4 text-xs text-slate-800 dark:text-white">
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Room Name / Number</label>
                 <input
@@ -1957,14 +1967,14 @@ export default function AdminTimetablePage() {
                 <button
                   type="button"
                   onClick={() => setShowRoomModal(false)}
-                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-850 text-slate-600 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white rounded-xl font-semibold transition"
+                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-xl font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingRoom}
-                  className="flex-1 py-2 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl font-bold transition disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm"
+                  className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   {submittingRoom ? (
                     <>
@@ -1993,20 +2003,20 @@ export default function AdminTimetablePage() {
                 <div className="text-xs text-slate-500 dark:text-slate-400">This action cannot be undone.</div>
               </div>
             </div>
-            <p className="text-xs text-slate-550 dark:text-slate-300 mb-4 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-300 mb-4 leading-relaxed">
               Are you sure you want to delete this venue? Any template schedule entries linked to this room will lose their room assignment.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setDeleteRoomConfirmId(null)}
-                className="flex-1 py-1.5 text-xs bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-850 hover:bg-slate-200 dark:hover:bg-neutral-900 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white font-semibold"
+                className="flex-1 py-1.5 text-xs bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-900 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white font-semibold"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmDeleteRoom}
                 disabled={isDeletingRoom}
-                className="flex-1 py-1.5 text-xs bg-red-650 hover:bg-red-750 text-white rounded-lg font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-1 cursor-pointer"
+                className="flex-1 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-1 cursor-pointer"
               >
                 {isDeletingRoom ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                 Delete
@@ -2023,14 +2033,14 @@ export default function AdminTimetablePage() {
             {/* Header */}
             <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 dark:border-slate-800">
               <div>
-                <h3 className="text-base font-bold text-slate-850 dark:text-slate-100 flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-indigo-500" /> Manage Subject Assignments
                 </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">Assign subjects and faculty to active term sections.</p>
               </div>
               <button
                 onClick={() => setShowAssignmentModal(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-650 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition"
+                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2068,7 +2078,7 @@ export default function AdminTimetablePage() {
                       <option value="">Select Section...</option>
                       {sections.map(s => (
                         <option key={s.id} value={s.id}>
-                          {s.sectionName} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
+                          {getCleanSectionName(s.sectionName)} ({s.batchName || s.batch?.batchName || 'N/A'} - Yr {s.year})
                         </option>
                       ))}
 
@@ -2107,7 +2117,7 @@ export default function AdminTimetablePage() {
                   <button
                     type="submit"
                     disabled={isSubmitting || loading}
-                    className="w-full py-2.5 bg-indigo-650 hover:bg-indigo-750 text-white text-xs font-bold rounded-lg transition-colors flex justify-center items-center gap-2 disabled:opacity-50"
+                    className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors flex justify-center items-center gap-2 disabled:opacity-50"
                   >
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     Assign Subject
@@ -2119,7 +2129,7 @@ export default function AdminTimetablePage() {
               <div className="space-y-4 text-left border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 md:pl-6 flex flex-col min-h-0">
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Assignments</h4>
-                  <span className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-650 dark:text-indigo-400 py-0.5 px-2.5 rounded-full text-[10px] font-bold">
+                  <span className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 py-0.5 px-2.5 rounded-full text-[10px] font-bold">
                     {assignments.length} Total
                   </span>
                 </div>
@@ -2128,7 +2138,7 @@ export default function AdminTimetablePage() {
                   {loading ? (
                     <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-indigo-500" /></div>
                   ) : assignments.length === 0 ? (
-                    <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-450 dark:text-slate-500 text-xs">
+                    <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 dark:text-slate-500 text-xs">
                       No assignments configured for this term yet.
                     </div>
                   ) : (
@@ -2171,7 +2181,7 @@ export default function AdminTimetablePage() {
                     </div>
                     <div>
                       <div className="font-semibold text-sm text-slate-800 dark:text-white">Delete Assignment?</div>
-                      <div className="text-xs text-slate-450 dark:text-slate-400">This action cannot be undone.</div>
+                      <div className="text-xs text-slate-400 dark:text-slate-400">This action cannot be undone.</div>
                     </div>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-300 mb-4 leading-relaxed">
@@ -2180,7 +2190,7 @@ export default function AdminTimetablePage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setDeleteConfirmId(null)}
-                      className="flex-1 py-1.5 text-xs bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-850 hover:bg-slate-200 dark:hover:bg-neutral-900 rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white font-semibold"
+                      className="flex-1 py-1.5 text-xs bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-900 rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white font-semibold"
                     >
                       Cancel
                     </button>
@@ -2202,7 +2212,7 @@ export default function AdminTimetablePage() {
               <button
                 type="button"
                 onClick={() => setShowAssignmentModal(false)}
-                className="px-5 py-2 bg-slate-200 hover:bg-slate-350 dark:bg-neutral-800 dark:hover:bg-neutral-750 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition"
+                className="px-5 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition"
               >
                 Close Editor
               </button>
@@ -2244,13 +2254,13 @@ function SectionOverridesList({ sectionId, date, term, onRevert }) {
   };
 
   if (loading) return <div className="flex justify-center py-6"><Loader2 className="w-4 h-4 animate-spin text-indigo-500" /></div>;
-  if (list.length === 0) return <div className="text-center py-8 text-xs text-slate-500 border border-dashed border-neutral-850 rounded-lg">No active overrides resolved for selected section today.</div>;
+  if (list.length === 0) return <div className="text-center py-8 text-xs text-slate-500 border border-dashed border-neutral-800 rounded-lg">No active overrides resolved for selected section today.</div>;
 
   return (
     <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 text-xs">
       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Active Section Disruptions:</p>
       {list.map(e => (
-        <div key={e.overrideId} className="p-2.5 rounded-lg border border-neutral-850 bg-neutral-950/40 space-y-1">
+        <div key={e.overrideId} className="p-2.5 rounded-lg border border-neutral-800 bg-neutral-950/40 space-y-1">
           <div className="flex justify-between items-start gap-1">
             <span className="font-bold text-white truncate">{e.subjectCode} — {e.overrideType}</span>
             <button

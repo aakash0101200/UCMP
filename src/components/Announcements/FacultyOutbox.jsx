@@ -114,7 +114,7 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl">
+      <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl">
         <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mb-3" />
         <p className="text-xs text-slate-400 animate-pulse">Loading sent messages...</p>
       </div>
@@ -138,9 +138,9 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
       </div>
 
       {messages.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl">
-          <Inbox className="w-12 h-12 text-slate-300 dark:text-slate-650 mb-3" />
-          <p className="text-sm font-medium text-slate-450 dark:text-slate-400">
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl">
+          <Inbox className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
+          <p className="text-sm font-medium text-slate-400 dark:text-slate-400">
             No messages sent yet
           </p>
           <p className="text-xs text-slate-400/70 mt-1">
@@ -158,7 +158,7 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
             return (
               <div
                 key={id}
-                className="p-5 bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                className="p-5 bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
                 style={{ animationDelay: `${idx * 40}ms` }}
               >
                 {/* Header */}
@@ -186,7 +186,7 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
 
                     <div className="flex items-center gap-2 text-[10px] text-slate-400">
                       <span>Audience: </span>
-                      <span className="font-semibold text-slate-600 dark:text-slate-350">
+                      <span className="font-semibold text-slate-600 dark:text-slate-300">
                         {is1to1
                           ? `Student (ID: ${msg.studentCollegeId})`
                           : `Section (${getSectionName(msg.sectionId)})`}
@@ -208,7 +208,7 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
                           Ack. Received
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-450 rounded-full text-[10px] font-semibold">
+                        <div className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full text-[10px] font-semibold">
                           <Clock className="w-3.5 h-3.5 animate-pulse" />
                           Pending Ack.
                         </div>
@@ -218,7 +218,7 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
                 </div>
 
                 {/* Message Body */}
-                <p className="text-xs text-slate-650 dark:text-slate-300 leading-relaxed text-left">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed text-left">
                   {msg.description}
                 </p>
 
@@ -240,7 +240,7 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
                             key={replyId}
                             className={`p-3 rounded-2xl border text-left flex items-start gap-3 transition-all duration-300 ${!isReplyAcked
                               ? "bg-emerald-500/5 dark:bg-emerald-500/10 border-emerald-500/20"
-                              : "bg-slate-50/50 dark:bg-slate-800/20 border-slate-205/40 dark:border-slate-800/40"
+                              : "bg-slate-50/50 dark:bg-slate-800/20 border-slate-200/40 dark:border-slate-800/40"
                               }`}
                           >
                             {/* Student Avatar */}
@@ -265,7 +265,7 @@ export default function FacultyOutbox({ sections = [], onRepliesChanged }) {
                                   {formatTimeAgo(reply.time)}
                                 </span>
                               </div>
-                              <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed">
+                              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                                 {reply.description}
                               </p>
                             </div>

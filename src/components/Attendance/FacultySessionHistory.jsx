@@ -173,7 +173,7 @@ export default function FacultySessionHistory() {
     );
 
     return (
-        <div className="bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl p-6 shadow-sm text-left text-slate-800 dark:text-slate-100">
+        <div className="bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl p-6 shadow-sm text-left text-slate-800 dark:text-slate-100">
             <AnimatePresence mode="wait">
                 {!selectedSession ? (
                     <motion.div
@@ -198,7 +198,7 @@ export default function FacultySessionHistory() {
                                     Filter Sessions
                                 </span>
 
-                                <div className="flex bg-slate-150/40 dark:bg-[#0D1512]/50 p-1 rounded-xl border border-slate-200/50 dark:border-emerald-950/60 w-fit gap-1 shadow-sm">
+                                <div className="flex bg-slate-200/40 dark:bg-[#0D1512]/50 p-1 rounded-xl border border-slate-200/50 dark:border-emerald-950/60 w-fit gap-1 shadow-sm">
                                     <button
                                         type="button"
                                         onClick={() => handlePresetChange('last20')}
@@ -304,7 +304,7 @@ export default function FacultySessionHistory() {
 
                                         <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/60">
                                             <div className="flex items-center gap-1.5">
-                                                <Users className="w-3.5 h-3.5 text-slate-450 dark:text-slate-500" />
+                                                <Users className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                                                 <span>{s.presentCount} Marked Present</span>
                                             </div>
                                             <div className="flex items-center gap-1">
@@ -343,7 +343,7 @@ export default function FacultySessionHistory() {
                         {selectedSession.status === 'ENDED' && (
                             <div className="p-4 bg-slate-50 dark:bg-[#0D1512]/60 border border-slate-200 dark:border-emerald-950/60 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex items-start gap-3">
-                                    <Clock className="w-5 h-5 text-emerald-605 dark:text-emerald-400 shrink-0 mt-0.5" />
+                                    <Clock className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                                     <div>
                                         <h5 className="text-sm font-semibold text-slate-900 dark:text-white">Manual Marking Window</h5>
                                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -363,7 +363,7 @@ export default function FacultySessionHistory() {
                                             onChange={e => setForceOverride(e.target.checked)}
                                             className="accent-emerald-600 dark:accent-emerald-500 rounded"
                                         />
-                                        <span className="text-xs text-emerald-650 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+                                        <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
                                             <ShieldAlert className="w-3.5 h-3.5" /> Force Override
                                         </span>
                                     </label>
@@ -380,15 +380,15 @@ export default function FacultySessionHistory() {
                                     placeholder="Search student..."
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
-                                    className="w-full pl-9 pr-4 py-2 text-sm bg-white dark:bg-[#0D1512]/40 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-905 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                                    className="w-full pl-9 pr-4 py-2 text-sm bg-white dark:bg-[#0D1512]/40 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                                 />
                             </div>
 
                             <div className="flex gap-4 w-full sm:w-auto">
-                                <span className="text-xs font-semibold text-emerald-650 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
+                                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
                                     Present: {presentStudents.length}
                                 </span>
-                                <span className="text-xs font-semibold text-amber-650 dark:text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20">
+                                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20">
                                     Absent: {absentStudents.length}
                                 </span>
                             </div>
@@ -408,14 +408,14 @@ export default function FacultySessionHistory() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {/* Absent List (Modifiable) */}
                                         <div className="space-y-2">
-                                            <h5 className="text-xs font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider mb-3">Absent Students</h5>
+                                            <h5 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Absent Students</h5>
                                             {filteredAbsent.length === 0 ? (
                                                 <p className="text-xs text-slate-500 dark:text-slate-400 italic">No absent students found.</p>
                                             ) : (
                                                 filteredAbsent.map(s => (
                                                     <div
                                                         key={s.collegeId}
-                                                        className="p-3 bg-slate-55 dark:bg-[#0D1512]/40 border border-slate-150 dark:border-emerald-950/40 rounded-xl flex items-center justify-between gap-3 hover:border-slate-300 dark:hover:border-emerald-950/70 transition"
+                                                        className="p-3 bg-slate-50 dark:bg-[#0D1512]/40 border border-slate-200 dark:border-emerald-950/40 rounded-xl flex items-center justify-between gap-3 hover:border-slate-300 dark:hover:border-emerald-950/70 transition"
                                                     >
                                                         <div>
                                                             <div className="text-xs font-bold text-slate-900 dark:text-white">{s.name}</div>
@@ -424,7 +424,7 @@ export default function FacultySessionHistory() {
                                                         <button
                                                             onClick={() => handleManualMark(s.collegeId)}
                                                             disabled={(!selectedSession.manualMarkAllowed && !forceOverride) || markingIds.has(s.collegeId)}
-                                                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white dark:bg-emerald-955/30 dark:hover:bg-emerald-500 dark:text-emerald-400 dark:hover:text-white border border-emerald-200 dark:border-emerald-950/60 rounded-lg text-[10px] font-bold uppercase transition flex items-center gap-1 disabled:opacity-30 disabled:hover:bg-emerald-50/10 disabled:hover:text-emerald-600"
+                                                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white dark:bg-emerald-950/30 dark:hover:bg-emerald-500 dark:text-emerald-400 dark:hover:text-white border border-emerald-200 dark:border-emerald-950/60 rounded-lg text-[10px] font-bold uppercase transition flex items-center gap-1 disabled:opacity-30 disabled:hover:bg-emerald-50/10 disabled:hover:text-emerald-600"
                                                         >
                                                             {markingIds.has(s.collegeId) ? (
                                                                 <Loader2 className="w-3 h-3 animate-spin" />
@@ -447,11 +447,11 @@ export default function FacultySessionHistory() {
                                                 filteredPresent.map(s => (
                                                     <div
                                                         key={s.collegeId}
-                                                        className="p-3 bg-slate-55 dark:bg-[#0D1512]/40 border border-slate-150 dark:border-emerald-950/40 rounded-xl flex items-center justify-between gap-3"
+                                                        className="p-3 bg-slate-50 dark:bg-[#0D1512]/40 border border-slate-200 dark:border-emerald-950/40 rounded-xl flex items-center justify-between gap-3"
                                                     >
                                                         <div>
                                                             <div className="text-xs font-bold text-slate-900 dark:text-slate-200">{s.name}</div>
-                                                            <div className="text-[10px] text-slate-505 dark:text-slate-400">{s.collegeId}</div>
+                                                            <div className="text-[10px] text-slate-500 dark:text-slate-400">{s.collegeId}</div>
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             {s.markedBy === 'FACULTY_MANUAL' && (
@@ -459,7 +459,7 @@ export default function FacultySessionHistory() {
                                                                     Manual
                                                                 </span>
                                                             )}
-                                                            <span className="text-[10px] font-bold text-emerald-650 dark:text-emerald-400 flex items-center gap-1">
+                                                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                                                                 <CheckCircle className="w-3 h-3" /> OK
                                                             </span>
                                                         </div>

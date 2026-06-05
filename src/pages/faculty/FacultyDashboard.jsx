@@ -137,9 +137,9 @@ export default function FacultyDashboard() {
       `}</style>
 
       {/* 1. Welcoming Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 p-6 rounded-3xl shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 p-6 rounded-3xl shadow-sm">
         <div>
-          <span className="text-xs font-semibold text-emerald-650 dark:text-emerald-400 tracking-wider uppercase">
+          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">
             Faculty Workspace
           </span>
           <h1 className="text-3xl font-light text-slate-900 dark:text-white tracking-tight mt-1">
@@ -172,7 +172,7 @@ export default function FacultyDashboard() {
         {/* Active Courses */}
         <Link
           to="/faculty/courses"
-          className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
+          className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
@@ -191,7 +191,7 @@ export default function FacultyDashboard() {
         {/* Today's Lectures */}
         <Link
           to="/faculty/schedule"
-          className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
+          className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
@@ -210,7 +210,7 @@ export default function FacultyDashboard() {
         {/* Pending Grading */}
         <Link
           to="/faculty/gradebook"
-          className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
+          className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
@@ -229,7 +229,7 @@ export default function FacultyDashboard() {
         {/* Students Assigned */}
         <Link
           to="/faculty/students"
-          className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
+          className="group block p-5 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 shadow-sm"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
@@ -247,12 +247,12 @@ export default function FacultyDashboard() {
       </div>
 
       {/* 3. Horizontal Segmented Tab Selector */}
-      <div className="flex bg-white/80 dark:bg-[#14221C]/80 p-1 rounded-2xl border border-emerald-150/40 dark:border-emerald-950/60 w-fit gap-2 shadow-sm">
+      <div className="flex bg-white/80 dark:bg-[#14221C]/80 p-1 rounded-2xl border border-emerald-200/40 dark:border-emerald-950/60 w-fit gap-2 shadow-sm">
         <button
           onClick={() => setDashboardTab('schedule')}
           className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 ${dashboardTab === 'schedule'
             ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
-            : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
+            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
             }`}
         >
           Daily Schedule
@@ -261,7 +261,7 @@ export default function FacultyDashboard() {
           onClick={() => setDashboardTab('attendance')}
           className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 ${dashboardTab === 'attendance'
             ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
-            : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
+            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
             }`}
         >
           Attendance Controller
@@ -270,7 +270,7 @@ export default function FacultyDashboard() {
           onClick={() => setDashboardTab('announcements')}
           className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 ${dashboardTab === 'announcements'
             ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
-            : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
+            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
             }`}
         >
           Announcements
@@ -279,7 +279,7 @@ export default function FacultyDashboard() {
           onClick={() => setDashboardTab('messages')}
           className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all duration-200 ${dashboardTab === 'messages'
             ? 'bg-emerald-600 text-white dark:bg-emerald-500 shadow-sm font-semibold'
-            : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
+            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#0D1512]/50'
             }`}
         >
           <MessageSquare className="w-3.5 h-3.5" />
@@ -291,13 +291,13 @@ export default function FacultyDashboard() {
       <div>
         {/* Schedule Tab Content */}
         {dashboardTab === 'schedule' && (
-          <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-left space-y-4">
+          <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-left space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800/60">
               <h3 className="font-semibold text-sm text-slate-800 dark:text-white flex items-center gap-2">
-                <Calendar className="w-4.5 h-4.5 text-emerald-650 dark:text-emerald-400" />
+                <Calendar className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
                 Lectures Today
               </h3>
-              <Link to="/faculty/schedule" className="text-xs text-emerald-650 dark:text-emerald-400 hover:underline font-semibold flex items-center">
+              <Link to="/faculty/schedule" className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold flex items-center">
                 Full Timetable <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -333,7 +333,7 @@ export default function FacultyDashboard() {
 
         {/* Attendance Tab Content */}
         {dashboardTab === 'attendance' && (
-          <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-left space-y-4">
+          <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-left space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800/60">
               <h3 className="font-semibold text-sm text-slate-800 dark:text-white flex items-center gap-2">
                 <Activity className="w-4.5 h-4.5 text-emerald-655 dark:text-emerald-400" />
@@ -341,7 +341,7 @@ export default function FacultyDashboard() {
               </h3>
               <button
                 onClick={() => setShowAttendanceModal(true)}
-                className="text-xs text-emerald-650 dark:text-emerald-400 hover:underline font-semibold flex items-center"
+                className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold flex items-center"
               >
                 Configure <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
               </button>
@@ -355,7 +355,7 @@ export default function FacultyDashboard() {
                     Active check-in session
                   </div>
                   <div className="p-3 bg-slate-50 dark:bg-[#0D1512]/40 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-left">
-                    <p className="text-xs font-semibold text-slate-805 dark:text-white truncate">
+                    <p className="text-xs font-semibold text-slate-800 dark:text-white truncate">
                       Section ID: {activeSession.sectionId}
                     </p>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
@@ -364,7 +364,7 @@ export default function FacultyDashboard() {
                   </div>
                   <button
                     onClick={() => setShowAttendanceModal(true)}
-                    className="w-full py-2.5 bg-emerald-650 hover:bg-emerald-750 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
                   >
                     View Checked-In Students
                   </button>
@@ -376,7 +376,7 @@ export default function FacultyDashboard() {
                   </p>
                   <button
                     onClick={() => setShowAttendanceModal(true)}
-                    className="px-4 py-2.5 bg-emerald-650 hover:bg-emerald-750 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+                    className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
                   >
                     Start New Session
                   </button>
@@ -388,13 +388,13 @@ export default function FacultyDashboard() {
 
         {/* Announcements Tab Content */}
         {dashboardTab === 'announcements' && (
-          <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-left space-y-4">
+          <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-left space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800/60">
               <h3 className="font-semibold text-sm text-slate-800 dark:text-white flex items-center gap-2">
                 <Bell className="w-4.5 h-4.5 text-emerald-655 dark:text-emerald-400" />
                 Notices
               </h3>
-              <Link to="/faculty/gradebook" className="text-xs text-emerald-650 dark:text-emerald-400 hover:underline font-semibold flex items-center">
+              <Link to="/faculty/gradebook" className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold flex items-center">
                 New Notice <Plus className="w-3.5 h-3.5 ml-0.5" />
               </Link>
             </div>
@@ -411,7 +411,7 @@ export default function FacultyDashboard() {
                       <span className="text-xs font-bold text-slate-800 dark:text-white line-clamp-1">
                         {ann.title}
                       </span>
-                      <span className="text-[9px] text-emerald-650 dark:text-emerald-400 font-semibold whitespace-nowrap bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                      <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-semibold whitespace-nowrap bg-emerald-500/10 px-2 py-0.5 rounded-full">
                         {ann.type || "Global"}
                       </span>
                     </div>
@@ -450,7 +450,7 @@ export default function FacultyDashboard() {
               >
                 Sent & Replies
                 {announcements.filter(a => a.type === 'REPLY' && !a.isCompleted && !a.completed).length > 0 && (
-                  <span className="px-1.5 py-0.5 bg-emerald-500 text-white dark:bg-emerald-650 text-[9px] rounded-full font-bold">
+                  <span className="px-1.5 py-0.5 bg-emerald-500 text-white dark:bg-emerald-600 text-[9px] rounded-full font-bold">
                     {announcements.filter(a => a.type === 'REPLY' && !a.isCompleted && !a.completed).length}
                   </span>
                 )}
@@ -478,7 +478,7 @@ export default function FacultyDashboard() {
       </div>
 
       {/* 5. Quick Actions / Navigation Links */}
-      <div className="p-6 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 space-y-4 shadow-sm">
+      <div className="p-6 rounded-3xl bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 space-y-4 shadow-sm">
         <h3 className="font-bold text-sm text-slate-900 dark:text-white">
           Quick Link Operations
         </h3>
@@ -490,7 +490,7 @@ export default function FacultyDashboard() {
             <div className="flex items-center gap-3">
               <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
               <div>
-                <h4 className="text-xs font-bold text-slate-905 dark:text-slate-100">Course Dashboard</h4>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Course Dashboard</h4>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Manage course syllabus & terms</p>
               </div>
             </div>
@@ -504,7 +504,7 @@ export default function FacultyDashboard() {
             <div className="flex items-center gap-3">
               <GraduationCap className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
               <div>
-                <h4 className="text-xs font-bold text-slate-905 dark:text-slate-100">Attendance Sessions</h4>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Attendance Sessions</h4>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">TOTP validation & Student check-in</p>
               </div>
             </div>
@@ -518,7 +518,7 @@ export default function FacultyDashboard() {
             <div className="flex items-center gap-3">
               <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
               <div>
-                <h4 className="text-xs font-bold text-slate-905 dark:text-slate-100">Grade Book Publisher</h4>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Grade Book Publisher</h4>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Grade releases & announcements</p>
               </div>
             </div>

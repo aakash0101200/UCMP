@@ -24,7 +24,7 @@ export default class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0B0F19] px-4 py-12 transition-colors duration-300 text-left">
-          <div className="w-full max-w-lg bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-805/60 rounded-[2rem] p-8 shadow-xl space-y-6">
+          <div className="w-full max-w-lg bg-white dark:bg-[#161B26] border border-slate-100 dark:border-slate-800/60 rounded-[2rem] p-8 shadow-xl space-y-6">
             
             {/* Visual Header */}
             <div className="flex items-center gap-4">
@@ -43,7 +43,7 @@ export default class ErrorBoundary extends React.Component {
 
             {/* Error Message Details */}
             <div className="p-4 bg-slate-50 dark:bg-[#0B0F19]/60 border border-slate-200/60 dark:border-transparent rounded-2xl text-xs space-y-2">
-              <p className="text-slate-650 dark:text-slate-350 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 The application encountered an unexpected runtime rendering error. Our engineering systems have logged the diagnostics.
               </p>
               {this.state.error && (

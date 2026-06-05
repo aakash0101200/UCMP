@@ -15,7 +15,7 @@ const getSafeReadNotificationIds = () => {
   try {
     const stored = localStorage.getItem('readNotificationIds');
     if (!stored) return [];
-    
+
     const parsed = JSON.parse(stored);
     // Ensure the data inside is actually an array before returning it
     return Array.isArray(parsed) ? parsed : [];
@@ -84,7 +84,7 @@ export default function DashboardLayout({ children, onLogout }) {
     // Apply role-wise, year-wise, and department scope filters for incoming global alerts
     const targetRole = newNotif.targetRole;
     const roleMatch = !targetRole || targetRole.toUpperCase() === activeRole?.toUpperCase();
-    
+
     let yearMatch = true;
     let deptMatch = true;
 
@@ -129,8 +129,8 @@ export default function DashboardLayout({ children, onLogout }) {
 
   // Dynamic configuration for student topic strings
   const studentSecId = profile?.student?.sectionId || localStorage.getItem('sectionId');
-  const sectionNotificationTopic = (activeRole?.toLowerCase() === 'student' && studentSecId) 
-    ? `/topic/notifications/section/${studentSecId}` 
+  const sectionNotificationTopic = (activeRole?.toLowerCase() === 'student' && studentSecId)
+    ? `/topic/notifications/section/${studentSecId}`
     : null;
 
   const collegeId = profile?.collegeId || localStorage.getItem('collegeId');
@@ -147,7 +147,7 @@ export default function DashboardLayout({ children, onLogout }) {
       if (prev.some(x => (x.id || x.announcementId) === id)) return prev;
       return [{ ...newNotif, isRead: readIds.includes(id) }, ...prev];
     });
-    
+
     if (newNotif.type === 'TIMETABLE') {
       toast.error(`Class Cancellation Alert: ${newNotif.title}`);
     } else if (newNotif.type === 'ATTENDANCE_SESSION') {
@@ -259,7 +259,7 @@ export default function DashboardLayout({ children, onLogout }) {
       setActiveSession(null);
     }
   }, [activeRole]);
-  
+
   // Fetch full core profile
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -280,7 +280,7 @@ export default function DashboardLayout({ children, onLogout }) {
         onLogout();
       }
     };
-    
+
     if (activeRole) {
       fetchUserProfile();
     } else {
@@ -332,7 +332,7 @@ export default function DashboardLayout({ children, onLogout }) {
               <span>Running in Demo Mode (Read-Only) — Database modifications and writes are disabled.</span>
             </div>
           )}
-          <DashboardNavBar 
+          <DashboardNavBar
             profile={profile}
             onLogout={onLogout}
             onRoleSwitch={handleRoleSwitch}
@@ -341,7 +341,7 @@ export default function DashboardLayout({ children, onLogout }) {
             onMarkAllRead={handleMarkAllRead}
           />
 
-          <main className="flex-1 min-w-0 space-y-4 p-6 bg-sidebar/70 transition-colors duration-300">
+          <main className="flex-1 min-w-0 space-y-4 p-6 page-canvas transition-colors duration-300">
             {activeSession && (
               <div className="p-4 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-lg backdrop-blur-sm animate-pulse text-left">
                 <div className="flex items-center gap-3">

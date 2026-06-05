@@ -33,19 +33,19 @@ function getZenithStyles(subjectCode, subjectName) {
   const cat = getSubjectCategory(subjectCode, subjectName);
   if (cat === 'MATH_THEORY') {
     return {
-      bg: 'bg-emerald-55/90 dark:bg-emerald-500/10',
+      bg: 'bg-emerald-50/90 dark:bg-emerald-500/10',
       text: 'text-emerald-700 dark:text-emerald-400',
       border: 'border border-emerald-200/80 dark:border-emerald-500/20'
     };
   } else if (cat === 'LABS_PROG') {
     return {
-      bg: 'bg-rose-55/90 dark:bg-rose-500/10',
+      bg: 'bg-rose-50/90 dark:bg-rose-500/10',
       text: 'text-rose-700 dark:text-rose-400',
       border: 'border border-rose-200/80 dark:border-rose-500/20'
     };
   } else {
     return {
-      bg: 'bg-indigo-55/90 dark:bg-indigo-500/10',
+      bg: 'bg-indigo-50/90 dark:bg-indigo-500/10',
       text: 'text-indigo-700 dark:text-indigo-400',
       border: 'border border-indigo-200/80 dark:border-indigo-500/20'
     };
