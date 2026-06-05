@@ -70,6 +70,12 @@ function ScannerPanel({ onSuccess }) {
   const [loadingSession, setLoadingSession] = useState(true);
   const [showLocationGuard, setShowLocationGuard] = useState(false);
 
+  // ── Race-condition guard ─────────────────────────────────────────────────
+  // Tracks whether WebSocket has already set a definitive session state.
+  // If WS fires before the slow HTTP response returns, the HTTP result
+  // must NOT overwrite what WebSocket already established.
+  const wsUpdatedRef = React.useRef(false);
+
   const sectionId = localStorage.getItem('sectionId');
   const wsTopic = sectionId ? `/topic/session/${sectionId}` : null;
 
@@ -78,12 +84,16 @@ function ScannerPanel({ onSuccess }) {
     useCallback((event) => {
       console.log('Received session event via WebSocket:', event);
       if (event.sessionId) {
+        // Mark that WS has spoken — HTTP must not overwrite after this
+        wsUpdatedRef.current = true;
+
         if (event.startTime) {
           // Session Started
           setActiveSession({
             id: event.sessionId,
             sectionName: event.sectionName
           });
+          setLoadingSession(false);
           setStatus('idle');
           setMessage('');
           setCode('');
@@ -100,10 +110,26 @@ function ScannerPanel({ onSuccess }) {
   );
 
   useEffect(() => {
+    let cancelled = false; // cleanup guard for unmount
+
     getActiveSession()
-      .then(r => setActiveSession(r.data))
-      .catch(() => setActiveSession(null))
-      .finally(() => setLoadingSession(false));
+      .then(r => {
+        // Only apply HTTP result if WebSocket hasn't already set the state
+        if (!cancelled && !wsUpdatedRef.current) {
+          setActiveSession(r.data);
+        }
+      })
+      .catch(() => {
+        // Only null-out if WebSocket hasn't already provided a session
+        if (!cancelled && !wsUpdatedRef.current) {
+          setActiveSession(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingSession(false);
+      });
+
+    return () => { cancelled = true; };
   }, []);
 
   const handleMark = () => {
@@ -161,20 +187,53 @@ function ScannerPanel({ onSuccess }) {
         <p className="text-xs text-muted-foreground mb-4">No active session for your class right now.</p>
       )}
 
-      <div className="flex flex-col items-center gap-4">
-        <input
-          type="text"
-          maxLength={6}
-          value={code}
-          onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
-          placeholder="000000"
-          disabled={!activeSession || status === 'success'}
-          className="w-full max-w-[220px] text-center text-4xl tracking-[0.5em] font-mono bg-muted/30 dark:bg-muted/20 border border-border rounded-2xl py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition disabled:opacity-50"
-        />
+      <div className="flex flex-col items-center gap-5 w-full">
+        {/* Passcode Segmented Inputs */}
+        <div className="relative w-full max-w-[260px] mx-auto">
+          {/* Hidden input overlaying the fields */}
+          <input
+            type="text"
+            pattern="\d*"
+            inputMode="numeric"
+            maxLength={6}
+            value={code}
+            onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
+            disabled={!activeSession || status === 'success'}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
+            placeholder=""
+          />
+          {/* Visual Segmented Fields */}
+          <div className="flex justify-center gap-2 w-full">
+            {Array.from({ length: 6 }).map((_, idx) => {
+              const digit = code[idx] || '';
+              const isFocused = code.length === idx && activeSession && status !== 'success';
+              return (
+                <div
+                  key={idx}
+                  className={`
+                    flex-1 aspect-[3/4] max-w-[36px] min-h-[44px]
+                    flex items-center justify-center
+                    text-xl font-semibold font-mono
+                    rounded-xl border transition-all duration-200
+                    ${isFocused
+                      ? 'border-indigo-600 dark:border-indigo-400 ring-2 ring-indigo-500/20 bg-background shadow-md'
+                      : 'border-border bg-muted/10 dark:bg-muted/5'
+                    }
+                    ${digit ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-muted-foreground/30'}
+                    ${(!activeSession || status === 'success') ? 'opacity-50' : ''}
+                  `}
+                >
+                  {digit || (isFocused ? '|' : '·')}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         <button
           onClick={handleMark}
           disabled={!activeSession || status === 'loading' || status === 'success'}
-          className={`w-full max-w-[220px] py-3 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2
+          className={`w-full max-w-[260px] py-3 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2
             ${status === 'loading' ? 'bg-indigo-400 cursor-not-allowed'
               : status === 'success' ? 'bg-emerald-600'
                 : 'bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20'}`}
@@ -185,7 +244,7 @@ function ScannerPanel({ onSuccess }) {
         </button>
 
         {message && (
-          <div className={`w-full max-w-[220px] p-3 rounded-xl text-center text-sm font-medium
+          <div className={`w-full max-w-[260px] p-3 rounded-xl text-center text-sm font-medium
             ${status === 'success' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
               : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
             {message}
@@ -225,8 +284,8 @@ function HistoryItem({ record, index }) {
       </div>
       <div className="flex items-center gap-2">
         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${isManual
-            ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border-indigo-500/20'
-            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+          ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border-indigo-500/20'
+          : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
           }`}>
           {isManual ? 'Faculty Manual' : 'TOTP Verified'}
         </span>
@@ -360,8 +419,8 @@ export default function AttendancePage() {
                 key={key}
                 onClick={() => setTab(key)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg flex items-center gap-1.5 transition-all ${tab === key
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 <Icon className="w-4 h-4" /> {label}
