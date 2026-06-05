@@ -386,7 +386,7 @@ export default function LiveAttendanceList({ sessionId }) {
                     {/* Export Buttons */}
                     <button
                         onClick={exportToCSV}
-                        className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white dark:bg-emerald-955/30 dark:hover:bg-emerald-500 dark:text-emerald-400 dark:hover:text-white border border-emerald-250 dark:border-emerald-950/60 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5"
+                        className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white dark:bg-emerald-950/30 dark:hover:bg-emerald-500 dark:text-emerald-400 dark:hover:text-white border border-emerald-200 dark:border-emerald-950/60 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5"
                     >
                         <Download className="w-3.5 h-3.5" />
                         Export CSV
@@ -407,7 +407,7 @@ export default function LiveAttendanceList({ sessionId }) {
                             placeholder="Search student..."
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 text-sm bg-white dark:bg-[#14221C]/60 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-550"
+                            className="w-full pl-9 pr-4 py-2 text-sm bg-white dark:bg-[#14221C]/60 border border-slate-200 dark:border-emerald-950/60 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                         />
                     </div>
                 </div>
@@ -418,7 +418,7 @@ export default function LiveAttendanceList({ sessionId }) {
                 <button
                     onClick={() => setActiveTab('present')}
                     className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${activeTab === 'present'
-                        ? 'border-emerald-600 text-emerald-650 dark:text-emerald-400'
+                        ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
                         : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                         }`}
                 >
@@ -428,7 +428,7 @@ export default function LiveAttendanceList({ sessionId }) {
                 <button
                     onClick={() => setActiveTab('absent')}
                     className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${activeTab === 'absent'
-                        ? 'border-amber-600 text-amber-650 dark:text-amber-400'
+                        ? 'border-amber-600 text-amber-600 dark:text-amber-400'
                         : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                         }`}
                 >
@@ -441,14 +441,14 @@ export default function LiveAttendanceList({ sessionId }) {
             <div className="max-h-[350px] overflow-y-auto pr-1 space-y-2">
                 {activeTab === 'present' ? (
                     filteredPresent.length === 0 ? (
-                        <div className="text-center py-10 text-slate-405 dark:text-slate-500 text-sm">
+                        <div className="text-center py-10 text-slate-400 dark:text-slate-500 text-sm">
                             {searchQuery ? "No matching students found." : "No students have marked present yet."}
                         </div>
                     ) : (
                         filteredPresent.map((record, index) => (
                             <div
                                 key={record.collegeId || index}
-                                className="flex items-center justify-between p-3 bg-white dark:bg-[#14221C]/80 border border-slate-150 dark:border-emerald-950/40 rounded-xl hover:border-slate-300 dark:hover:border-emerald-950/70 transition duration-200"
+                                className="flex items-center justify-between p-3 bg-white dark:bg-[#14221C]/80 border border-slate-200 dark:border-emerald-950/40 rounded-xl hover:border-slate-300 dark:hover:border-emerald-950/70 transition duration-200"
                             >
                                 <div>
                                     <div className="font-semibold text-slate-900 dark:text-white text-sm">
@@ -464,7 +464,7 @@ export default function LiveAttendanceList({ sessionId }) {
                                         </span>
                                     )}
                                     <div className="text-right">
-                                        <div className="text-xs text-emerald-650 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                                        <div className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
                                             <Check className="w-3.5 h-3.5" /> Present
                                         </div>
                                         <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
@@ -477,17 +477,17 @@ export default function LiveAttendanceList({ sessionId }) {
                     )
                 ) : (
                     filteredAbsent.length === 0 ? (
-                        <div className="text-center py-10 text-slate-405 dark:text-slate-500 text-sm">
+                        <div className="text-center py-10 text-slate-400 dark:text-slate-500 text-sm">
                             {searchQuery ? "No matching students found." : "All students are marked present!"}
                         </div>
                     ) : (
                         filteredAbsent.map((student) => (
                             <div
                                 key={student.collegeId}
-                                className="flex items-center justify-between p-3 bg-white dark:bg-[#14221C]/80 border border-slate-150 dark:border-emerald-950/40 rounded-xl hover:border-slate-300 dark:hover:border-emerald-950/70 transition duration-200"
+                                className="flex items-center justify-between p-3 bg-white dark:bg-[#14221C]/80 border border-slate-200 dark:border-emerald-950/40 rounded-xl hover:border-slate-300 dark:hover:border-emerald-950/70 transition duration-200"
                             >
                                 <div>
-                                    <div className="font-semibold text-slate-900 dark:text-slate-205 text-sm">
+                                    <div className="font-semibold text-slate-900 dark:text-slate-200 text-sm">
                                         {student.name}
                                         {student.rollNumber && <span className="text-xs text-slate-400 dark:text-slate-500 ml-2 font-normal">Roll: {student.rollNumber}</span>}
                                     </div>
@@ -499,7 +499,7 @@ export default function LiveAttendanceList({ sessionId }) {
                                 <button
                                     onClick={() => handleManualMark(student.collegeId)}
                                     disabled={markingIds.has(student.collegeId)}
-                                    className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white dark:bg-emerald-955/30 dark:hover:bg-emerald-500 dark:text-emerald-400 dark:hover:text-white border border-emerald-200 dark:border-emerald-950/60 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 disabled:opacity-50"
+                                    className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white dark:bg-emerald-950/30 dark:hover:bg-emerald-500 dark:text-emerald-400 dark:hover:text-white border border-emerald-200 dark:border-emerald-950/60 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 disabled:opacity-50"
                                 >
                                     {markingIds.has(student.collegeId) ? (
                                         <Loader2 className="w-3.5 h-3.5 animate-spin" />

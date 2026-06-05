@@ -321,7 +321,7 @@ export default function AssignmentPage() {
                         )}
                       </button>
                     ) : (
-                      <div className="w-full py-3.5 px-4 rounded-[1.5rem] border border-gray-250/20 dark:border-zinc-800/40 bg-gray-100/50 dark:bg-zinc-900/40 text-center select-none">
+                      <div className="w-full py-3.5 px-4 rounded-[1.5rem] border border-gray-200/20 dark:border-zinc-800/40 bg-gray-100/50 dark:bg-zinc-900/40 text-center select-none">
                         <p className="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">
                           Link not configured
                         </p>

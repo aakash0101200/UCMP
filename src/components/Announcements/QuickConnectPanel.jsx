@@ -167,7 +167,7 @@ export default function QuickConnectPanel({ sections = [], profile }) {
   const canSend = title.trim() && body.trim() && selectedSectionId && cooldown === 0 && !sending && !sent;
 
   return (
-    <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-150/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-left space-y-5 animate-in fade-in duration-300">
+    <div className="p-6 bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-left space-y-5 animate-in fade-in duration-300">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/60">
         <h3 className="font-semibold text-sm text-slate-800 dark:text-white flex items-center gap-2">

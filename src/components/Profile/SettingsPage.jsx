@@ -18,7 +18,7 @@ const themeConfigs = {
     accentBg: "bg-indigo-600 hover:bg-indigo-700 text-white",
     accentLight: "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-100 dark:border-indigo-900/50 text-indigo-700 dark:text-indigo-400",
     border: "border-slate-100 dark:border-zinc-700",
-    inputBg: "bg-slate-55 dark:bg-zinc-900/50 border-slate-205 dark:border-zinc-750",
+    inputBg: "bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-zinc-700",
     ring: "focus:border-indigo-500 focus:ring-indigo-500"
   },
   faculty: {
@@ -29,7 +29,7 @@ const themeConfigs = {
     accentText: "text-emerald-600 dark:text-emerald-400",
     accentBg: "bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white",
     accentLight: "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400",
-    border: "border-emerald-150/40 dark:border-emerald-950/60",
+    border: "border-emerald-200/40 dark:border-emerald-950/60",
     inputBg: "bg-slate-50 dark:bg-[#0D1512]/40 border-slate-202 dark:border-emerald-950/60",
     ring: "focus:border-emerald-500 focus:ring-emerald-500"
   },
@@ -39,7 +39,7 @@ const themeConfigs = {
     textPrimary: "text-slate-900 dark:text-white",
     textSecondary: "text-slate-500 dark:text-slate-400",
     accentText: "text-indigo-600 dark:text-[#6366F1]",
-    accentBg: "bg-indigo-650 hover:bg-indigo-750 dark:bg-[#6366F1] dark:hover:bg-indigo-600 text-white",
+    accentBg: "bg-indigo-600 hover:bg-indigo-700 dark:bg-[#6366F1] dark:hover:bg-indigo-600 text-white",
     accentLight: "bg-indigo-500/10 border-indigo-500/20 text-indigo-600 dark:text-[#6366F1]",
     border: "border-slate-100 dark:border-slate-800/60",
     inputBg: "bg-slate-50 dark:bg-[#0B0F19]/40 border-slate-202 dark:border-slate-800/60",
@@ -297,7 +297,7 @@ export default function SettingsPage({ userRole = 'student' }) {
               onClick={() => setActiveTab('profile')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${activeTab === 'profile'
                 ? theme.accentBg + ' shadow-sm'
-                : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
                 }`}
             >
               <User className="w-4 h-4" />
@@ -307,7 +307,7 @@ export default function SettingsPage({ userRole = 'student' }) {
               onClick={() => setActiveTab('password')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${activeTab === 'password'
                 ? theme.accentBg + ' shadow-sm'
-                : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
                 }`}
             >
               <KeyRound className="w-4 h-4" />
@@ -318,7 +318,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                 onClick={() => setActiveTab('maintenance')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${activeTab === 'maintenance'
                   ? theme.accentBg + ' shadow-sm'
-                  : 'text-slate-500 hover:text-slate-805 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
                   }`}
               >
                 <ShieldAlert className="w-4 h-4 text-rose-500" />
@@ -348,7 +348,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                   {/* Name field (READ-ONLY) */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       Full Name (Read-Only)
                     </label>
                     <input
@@ -361,7 +361,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                   {/* College ID field (READ-ONLY) */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       College ID / Code
                     </label>
                     <input
@@ -374,7 +374,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                   {/* Email field (READ-ONLY) */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       Email Address
                     </label>
                     <input
@@ -387,7 +387,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                   {/* Phone Number (EDITABLE) */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       Phone Number
                     </label>
                     <div className="relative">
@@ -404,7 +404,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                   {/* Avatar URL (EDITABLE) */}
                   <div className="flex flex-col gap-1.5 sm:col-span-2">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       Profile Picture URL
                     </label>
                     <input
@@ -418,7 +418,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                   {/* Address (EDITABLE) */}
                   <div className="flex flex-col gap-1.5 sm:col-span-2">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       Residential Address
                     </label>
                     <div className="relative">
@@ -436,7 +436,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                 </div>
 
                 {/* Role Specific Meta Card (READ-ONLY info) */}
-                <div className={`p-4 rounded-2xl border text-xs text-slate-500 dark:text-slate-400 space-y-3 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-150 dark:border-zinc-800/40`}>
+                <div className={`p-4 rounded-2xl border text-xs text-slate-500 dark:text-slate-400 space-y-3 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-200 dark:border-zinc-800/40`}>
                   <div className="flex items-center gap-2 font-bold text-[10px] uppercase tracking-wider text-slate-400">
                     <Info className="w-3.5 h-3.5" />
                     <span>Academic Scope Details</span>
@@ -531,7 +531,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                   {/* Old Password */}
                   <div className="flex flex-col gap-1.5 relative">
-                    <label className="text-[10px] font-bold text-slate-450 dark:text-slate-550 uppercase tracking-wider">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       Current Password
                     </label>
                     <div className="relative">
@@ -545,7 +545,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                       <button
                         type="button"
                         onClick={() => setShowOldPass(!showOldPass)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                       >
                         {showOldPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -554,7 +554,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                   {/* New Password */}
                   <div className="flex flex-col gap-1.5 relative">
-                    <label className="text-[10px] font-bold text-slate-450 dark:text-slate-550 uppercase tracking-wider">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       New Strong Password
                     </label>
                     <div className="relative">
@@ -568,7 +568,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                       <button
                         type="button"
                         onClick={() => setShowNewPass(!showNewPass)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                       >
                         {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -577,7 +577,7 @@ export default function SettingsPage({ userRole = 'student' }) {
 
                   {/* Confirm Password */}
                   <div className="flex flex-col gap-1.5 relative">
-                    <label className="text-[10px] font-bold text-slate-450 dark:text-slate-550 uppercase tracking-wider">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       Confirm New Password
                     </label>
                     <div className="relative">
@@ -591,7 +591,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                       <button
                         type="button"
                         onClick={() => setShowConfirmPass(!showConfirmPass)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                       >
                         {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -604,7 +604,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl">
 
                   {/* Checklist */}
-                  <div className={`p-4 rounded-2xl border text-xs space-y-2 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-150 dark:border-zinc-800/40 text-slate-500 dark:text-slate-400`}>
+                  <div className={`p-4 rounded-2xl border text-xs space-y-2 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-200 dark:border-zinc-800/40 text-slate-500 dark:text-slate-400`}>
                     <div className="font-bold text-[9px] uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
                       <ShieldAlert className="w-3.5 h-3.5" />
                       <span>Security Strength Checklist</span>
@@ -655,7 +655,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                   </div>
 
                   {/* Match Indicator card */}
-                  <div className={`p-4 rounded-2xl border text-xs flex flex-col justify-center gap-3 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-150 dark:border-zinc-800/40 text-slate-550`}>
+                  <div className={`p-4 rounded-2xl border text-xs flex flex-col justify-center gap-3 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-200 dark:border-zinc-800/40 text-slate-500`}>
                     <div className="font-bold text-[9px] uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                       <FileCheck className="w-3.5 h-3.5" />
                       <span>Password Match Status</span>
@@ -849,7 +849,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                             placeholder="Type WIPE"
                             value={confirmInputs.alerts}
                             onChange={(e) => setConfirmInputs(prev => ({ ...prev, alerts: e.target.value }))}
-                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-55 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
+                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
                           />
                           <button
                             onClick={() => handleWipeAction('alerts', wipeAlerts, 'Announcements and alerts')}
