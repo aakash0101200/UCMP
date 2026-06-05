@@ -136,300 +136,278 @@ export default function FacultyAttendanceSession() {
     );
     return (
         <div className="
-            mt-4 mb-4 mx-auto w-full max-w-5xl p-6 sm:p-8
+            mt-4 mb-4 mx-auto w-full max-w-6xl p-5 sm:p-6 lg:p-8
             bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 rounded-3xl shadow-sm text-slate-800 dark:text-slate-100 overflow-hidden text-left
         ">
-            <h3 className="text-xl sm:text-2xl font-light tracking-tight text-slate-900 dark:text-white mb-6 ml-2">
+            <h3 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-white mb-6">
                 Live Class Attendance
             </h3>
 
             {!sessionActive ? (
-                <div className="
-                    flex flex-col items-center py-6 max-w-3xl mx-auto w-full space-y-6
-                ">
-
-                    {/* Section */}
-                    <div className="max-w-md mx-auto w-full px-2">
-                        <label className="
-                            block text-xs
-                            text-slate-500 dark:text-slate-400
-                            mb-2
-                            font-semibold
-                            uppercase
-                            tracking-wider
-                        ">
-                            Section
-                        </label>
-
-                        <select
-                            value={selectedSectionId}
-                            onChange={e => setSelectedSectionId(e.target.value)}
-                            className="
-                                w-full
-                                px-4
-                                py-3
-                                text-sm
-                                bg-slate-50 dark:bg-[#0D1512]/40
-                                text-slate-900 dark:text-slate-100
-                                rounded-xl
-                                border border-slate-200 dark:border-emerald-950/60
-                                focus:outline-none
-                                focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
-                                transition-all cursor-pointer
-                            "
-                        >
-                            <option value="" disabled className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">
-                                Select a Section
-                            </option>
-
-                            {sections.map(s => (
-                                <option key={s.id} value={s.id} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">
-                                    {s.sectionName}
+                <div className="w-full max-w-4xl mx-auto space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        {/* Section */}
+                        <div className="space-y-2">
+                            <label className="
+                                block text-xs
+                                text-slate-500 dark:text-slate-400
+                                font-semibold
+                                uppercase
+                                tracking-wider
+                            ">
+                                Section
+                            </label>
+                            <select
+                                value={selectedSectionId}
+                                onChange={e => setSelectedSectionId(e.target.value)}
+                                className="
+                                    w-full
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    bg-slate-50 dark:bg-[#0D1512]/40
+                                    text-slate-900 dark:text-slate-100
+                                    rounded-xl
+                                    border border-slate-200 dark:border-emerald-950/60
+                                    focus:outline-none
+                                    focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
+                                    transition-all cursor-pointer
+                                "
+                            >
+                                <option value="" disabled className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">
+                                    Select a Section
                                 </option>
-                            ))}
-                        </select>
-                    </div>
+                                {sections.map(s => (
+                                    <option key={s.id} value={s.id} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">
+                                        {s.sectionName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                    {/* Subject */}
-                    <div className="max-w-md mx-auto w-full px-2">
-                        <label className="
-                            block text-xs
-                            text-slate-500 dark:text-slate-400
-                            mb-2
-                            font-semibold
-                            uppercase
-                            tracking-wider
-                        ">
-                            Subject being taught
-                        </label>
-
-                        <select
-                            value={selectedSubjectId}
-                            onChange={e => setSelectedSubjectId(e.target.value)}
-                            disabled={subjects.length === 0}
-                            className="
-                                w-full
-                                px-4
-                                py-3
-                                text-sm
-                                bg-slate-50 dark:bg-[#0D1512]/40
-                                text-slate-900 dark:text-slate-100
-                                rounded-xl
-                                border border-slate-200 dark:border-emerald-950/60
-                                focus:outline-none
-                                focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
-                                transition-all cursor-pointer
-                                disabled:opacity-50
-                            "
-                        >
-                            <option value="" disabled className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">
-                                {subjects.length === 0
-                                    ? "No subjects found for this section"
-                                    : "Select a Subject"}
-                            </option>
-
-                            {subjects.map(s => (
-                                <option
-                                    key={s.subjectId}
-                                    value={s.subjectId}
-                                    className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100"
-                                >
-                                    {s.subjectCode
-                                        ? `${s.subjectCode} — ${s.subjectName}`
-                                        : s.subjectName}
+                        {/* Subject */}
+                        <div className="space-y-2">
+                            <label className="
+                                block text-xs
+                                text-slate-500 dark:text-slate-400
+                                font-semibold
+                                uppercase
+                                tracking-wider
+                            ">
+                                Subject being taught
+                            </label>
+                            <select
+                                value={selectedSubjectId}
+                                onChange={e => setSelectedSubjectId(e.target.value)}
+                                disabled={subjects.length === 0}
+                                className="
+                                    w-full
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    bg-slate-50 dark:bg-[#0D1512]/40
+                                    text-slate-900 dark:text-slate-100
+                                    rounded-xl
+                                    border border-slate-200 dark:border-emerald-950/60
+                                    focus:outline-none
+                                    focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
+                                    transition-all cursor-pointer
+                                    disabled:opacity-50
+                                "
+                            >
+                                <option value="" disabled className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">
+                                    {subjects.length === 0
+                                        ? "No subjects assigned"
+                                        : "Select a Subject"}
                                 </option>
-                            ))}
-                        </select>
+                                {subjects.map(s => (
+                                    <option
+                                        key={s.subjectId}
+                                        value={s.subjectId}
+                                        className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100"
+                                    >
+                                        {s.subjectCode
+                                            ? `${s.subjectCode} — ${s.subjectName}`
+                                            : s.subjectName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                        <p className="
-                            mt-2
-                            text-xs
-                            text-slate-400 dark:text-slate-500
-                        ">
-                            Each session is tagged for subject attendance tracking.
-                        </p>
+                        {/* Duration */}
+                        <div className="space-y-2">
+                            <label className="
+                                block text-xs
+                                text-slate-500 dark:text-slate-400
+                                font-semibold
+                                uppercase
+                                tracking-wider
+                            ">
+                                Session Duration
+                            </label>
+                            <select
+                                value={durationInMinutes}
+                                onChange={e => setDurationInMinutes(parseInt(e.target.value))}
+                                className="
+                                    w-full
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    bg-slate-50 dark:bg-[#0D1512]/40
+                                    text-slate-900 dark:text-slate-100
+                                    rounded-xl
+                                    border border-slate-200 dark:border-emerald-950/60
+                                    focus:outline-none
+                                    focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
+                                    transition-all cursor-pointer
+                                "
+                            >
+                                <option value={30} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">30 Minutes</option>
+                                <option value={40} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">40 Minutes (Default)</option>
+                                <option value={50} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">50 Minutes</option>
+                                <option value={60} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">60 Minutes</option>
+                                <option value={90} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">90 Minutes</option>
+                            </select>
+                        </div>
                     </div>
 
-                    {/* Duration */}
-                    <div className="max-w-md mx-auto w-full px-2">
-                        <label className="
-                            block text-xs
-                            text-slate-500 dark:text-slate-400
-                            mb-2
-                            font-semibold
-                            uppercase
-                            tracking-wider
-                        ">
-                            Session Duration
-                        </label>
-
-                        <select
-                            value={durationInMinutes}
-                            onChange={e => setDurationInMinutes(parseInt(e.target.value))}
+                    <div className="flex justify-center pt-2">
+                        <button
+                            onClick={startSession}
+                            disabled={!selectedSectionId}
                             className="
-                                w-full
-                                px-4
-                                py-3
-                                text-sm
-                                bg-slate-50 dark:bg-[#0D1512]/40
-                                text-slate-900 dark:text-slate-100
+                                px-8 py-3.5
+                                bg-emerald-600
+                                hover:bg-emerald-700
+                                disabled:bg-slate-300 dark:disabled:bg-emerald-950/50
+                                disabled:cursor-not-allowed
+                                text-white
                                 rounded-xl
-                                border border-slate-200 dark:border-emerald-950/60
-                                focus:outline-none
-                                focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
-                                transition-all cursor-pointer
+                                font-bold
+                                transition-all
+                                shadow-md shadow-emerald-500/10
                             "
                         >
-                            <option value={30} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">30 Minutes</option>
-                            <option value={40} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">40 Minutes (Default)</option>
-                            <option value={50} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">50 Minutes</option>
-                            <option value={60} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">60 Minutes</option>
-                            <option value={90} className="bg-white dark:bg-[#14221C] text-slate-900 dark:text-slate-100">90 Minutes</option>
-                        </select>
+                            Start Attendance Session
+                        </button>
                     </div>
-
-                    <button
-                        onClick={startSession}
-                        disabled={!selectedSectionId}
-                        className="
-                            w-full sm:w-auto
-                            px-8 py-3.5
-                            bg-emerald-600
-                            hover:bg-emerald-700
-                            disabled:bg-slate-300 dark:disabled:bg-emerald-950/50
-                            disabled:cursor-not-allowed
-                            text-white
-                            rounded-xl
-                            font-bold
-                            transition-all
-                            shadow-md shadow-emerald-500/10
-                        "
-                    >
-                        Start Attendance Session
-                    </button>
-
                 </div>
 
             ) : (
 
-                <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
+                    
+                    {/* Left Panel: Control console and rotating code */}
+                    <div className="lg:col-span-5 flex flex-col items-center text-center p-6 bg-slate-50/50 dark:bg-[#0D1512]/30 border border-slate-200/50 dark:border-emerald-950/40 rounded-2xl w-full">
+                        
+                        {currentSubject && (
+                            <div className="
+                                mb-4
+                                px-4
+                                py-2.5
+                                text-center
+                                bg-emerald-50 dark:bg-emerald-950/30
+                                border border-emerald-200/40 dark:border-emerald-950/60
+                                rounded-xl
+                                text-xs
+                                text-emerald-700 dark:text-emerald-300
+                                font-bold
+                                max-w-full
+                                break-words
+                            ">
+                                📚 {currentSubject.subjectCode} — {currentSubject.subjectName}
+                            </div>
+                        )}
 
-                    {currentSubject && (
-                        <div className="
-                            mb-2
-                            px-6
-                            py-3
-                            text-center
-                            bg-emerald-50 dark:bg-emerald-950/30
-                            border border-emerald-200/40 dark:border-emerald-950/60
-                            rounded-2xl
-                            text-sm
-                            text-emerald-700 dark:text-emerald-300
-                            font-bold
-                            max-w-full
-                            break-words
-                        ">
-                            📚 {currentSubject.subjectCode}
-                            {" — "}
-                            {currentSubject.subjectName}
-                        </div>
-                    )}
-
-                    <p className="
-                        text-slate-400 dark:text-slate-500
-                        mb-2
-                        font-semibold
-                        uppercase
-                        tracking-wider
-                        text-xs
-                        text-center
-                    ">
-                        Project this code to the class
-                    </p>
-
-                    {/* Attendance code */}
-                    <div className="
-                        w-full
-                        text-center
-                        overflow-x-auto
-                    ">
-                        <div className="
-                            inline-block
-                            text-4xl
-                            sm:text-6xl
-                            lg:text-7xl
-                            font-mono
-                            text-slate-800 dark:text-white
-                            tracking-[0.25em]
-                            bg-slate-50 dark:bg-[#0D1512]
-                            px-8 sm:px-12 lg:px-16
-                            py-6 sm:py-8
-                            rounded-3xl
-                            border border-slate-200 dark:border-emerald-950/60
-                            shadow-inner
-                        ">
-                            {currentCode
-                                ? currentCode.split("").join(" ")
-                                : "------"}
-                        </div>
-                    </div>
-
-                    {/* Timer */}
-                    <div className="
-                        mt-6
-                        flex
-                        justify-center
-                        items-center
-                        gap-3
-                        text-center
-                        bg-emerald-500/10 dark:bg-emerald-950/30
-                        px-6
-                        py-3
-                        rounded-full
-                        border border-emerald-500/20 dark:border-emerald-950/50
-                    ">
-                        <div className="
-                            w-4.5 h-4.5
-                            rounded-full
-                            border-4
-                            border-emerald-600 dark:border-emerald-400
-                            border-t-transparent
-                            animate-spin
-                        " />
-
-                        <span className="
-                            text-emerald-700 dark:text-emerald-300
-                            text-sm
+                        <p className="
+                            text-slate-400 dark:text-slate-500
+                            mb-4
                             font-semibold
+                            uppercase
+                            tracking-wider
+                            text-[11px]
                         ">
-                            Refreshes in {countdown} sec
-                        </span>
+                            Class Verification Code
+                        </p>
+
+                        {/* Individual Card-Based Passcode Display */}
+                        <div className="flex justify-center gap-2 sm:gap-3 my-2 w-full max-w-md">
+                            {Array.from({ length: 6 }).map((_, idx) => {
+                                const char = currentCode ? currentCode[idx] : '—';
+                                return (
+                                    <div
+                                        key={idx}
+                                        className="
+                                            flex-1 aspect-[3/4] max-w-[55px] min-h-[50px]
+                                            flex items-center justify-center
+                                            text-2xl sm:text-3xl font-bold font-mono
+                                            rounded-xl
+                                            bg-gradient-to-b from-white to-slate-50/50
+                                            dark:from-[#1A2E26] dark:to-[#0D1A15]
+                                            border border-slate-200 dark:border-emerald-900/40
+                                            shadow-sm text-emerald-600 dark:text-emerald-400
+                                            transition-all duration-300 transform hover:scale-105
+                                        "
+                                    >
+                                        {char}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Timer Badge */}
+                        <div className="
+                            mt-6
+                            flex
+                            justify-center
+                            items-center
+                            gap-2.5
+                            bg-emerald-500/10 dark:bg-emerald-950/30
+                            px-4
+                            py-2
+                            rounded-full
+                            border border-emerald-500/20 dark:border-emerald-950/50
+                        ">
+                            <div className="
+                                w-3.5 h-3.5
+                                rounded-full
+                                border-2
+                                border-emerald-600 dark:border-emerald-400
+                                border-t-transparent
+                                animate-spin
+                            " />
+                            <span className="
+                                text-emerald-700 dark:text-emerald-300
+                                text-xs
+                                font-semibold
+                            ">
+                                Refreshes in {countdown} sec
+                            </span>
+                        </div>
+
+                        {/* Action Control */}
+                        <button
+                            onClick={stopSession}
+                            className="
+                                mt-6
+                                w-full
+                                py-3
+                                bg-rose-500/10
+                                hover:bg-rose-500/20
+                                text-rose-600 dark:text-rose-400
+                                border border-rose-500/30
+                                rounded-xl
+                                font-bold
+                                text-sm
+                                transition
+                            "
+                        >
+                            End Session
+                        </button>
                     </div>
 
-                    <button
-                        onClick={stopSession}
-                        className="
-                            mt-6
-                            w-full sm:w-auto
-                            px-8
-                            py-3
-                            bg-rose-500/10
-                            hover:bg-rose-500/20
-                            text-rose-600 dark:text-rose-400
-                            border border-rose-500/30
-                            rounded-xl
-                            font-bold
-                            transition
-                        "
-                    >
-                        End Session
-                    </button>
-
-                    <div className="
-                        w-full
-                        mt-8
-                        overflow-x-auto
-                    ">
+                    {/* Right Panel: Live Attendance Roster */}
+                    <div className="lg:col-span-7 w-full lg:mt-0 mt-4">
                         <LiveAttendanceList
                             sessionId={sessionId}
                         />
