@@ -127,7 +127,9 @@ export default function FacultySessionHistory() {
             }
         } catch (error) {
             console.error("Failed to mark attendance", error);
-            const errMsg = error.response?.data?.error || error.response?.data?.message || "Failed to mark attendance";
+            const errMsg = typeof error.response?.data === 'string'
+                ? error.response.data
+                : (error.response?.data?.error || error.response?.data?.message || "Failed to mark attendance");
             toast.error(errMsg);
         } finally {
             setMarkingIds(prev => {

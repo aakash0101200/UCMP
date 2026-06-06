@@ -59,8 +59,11 @@ export default function StudentAttendanceScanner() {
             setMessage("Attendance marked successfully!");
         } catch (error) {
             setStatus('error');
-            // Backend might return "Invalid Code", "Too far away", or "Session Expired"
-            setMessage(error.response?.data?.message || "Failed to mark attendance.");
+            // Backend returns error as plain string body, not { message: "..." }
+            const backendMsg = typeof error.response?.data === 'string'
+                ? error.response.data
+                : error.response?.data?.message;
+            setMessage(backendMsg || "Failed to mark attendance.");
         }
     };
 
