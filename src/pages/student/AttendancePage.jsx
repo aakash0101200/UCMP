@@ -69,6 +69,7 @@ function ScannerPanel({ onSuccess }) {
   const [activeSession, setActiveSession] = useState(null);
   const [loadingSession, setLoadingSession] = useState(true);
   const [showLocationGuard, setShowLocationGuard] = useState(false);
+  const locationGrantedRef = React.useRef(false);
 
   // ── Race-condition guard ─────────────────────────────────────────────────
   // Tracks whether WebSocket has already set a definitive session state.
@@ -147,10 +148,12 @@ function ScannerPanel({ onSuccess }) {
     }
 
     // Open Location Access Guard modal
+    locationGrantedRef.current = false;
     setShowLocationGuard(true);
   };
 
   const handleLocationGranted = async (coords) => {
+    locationGrantedRef.current = true;
     setStatus('loading');
     setMessage('');
     try {
@@ -166,7 +169,31 @@ function ScannerPanel({ onSuccess }) {
       onSuccess?.();
     } catch (err) {
       setStatus('error');
-      setMessage(err.response?.data?.message || 'Failed to mark attendance.');
+      // Backend returns error as plain string body, not { message: "..." }
+      const backendMsg = typeof err.response?.data === 'string'
+        ? err.response.data
+        : err.response?.data?.message;
+      setMessage(backendMsg || 'Failed to mark attendance.');
+    }
+  };
+
+  const handleLocationRejected = (errorCode) => {
+    const msgs = {
+      DENIED: 'Location access was denied. Please allow location permissions in your browser settings and try again.',
+      UNAVAILABLE: 'Could not determine your location. Please check your device\'s GPS/location services.',
+      TIMEOUT: 'Location request timed out. Please ensure you have a clear GPS signal and try again.',
+      UNSUPPORTED: 'Your browser does not support geolocation. Please use a modern browser.'
+    };
+    setStatus('error');
+    setMessage(msgs[errorCode] || 'Location access failed. Please try again.');
+    toast.error('Location access failed — attendance not submitted.');
+  };
+
+  const handleLocationGuardClose = () => {
+    setShowLocationGuard(false);
+    // If location was never granted (user dismissed the prompt), reset to idle
+    if (!locationGrantedRef.current && status !== 'loading' && status !== 'success') {
+      // Leave any existing error message visible
     }
   };
 
@@ -255,8 +282,9 @@ function ScannerPanel({ onSuccess }) {
       {/* Location Access Pre-Prompt and Troubleshooting Guard Modal */}
       <LocationAccessGuard
         isOpen={showLocationGuard}
-        onClose={() => setShowLocationGuard(false)}
+        onClose={handleLocationGuardClose}
         onSuccess={handleLocationGranted}
+        onReject={handleLocationRejected}
       />
     </div>
   );
