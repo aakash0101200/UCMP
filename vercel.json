@@ -4,6 +4,9 @@
       "source": "/api/:path*",
       "destination": "http://ucmp-backend-env.eba-tqivhm8b.eu-north-1.elasticbeanstalk.com/api/:path*"
     },
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
   ]
 }
