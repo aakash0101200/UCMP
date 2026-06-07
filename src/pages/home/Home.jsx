@@ -90,7 +90,7 @@ const Home = () => {
             className="relative flex items-center justify-center w-full lg:h-full group"
           >
             {/* Soft inner glow behind image */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-transparent rounded-full blur-3xl scale-75 group-hover:scale-90 transition-transform duration-1000" />
+            <div className="absolute inset-0 bg-gradient-to-bl from-indigo-500/5 to-transparent rounded-full blur-3xl scale-75 group-hover:scale-90 transition-transform duration-1000" />
 
             <motion.img
               animate={{

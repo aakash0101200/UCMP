@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { ModeToggle } from '../Theme/ModeToggle';
 import { Button } from '../ui/button';
-import blogo from '../../assets/logo/bluelogo.png';
+import blogo from '../../assets/logo/favic.png';
 import wlogo from '../../assets/logo/whitelogo.png';
 
 const navLinks = [
@@ -27,16 +27,16 @@ export default function LandingNavBar() {
           {/* <Link to="/" className="flex items-center -space-x-9">
             <img src={logo} alt="JECRC Logo" className="h-20 w-38 mt-6" />
             <span className="font-bold text-[#1e40af] font-serif text-xl">JECRC Foundation</span>
-          </Link> */} 
+          </Link> */}
 
-           {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <img
-            src={blogo}
-            alt="Logo"
-            className="h-10 w-auto transition duration-300 dark:invert dark:brightness-0"
-          />
-        </Link>
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <img
+              src={blogo}
+              alt="Logo"
+              className="h-13 w-auto transition duration-300 dark:invert dark:brightness-0"
+            />
+          </Link>
 
 
           {/* Desktop Navigation */}
@@ -46,12 +46,12 @@ export default function LandingNavBar() {
                 key={to}
                 to={to}
                 className={variant === 'button'
-                    ? 'bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90'
-                    : pathname === to
+                  ? 'bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90'
+                  : pathname === to
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 }>
-            
+
                 {label}
               </Link>
             ))}

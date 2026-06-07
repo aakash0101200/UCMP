@@ -3,10 +3,58 @@ import { toast } from 'react-toastify';
 import {
   User, KeyRound, Save, RefreshCw, Eye, EyeOff, Check, X,
   MapPin, Phone, Mail, ShieldAlert, BadgeInfo, FileCheck, Info,
-  AlertTriangle, Trash2, Database
+  AlertTriangle, Trash2, Database, Upload, Camera, Palette, Sparkles
 } from 'lucide-react';
 import { getProfile, updateProfile, changePassword } from '../../Services/profile';
 import { wipeTimetable, wipeAttendance, wipeAlerts, wipeDirectory } from '../../Services/admin';
+
+const AESTHETIC_PRESETS = [
+  {
+    id: 'slate',
+    name: 'Default Slate',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    description: 'Clean, professional slate theme.',
+    style: {
+      card: 'bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 shadow-sm relative overflow-hidden',
+      avatarBorder: 'border-slate-200 dark:border-zinc-700',
+      avatarGlow: '',
+      badge: 'bg-slate-100 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 border border-slate-200/50 dark:border-zinc-600',
+      vibeText: 'Standard mode',
+      vibeIcon: '💼',
+      cardBackgroundEffects: ''
+    }
+  },
+  {
+    id: 'sakura',
+    name: 'Sakura Dream',
+    avatar: 'https://images.unsplash.com/photo-1522441815192-d9f04eb0615c?w=150&auto=format&fit=crop&q=80',
+    description: 'Pastel pinks and soft dreamlike gradients.',
+    style: {
+      card: 'bg-gradient-to-br from-pink-50/50 via-white to-pink-100/50 dark:from-zinc-950 dark:via-zinc-900 dark:to-pink-950/20 border-pink-200/50 dark:border-pink-900/30 shadow-pink-200/20 dark:shadow-pink-950/20 relative overflow-hidden',
+      avatarBorder: 'border-pink-300 dark:border-pink-500/50 shadow-[0_0_15px_rgba(244,114,182,0.4)]',
+      avatarGlow: '',
+      badge: 'bg-pink-100 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 border border-pink-200/30',
+      vibeText: 'Sakura Dreamer',
+      vibeIcon: '🌸',
+      cardBackgroundEffects: 'absolute inset-0 bg-gradient-to-b from-transparent to-pink-500/5 pointer-events-none'
+    }
+  },
+  {
+    id: 'nature',
+    name: 'Zen Forest',
+    avatar: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=150&auto=format&fit=crop&q=80',
+    description: 'Organic greens, serene forest aesthetic.',
+    style: {
+      card: 'bg-gradient-to-tr from-emerald-50/40 via-white to-teal-50/40 dark:from-zinc-950 dark:via-zinc-900 dark:to-emerald-950/10 border-emerald-100/70 dark:border-emerald-900/20 shadow-emerald-100/25 dark:shadow-emerald-950/5 relative overflow-hidden',
+      avatarBorder: 'border-emerald-400 dark:border-emerald-500/50 shadow-[0_0_15px_rgba(52,211,153,0.3)]',
+      avatarGlow: '',
+      badge: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/20',
+      vibeText: 'Zen Forest',
+      vibeIcon: '🌿',
+      cardBackgroundEffects: 'absolute inset-0 bg-gradient-to-b from-transparent to-emerald-500/5 pointer-events-none'
+    }
+  }
+];
 
 const themeConfigs = {
   student: {
@@ -60,6 +108,8 @@ export default function SettingsPage({ userRole = 'student' }) {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [profileTheme, setProfileTheme] = useState(localStorage.getItem('ucmp-profile-theme') || 'slate');
+  const selectedThemePreset = AESTHETIC_PRESETS.find(p => p.id === profileTheme) || AESTHETIC_PRESETS[0];
 
   // Password fields
   const [oldPassword, setOldPassword] = useState('');
@@ -89,8 +139,8 @@ export default function SettingsPage({ userRole = 'student' }) {
     directory: false
   });
 
-  const isSuperAdmin = role === 'admin' || 
-    profile?.roles?.includes('ADMIN') || 
+  const isSuperAdmin = role === 'admin' ||
+    profile?.roles?.includes('ADMIN') ||
     profile?.roles?.includes('admin');
 
   console.log("SettingsPage Render Details:", {
@@ -157,6 +207,53 @@ export default function SettingsPage({ userRole = 'student' }) {
 
   const isPasswordValid = Object.values(passChecks).every(Boolean);
   const isPasswordMatch = newPassword === confirmPassword;
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please upload an image file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Resize using a canvas to keep base64 string small (~10-15KB max)
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 150;
+        const MAX_HEIGHT = 150;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert canvas to compressed JPEG base64
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        setAvatarUrl(compressedBase64);
+        toast.success("Image uploaded and optimized successfully!");
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Handlers
   const handleUpdateProfile = async (e) => {
@@ -238,19 +335,48 @@ export default function SettingsPage({ userRole = 'student' }) {
         <div className="lg:col-span-1 space-y-6">
 
           {/* Profile Overview Card */}
-          <div className={`border ${theme.border} rounded-3xl p-6 text-center space-y-4 shadow-sm ${theme.card}`}>
-            <div className="relative mx-auto w-24 h-24">
+          <div className={`border rounded-3xl p-6 text-center space-y-4 shadow-sm transition-all duration-300 relative overflow-hidden ${selectedThemePreset.style.card}`}>
+
+            {/* Custom Theme Background Decorations */}
+            {profileTheme === 'sakura' && (
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-pink-500/5 pointer-events-none" />
+            )}
+            {profileTheme === 'nature' && (
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-emerald-500/5 pointer-events-none" />
+            )}
+
+            {/* Vibe Badge */}
+            <div className="relative z-10 flex justify-center">
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider flex items-center gap-1.5 ${selectedThemePreset.style.badge}`}>
+                <span>{selectedThemePreset.style.vibeIcon}</span>
+                <span>{selectedThemePreset.style.vibeText}</span>
+              </span>
+            </div>
+
+            <div className="relative mx-auto w-24 h-24 z-10 group">
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
                   alt={profile?.name || 'User'}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-slate-200 dark:border-zinc-700 shadow-inner"
+                  className={`w-24 h-24 rounded-full object-cover border-2 shadow-inner transition-all duration-300 ${selectedThemePreset.style.avatarBorder}`}
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center border-2 border-slate-200 dark:border-zinc-700">
+                <div className={`w-24 h-24 rounded-full flex items-center justify-center border-2 transition-all duration-300 bg-slate-100 dark:bg-zinc-800 ${selectedThemePreset.style.avatarBorder}`}>
                   <User className="w-12 h-12 text-slate-400" />
                 </div>
               )}
+
+              {/* Floating Camera Button */}
+              <label htmlFor="avatar-file-upload" className="absolute bottom-0 right-0 p-1.5 bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 hover:scale-110 text-white rounded-full cursor-pointer shadow-md transition-all">
+                <Camera className="w-3.5 h-3.5" />
+                <input
+                  id="avatar-file-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </label>
             </div>
 
             <div>
@@ -341,6 +467,48 @@ export default function SettingsPage({ userRole = 'student' }) {
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Manage your personal details. Core academic and organizational data are restricted to read-only for security reasons.
                 </p>
+              </div>
+
+              {/* Aesthetic Vibe Picker */}
+              <div className="space-y-3 p-5 rounded-2xl border border-slate-200/60 dark:border-zinc-800/40 bg-slate-50/50 dark:bg-zinc-950/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    <Palette className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>Choose Your Dashboard Vibe & Profile Theme</span>
+                  </div>
+                  <span className="text-[9px] text-slate-400/80 italic">Tip: Click camera icon on avatar to upload custom photo</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {AESTHETIC_PRESETS.map((preset) => {
+                    const isSelected = profileTheme === preset.id;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => {
+                          setProfileTheme(preset.id);
+                          localStorage.setItem('ucmp-profile-theme', preset.id);
+                          setAvatarUrl(preset.avatar);
+                          toast.info(`Vibe changed to "${preset.name}". Click Save to apply!`);
+                        }}
+                        className={`flex flex-col items-center p-3 rounded-2xl border text-center transition-all duration-200 cursor-pointer ${isSelected
+                            ? 'border-indigo-500 bg-white dark:bg-zinc-900 shadow-[0_0_12px_rgba(99,102,241,0.15)] ring-1 ring-indigo-500'
+                            : 'border-slate-200/60 dark:border-zinc-800/60 bg-white/40 dark:bg-zinc-900/30 hover:border-slate-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900'
+                          }`}
+                      >
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden mb-1.5 border border-slate-200 dark:border-zinc-700">
+                          <img src={preset.avatar} alt={preset.name} className="w-full h-full object-cover" />
+                        </div>
+                        <span className="text-[11px] font-semibold text-slate-800 dark:text-slate-200 leading-tight">
+                          {preset.name}
+                        </span>
+                        <span className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5">
+                          {preset.style.vibeIcon} {preset.style.vibeText}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <form onSubmit={handleUpdateProfile} className="space-y-5">
@@ -728,7 +896,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                       Deletes all scheduled timetable entries, extra class overrides, cancellations, and class subject assignments.
                     </p>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {showConfirmField.timetable ? (
                       <div className="space-y-2">
@@ -782,7 +950,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                       Deletes all student attendance record history, session logs, and class segment records.
                     </p>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {showConfirmField.attendance ? (
                       <div className="space-y-2">
@@ -836,7 +1004,7 @@ export default function SettingsPage({ userRole = 'student' }) {
                       Deletes all global, batch, and section-specific announcements, updates, and notice board logs.
                     </p>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {showConfirmField.alerts ? (
                       <div className="space-y-2">
@@ -887,11 +1055,11 @@ export default function SettingsPage({ userRole = 'student' }) {
                       <span className="font-bold text-xs uppercase tracking-wider">Reset User Directory (Nuclear Option)</span>
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Deletes all student registry files, faculty assignments, personal profiles, and login user credentials from the database. 
+                      Deletes all student registry files, faculty assignments, personal profiles, and login user credentials from the database.
                       <strong className="text-red-600 dark:text-red-400 ml-1">Warning:</strong> To protect admin access, this deletes all user classes EXCEPT accounts assigned with the ADMIN role.
                     </p>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {showConfirmField.directory ? (
                       <div className="space-y-2">
