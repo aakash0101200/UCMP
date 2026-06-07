@@ -7,8 +7,8 @@ import { ModeToggle } from '../Theme/ModeToggle';
 import { SidebarTrigger } from '../../components/ui/sidebar';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import blogo from '../../assets/logo/bluelogo.png';
-import {logout, getAllRoles, getActiveRole, setActiveRole } from "../../Services/auth";
+import blogo from '../../assets/logo/favic.png';
+import { logout, getAllRoles, getActiveRole, setActiveRole } from "../../Services/auth";
 
 
 import {
@@ -22,7 +22,7 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { Badge } from '../../components/ui/badge';
-import logo from '../../assets/logo/bluelogo.png';
+import logo from '../../assets/logo/favic.png';
 
 
 const formatNotificationTime = (timeStr) => {
@@ -34,7 +34,7 @@ const formatNotificationTime = (timeStr) => {
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
@@ -60,10 +60,10 @@ export default function DashboardNavBar({
 
   const filteredNotifications = notifications.filter(n => {
     if (activeTab === 'priority') {
-      return n.type === 'TIMETABLE' || 
-             n.type === 'SCHEDULE_OVERRIDE' || 
-             n.type === 'SCHEDULE' || 
-             (n.title && (n.title.toLowerCase().includes('urgent') || n.title.toLowerCase().includes('important')));
+      return n.type === 'TIMETABLE' ||
+        n.type === 'SCHEDULE_OVERRIDE' ||
+        n.type === 'SCHEDULE' ||
+        (n.title && (n.title.toLowerCase().includes('urgent') || n.title.toLowerCase().includes('important')));
     }
     if (activeTab === 'messages') {
       return n.type === 'ANNOUNCEMENT' || n.type === 'PERSONAL' || n.type === 'MESSAGE' || n.type === 'PRIORITY_MESSAGE' || n.type === 'REPLY' || !n.type;
@@ -101,7 +101,7 @@ export default function DashboardNavBar({
   };
 
   const navigate = useNavigate();
-  
+
 
   const handleRoleSwitch = (newRole) => {
     setActiveRole(newRole); // Update active role in localStorage
@@ -116,11 +116,11 @@ export default function DashboardNavBar({
     navigate("/login");
   };
   if (!profile || !activeRole) {
-    return null; 
+    return null;
   }
-const userName = typeof profile.name === 'string'
-  ? profile.name.split(' ')[0]
-  : 'User';
+  const userName = typeof profile.name === 'string'
+    ? profile.name.split(' ')[0]
+    : 'User';
 
 
   return (
@@ -212,11 +212,10 @@ const userName = typeof profile.name === 'string'
                           e.stopPropagation();
                           setActiveTab(tab);
                         }}
-                        className={`flex-1 py-1.5 text-center text-xs font-bold transition-all relative border-b-2 rounded-t-lg capitalize cursor-pointer ${
-                          activeTab === tab
-                            ? 'border-indigo-600 text-indigo-600 dark:text-[#6366F1] dark:border-[#6366F1] bg-indigo-50/50 dark:bg-indigo-500/5'
-                            : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-accent/40'
-                        }`}
+                        className={`flex-1 py-1.5 text-center text-xs font-bold transition-all relative border-b-2 rounded-t-lg capitalize cursor-pointer ${activeTab === tab
+                          ? 'border-indigo-600 text-indigo-600 dark:text-[#6366F1] dark:border-[#6366F1] bg-indigo-50/50 dark:bg-indigo-500/5'
+                          : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-accent/40'
+                          }`}
                       >
                         {tab}
                         {count > 0 && (
@@ -246,11 +245,10 @@ const userName = typeof profile.name === 'string'
                               onMarkRead(id);
                             }
                           }}
-                          className={`flex items-start gap-3 p-3 rounded-xl transition-all cursor-pointer text-left select-none relative ${
-                            !n.isRead 
-                              ? 'bg-indigo-500/5 dark:bg-indigo-500/10 border-l-2 border-indigo-500 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20' 
-                              : 'hover:bg-accent/60 border-l-2 border-transparent'
-                          }`}
+                          className={`flex items-start gap-3 p-3 rounded-xl transition-all cursor-pointer text-left select-none relative ${!n.isRead
+                            ? 'bg-indigo-500/5 dark:bg-indigo-500/10 border-l-2 border-indigo-500 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20'
+                            : 'hover:bg-accent/60 border-l-2 border-transparent'
+                            }`}
                         >
                           {getNotificationIcon(n)}
                           <div className="flex-1 min-w-0">
