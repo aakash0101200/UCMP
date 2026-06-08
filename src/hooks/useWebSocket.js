@@ -25,7 +25,13 @@ export const useWebSocket = (topic, onMessageReceived) => {
     if (!topic) return;
 
     const client = new Client({
-      webSocketFactory: () => new SockJS(getWsUrl()),
+      webSocketFactory: () => {
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const transports = isLocal
+          ? ['websocket', 'xhr-streaming', 'xhr-polling']
+          : ['xhr-streaming', 'xhr-polling'];
+        return new SockJS(getWsUrl(), null, { transports });
+      },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
