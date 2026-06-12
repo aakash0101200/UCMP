@@ -126,7 +126,7 @@ export default function FacultyDashboard() {
   }
 
   return (
-    <div className="-mt-6 -mx-6 min-h-[calc(100vh-64px)] bg-[#F9FBFC] dark:bg-[#0D1512] transition-colors duration-300 text-slate-800 dark:text-slate-100 overflow-y-auto w-[calc(100%+3rem)] p-6 space-y-6 pb-24 text-left">
+    <div className="space-y-6 pb-12 text-slate-800 dark:text-slate-100 text-left">
       <style>{`
         .scroll-style::-webkit-scrollbar {
           display: none;

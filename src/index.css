@@ -61,8 +61,12 @@ html {
   /* card border  ≈ #D8E0EA  */
   --surface-border-inner: oklch(0.91 0.006 264);
   /* inner divider ≈ #E6ECF3 */
-  --surface-shadow: 0 1px 4px 0 oklch(0 0 0 / 0.07), 0 3px 12px 0 oklch(0 0 0 / 0.05);
-  --surface-shadow-hover: 0 4px 16px 0 oklch(0 0 0 / 0.11), 0 1px 4px 0 oklch(0 0 0 / 0.06);
+  --surface-shadow: 0 0 16px 0 oklch(0 0 0 / 0.04), 0 0 6px 0 oklch(0 0 0 / 0.02);
+  --surface-shadow-hover: 0 0 24px 0 oklch(0 0 0 / 0.08), 0 0 8px 0 oklch(0 0 0 / 0.03);
+  --shadow-sm-val: 0 0 12px 0 oklch(0 0 0 / 0.04), 0 0 4px 0 oklch(0 0 0 / 0.02);
+  --shadow-md-val: 0 0 20px 0 oklch(0 0 0 / 0.05), 0 0 8px 0 oklch(0 0 0 / 0.03);
+  --shadow-lg-val: 0 0 28px 0 oklch(0 0 0 / 0.06), 0 0 12px 0 oklch(0 0 0 / 0.04);
+  --shadow-xl-val: 0 0 36px 0 oklch(0 0 0 / 0.07), 0 0 16px 0 oklch(0 0 0 / 0.05);
 
   /* ─── Text hierarchy ─── */
   --foreground: oklch(0.145 0 0);
@@ -148,6 +152,11 @@ html {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  --shadow-sm: var(--shadow-sm-val);
+  --shadow-md: var(--shadow-md-val);
+  --shadow-lg: var(--shadow-lg-val);
+  --shadow-xl: var(--shadow-xl-val);
 }
 
 .daypilot-event {
@@ -170,8 +179,12 @@ html {
   /* card border */
   --surface-border-inner: oklch(1 0 0 / 7%);
   /* inner divider */
-  --surface-shadow: none;
-  --surface-shadow-hover: none;
+  --surface-shadow: 0 0 16px 0 oklch(0 0 0 / 0.25);
+  --surface-shadow-hover: 0 0 24px 0 oklch(0 0 0 / 0.35);
+  --shadow-sm-val: 0 0 12px 0 oklch(0 0 0 / 0.22);
+  --shadow-md-val: 0 0 20px 0 oklch(0 0 0 / 0.32);
+  --shadow-lg-val: 0 0 28px 0 oklch(0 0 0 / 0.42);
+  --shadow-xl-val: 0 0 36px 0 oklch(0 0 0 / 0.52);
 
   /* ─── Text hierarchy ─── */
   --text-primary: oklch(0.97 0 0);

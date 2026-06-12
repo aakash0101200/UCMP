@@ -124,7 +124,7 @@ export default function StudentInbox() {
   }
 
   return (
-    <div className="-mt-6 -mx-6 min-h-[calc(100vh-64px)] bg-[#F9FBFC] dark:bg-[#0A0F1A] transition-colors duration-300 text-slate-800 dark:text-slate-100 overflow-y-auto w-[calc(100%+3rem)] p-6 space-y-5 pb-24 text-left">
+    <div className="space-y-5">
       <style>{`
         .scroll-hide::-webkit-scrollbar { display: none; }
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }

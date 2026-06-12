@@ -281,7 +281,7 @@ export default function SettingsPage({ userRole = 'student' }) {
   }
 
   return (
-    <div className={`space-y-6 pb-24 p-6 -mt-6 -mx-6 min-h-[calc(100vh-64px)] ${theme.bg} transition-colors duration-300 overflow-y-auto w-[calc(100%+3rem)] text-left`}>
+    <div className="space-y-6 pb-12 text-left">
 
       {/* Header Area */}
       <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-zinc-800/10 border ${theme.border} p-6 rounded-3xl shadow-sm ${theme.card}`}>

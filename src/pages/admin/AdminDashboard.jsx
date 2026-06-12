@@ -72,7 +72,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-6 pb-24 p-6 -mt-6 -mx-6 min-h-[calc(100vh-64px)] page-canvas transition-colors duration-300 text-foreground overflow-y-auto w-[calc(100%+3rem)]">
+    <div className="space-y-6 pb-12 text-foreground">
 
       {/* BEGIN: Admin Header */}
       <section data-purpose="greeting" className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

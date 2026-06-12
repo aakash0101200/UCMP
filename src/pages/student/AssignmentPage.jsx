@@ -117,7 +117,7 @@ export default function AssignmentPage() {
   }
 
   return (
-    <div className="space-y-8 pb-24 p-6 -mt-6 -mx-6 -mb-6 w-[calc(100%+3rem)] min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#E0F2FE] via-[#F1F5F9] to-[#FCE7F3] dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 transition-colors duration-300 text-foreground overflow-y-auto text-left">
+    <div className="space-y-8 pb-12 text-foreground text-left">
 
       {/* Visual Enhancers */}
       <style>{`
