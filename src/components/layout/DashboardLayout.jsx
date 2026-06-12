@@ -55,7 +55,7 @@ export default function DashboardLayout({ children, onLogout }) {
         res = await getAnnouncements();
       }
 
-      if (res && res.data) {
+      if (res && Array.isArray(res.data)) {
         const readIds = getSafeReadNotificationIds();
         const mapped = res.data.map(item => {
           const id = item.id || item.announcementId;
