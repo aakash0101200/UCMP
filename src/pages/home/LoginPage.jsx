@@ -223,7 +223,7 @@ const LoginPage = ({ onLogin }) => {
             </label>
 
             <div className="relative group">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-login-icon group-focus-within:text-indigo-500 transition-colors duration-200">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-login-icon group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-400 transition-colors duration-200">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -249,14 +249,16 @@ const LoginPage = ({ onLogin }) => {
                 className="
                 w-full h-12
                 rounded-xl
-                border border-border/60
-                bg-background/60
+                border border-zinc-300 dark:border-zinc-700/80
+                bg-transparent
                 pl-10 pr-4
                 text-sm
+                text-foreground
+                placeholder-zinc-400 dark:placeholder-zinc-600
                 outline-none
                 transition-all
-                focus:border-indigo-500
-                focus:ring-2 focus:ring-indigo-500/20
+                focus:border-zinc-500 dark:focus:border-zinc-400
+                focus:ring-2 focus:ring-zinc-500/10 dark:focus:ring-zinc-400/10
               "
               />
             </div>
@@ -288,7 +290,7 @@ const LoginPage = ({ onLogin }) => {
 
             <div className="relative group">
 
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-login-icon group-focus-within:text-indigo-500 transition-colors duration-200">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-login-icon group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-400 transition-colors duration-200">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -314,14 +316,16 @@ const LoginPage = ({ onLogin }) => {
                 className="
                 w-full h-12
                 rounded-xl
-                border border-border/60
-                bg-background/60
+                border border-zinc-300 dark:border-zinc-700/80
+                bg-transparent
                 pl-10 pr-10
                 text-sm
+                text-foreground
+                placeholder-zinc-400 dark:placeholder-zinc-600
                 outline-none
                 transition-all
-                focus:border-indigo-500
-                focus:ring-2 focus:ring-indigo-500/20
+                focus:border-zinc-500 dark:focus:border-zinc-400
+                focus:ring-2 focus:ring-zinc-500/10 dark:focus:ring-zinc-400/10
               "
               />
 
@@ -332,7 +336,7 @@ const LoginPage = ({ onLogin }) => {
                 absolute inset-y-0 right-0
                 pr-3 flex items-center
                 text-login-icon
-                hover:text-indigo-500
+                hover:text-zinc-600 dark:hover:text-zinc-400
               "
               >
                 {showPassword ? (

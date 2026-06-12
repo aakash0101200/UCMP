@@ -24,7 +24,7 @@ import ErrorBoundary from './components/ui/ErrorBoundary'
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* 1. Wrap entire App in ThemeProvider */}
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <ErrorBoundary>
         <App />
       </ErrorBoundary>
