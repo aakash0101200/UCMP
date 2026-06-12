@@ -454,21 +454,19 @@ export default function FacultyDashboard() {
             <div className="flex border-b border-slate-100 dark:border-slate-800/60 pb-1.5 gap-4">
               <button
                 onClick={() => setMessageSubTab('compose')}
-                className={`text-xs font-bold pb-2 transition-all border-b-2 relative ${
-                  messageSubTab === 'compose'
+                className={`text-xs font-bold pb-2 transition-all border-b-2 relative ${messageSubTab === 'compose'
                     ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 dark:border-emerald-400'
                     : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                }`}
+                  }`}
               >
                 Compose Message
               </button>
               <button
                 onClick={() => setMessageSubTab('sent')}
-                className={`text-xs font-bold pb-2 transition-all border-b-2 relative flex items-center gap-1.5 ${
-                  messageSubTab === 'sent'
+                className={`text-xs font-bold pb-2 transition-all border-b-2 relative flex items-center gap-1.5 ${messageSubTab === 'sent'
                     ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 dark:border-emerald-400'
                     : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                }`}
+                  }`}
               >
                 Sent & Replies
                 {announcements.filter(a => a.type === 'REPLY' && !a.isCompleted && !a.completed).length > 0 && (
@@ -482,9 +480,9 @@ export default function FacultyDashboard() {
             {messageSubTab === 'compose' ? (
               <QuickConnectPanel sections={sections} profile={profile} />
             ) : (
-              <FacultyOutbox 
-                sections={sections} 
-                profile={profile} 
+              <FacultyOutbox
+                sections={sections}
+                profile={profile}
                 onRepliesChanged={async () => {
                   try {
                     const annRes = await getAnnouncements();
