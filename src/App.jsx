@@ -47,7 +47,7 @@ function AppShell({ children }) {
   // Enforce Light Mode on all public routes inside AppShell
   React.useEffect(() => {
     const root = window.document.documentElement;
-    const originalTheme = localStorage.getItem("vite-ui-theme") || "system";
+    const originalTheme = localStorage.getItem("vite-ui-theme") || "light";
 
     const forceLight = () => {
       root.classList.remove("dark");

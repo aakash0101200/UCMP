@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 /* --------------------------------- Context --------------------------------- */
 
 const initialState = {
-  theme: 'system',          // 'light' | 'dark' | 'system'
+  theme: 'light',          // 'light' | 'dark' | 'system'
   setTheme: () => {},       // placeholder – replaced in provider
 };
 
@@ -14,7 +14,7 @@ const ThemeProviderContext = createContext(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'system',
+  defaultTheme = 'light',
   storageKey  = 'vite-ui-theme',
   ...props
 }) {
