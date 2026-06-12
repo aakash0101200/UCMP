@@ -19,6 +19,16 @@ import {
   AlertCircle
 } from "lucide-react";
 
+const getGreetingName = (name) => {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  const titles = ["dr.", "dr", "mr.", "mr", "mrs.", "mrs", "ms.", "ms", "prof.", "prof"];
+  if (parts.length > 1 && titles.includes(parts[0].toLowerCase())) {
+    return `${parts[0]} ${parts[1]}`;
+  }
+  return parts[0];
+};
+
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -180,7 +190,7 @@ export default function StudentDashboard() {
         {/* Left Side: Greeting Info */}
         <div className="flex-1 flex flex-col justify-center text-left">
           <h1 className="text-5xl font-light text-gray-900 dark:text-white tracking-tight leading-tight">
-            Hello, <span className="font-normal text-gray-900 dark:text-white">{profile?.name ? profile.name.split(' ')[0] : "Student"}</span>
+            Hello, <span className="font-normal text-gray-900 dark:text-white">{profile?.name ? getGreetingName(profile.name) : "Student"}</span>
           </h1>
           <p className="text-gray-600 dark:text-zinc-400 mt-2 text-lg">
             Access your academic summary, schedules, and active classroom sessions.

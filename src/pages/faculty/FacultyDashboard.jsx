@@ -24,6 +24,16 @@ import {
   User
 } from "lucide-react";
 
+const getGreetingName = (name) => {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  const titles = ["dr.", "dr", "mr.", "mr", "mrs.", "mrs", "ms.", "ms", "prof.", "prof"];
+  if (parts.length > 1 && titles.includes(parts[0].toLowerCase())) {
+    return `${parts[0]} ${parts[1]}`;
+  }
+  return parts[0];
+};
+
 export default function FacultyDashboard() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -138,16 +148,13 @@ export default function FacultyDashboard() {
       `}</style>
 
       {/* 1. Welcoming Header */}
-      <section className="flex flex-col lg:flex-row gap-6 items-stretch justify-between bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 p-6 rounded-3xl shadow-sm" data-purpose="greeting">
+      <section className="flex flex-col lg:flex-row gap-6 items-stretch justify-between" data-purpose="greeting">
         {/* Left Side: Greeting Info */}
         <div className="flex-grow flex flex-col justify-center text-left">
-          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">
-            Faculty Workspace
-          </span>
-          <h1 className="text-3xl font-light text-slate-900 dark:text-white tracking-tight mt-1 leading-tight">
-            Welcome, <span className="font-normal text-slate-900 dark:text-white">{profile?.name ? profile.name.split(' ')[0] : "Professor"}</span>
+          <h1 className="text-5xl font-light text-slate-900 dark:text-white tracking-tight leading-tight">
+            Welcome, <span className="font-normal text-slate-900 dark:text-white">{profile?.name ? getGreetingName(profile.name) : "Professor"}</span>
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-gray-600 dark:text-zinc-400 mt-2 text-lg">
             Manage your teaching schedule, publish announcements, track attendance, and log course grade submissions.
           </p>
         </div>
