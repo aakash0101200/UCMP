@@ -691,7 +691,7 @@ export default function AdminTimetablePage() {
     : [];
 
   return (
-    <div className="space-y-6 pb-24 p-6 -mt-6 -mx-6 min-h-[calc(100vh-64px)] page-canvas transition-colors duration-300 text-foreground overflow-y-auto w-[calc(100%+3rem)] text-left">
+    <div className="space-y-6 pb-12 text-foreground text-left">
       <div className="space-y-6 text-left">
         {/* Title Block */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

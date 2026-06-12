@@ -53,9 +53,10 @@ export default function StudentInbox() {
     setLoading(true);
     try {
       const res = await getAnnouncements();
-      setMessages(res.data || []);
+      setMessages(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Failed to load messages:", err);
+      setMessages([]);
     } finally {
       setLoading(false);
     }
@@ -66,9 +67,9 @@ export default function StudentInbox() {
     try {
       await acknowledgeMessage(id);
       setMessages((prev) =>
-        prev.map((m) =>
+        Array.isArray(prev) ? prev.map((m) =>
           (m.announcementId || m.id) === id ? { ...m, isCompleted: true, completed: true } : m
-        )
+        ) : []
       );
       toast.success("Message acknowledged!");
     } catch (err) {
@@ -95,8 +96,10 @@ export default function StudentInbox() {
     }
   };
 
+  const messagesArray = Array.isArray(messages) ? messages : [];
+
   // Filter messages based on tab
-  const filteredMessages = messages.filter((m) => {
+  const filteredMessages = messagesArray.filter((m) => {
     if (activeTab === "faculty") {
       const t = (m.type || "").toUpperCase();
       return t === "MESSAGE" || t === "PRIORITY_MESSAGE" || t === "REPLY";
@@ -104,12 +107,12 @@ export default function StudentInbox() {
     return true;
   });
 
-  const facultyCount = messages.filter((m) => {
+  const facultyCount = messagesArray.filter((m) => {
     const t = (m.type || "").toUpperCase();
     return t === "MESSAGE" || t === "PRIORITY_MESSAGE" || t === "REPLY";
   }).length;
 
-  const unreadFaculty = messages.filter((m) => {
+  const unreadFaculty = messagesArray.filter((m) => {
     const t = (m.type || "").toUpperCase();
     return (t === "MESSAGE" || t === "PRIORITY_MESSAGE") && !m.isCompleted && !m.completed;
   }).length;
@@ -124,7 +127,7 @@ export default function StudentInbox() {
   }
 
   return (
-    <div className="-mt-6 -mx-6 min-h-[calc(100vh-64px)] bg-[#F9FBFC] dark:bg-[#0A0F1A] transition-colors duration-300 text-slate-800 dark:text-slate-100 overflow-y-auto w-[calc(100%+3rem)] p-6 space-y-5 pb-24 text-left">
+    <div className="space-y-5">
       <style>{`
         .scroll-hide::-webkit-scrollbar { display: none; }
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }

@@ -127,7 +127,7 @@ export default function StudentDashboard() {
   const attendanceVal = overallAttendance || 0;
 
   return (
-    <div className="space-y-8 pb-24 p-6 -mt-6 -mx-6 -mb-6 w-[calc(100%+3rem)] min-h-[calc(100vh-64px)] bg-[#F9FBFC] dark:bg-[#0D1512] transition-colors duration-300 text-foreground overflow-y-auto text-left">
+    <div className="space-y-8 pb-12 text-foreground text-left">
 
       {/* Dynamic breathing and focus animation styling */}
       <style>{`
