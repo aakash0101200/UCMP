@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import API from '../../Services/api';
 import LocationAccessGuard from './LocationAccessGuard';
+import { getDeviceFingerprint } from '../../utils/fingerprint';
 
 export default function StudentAttendanceScanner() {
     const [code, setCode] = useState('');
@@ -52,7 +53,8 @@ export default function StudentAttendanceScanner() {
                 sessionId: activeSession.id,
                 code: code,
                 latitude: coords.latitude,
-                longitude: coords.longitude
+                longitude: coords.longitude,
+                deviceFingerprint: getDeviceFingerprint()
             });
 
             setStatus('success');
