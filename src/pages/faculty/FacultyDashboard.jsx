@@ -20,7 +20,8 @@ import {
   Loader2,
   AlertCircle,
   X,
-  MessageSquare
+  MessageSquare,
+  User
 } from "lucide-react";
 
 export default function FacultyDashboard() {
@@ -137,35 +138,56 @@ export default function FacultyDashboard() {
       `}</style>
 
       {/* 1. Welcoming Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 p-6 rounded-3xl shadow-sm">
-        <div>
+      <section className="flex flex-col lg:flex-row gap-6 items-stretch justify-between bg-white dark:bg-[#14221C] border border-emerald-200/40 dark:border-emerald-950/60 p-6 rounded-3xl shadow-sm" data-purpose="greeting">
+        {/* Left Side: Greeting Info */}
+        <div className="flex-grow flex flex-col justify-center text-left">
           <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">
             Faculty Workspace
           </span>
-          <h1 className="text-3xl font-light text-slate-900 dark:text-white tracking-tight mt-1">
-            Welcome, {profile?.name || "Professor"}
+          <h1 className="text-3xl font-light text-slate-900 dark:text-white tracking-tight mt-1 leading-tight">
+            Welcome, <span className="font-normal text-slate-900 dark:text-white">{profile?.name ? profile.name.split(' ')[0] : "Professor"}</span>
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Manage your teaching schedule, publish announcements, track attendance, and log course grade submissions.
           </p>
         </div>
 
-        {/* Profile Badges */}
-        <div className="flex flex-wrap gap-2 text-xs">
-          <div className="bg-slate-50 dark:bg-[#0D1512]/60 border border-slate-200 dark:border-emerald-950/60 px-3.5 py-1.5 rounded-xl font-medium shadow-sm">
-            <span className="text-slate-500 dark:text-slate-400">ID: </span>
-            <span className="font-semibold text-slate-900 dark:text-slate-100">{profile?.collegeId}</span>
+        {/* Right Side: The Profile Card */}
+        <div className="lg:w-80 shrink-0 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm flex items-center gap-4 relative overflow-hidden text-foreground">
+          {/* Avatar frame */}
+          <div className="relative w-16 h-16 shrink-0 z-10">
+            {profile?.profilePictureUrl ? (
+              <img
+                src={profile.profilePictureUrl}
+                alt={profile?.name || 'User'}
+                className="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-zinc-700 shadow-inner"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center border-2 border-slate-200 dark:border-zinc-700">
+                <User className="w-8 h-8 text-slate-400" />
+              </div>
+            )}
           </div>
-          <div className="bg-slate-50 dark:bg-[#0D1512]/60 border border-slate-200 dark:border-emerald-950/60 px-3.5 py-1.5 rounded-xl font-medium shadow-sm">
-            <span className="text-slate-500 dark:text-slate-400">Dept: </span>
-            <span className="font-semibold text-slate-900 dark:text-slate-100">{profile?.faculty?.department || "N/A"}</span>
-          </div>
-          <div className="bg-slate-50 dark:bg-[#0D1512]/60 border border-slate-200 dark:border-emerald-950/60 px-3.5 py-1.5 rounded-xl font-medium shadow-sm">
-            <span className="text-slate-500 dark:text-slate-400">Designation: </span>
-            <span className="font-semibold text-slate-900 dark:text-slate-100">{profile?.faculty?.designation || "Faculty"}</span>
+
+          {/* User Meta */}
+          <div className="flex-1 min-w-0 z-10 text-left">
+            <h4 className="font-semibold text-sm truncate text-gray-900 dark:text-white leading-tight">
+              {profile?.name}
+            </h4>
+            <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-mono mt-0.5">
+              {profile?.collegeId}
+            </p>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700 shadow-sm" title={profile?.faculty?.department || "Department"}>
+                📚
+              </span>
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-zinc-850 px-2 py-0.5 rounded-full border border-slate-200/50 dark:border-zinc-750">
+                {profile?.faculty?.department || "Faculty"}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* 2. Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

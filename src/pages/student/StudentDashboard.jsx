@@ -22,7 +22,6 @@ import {
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
-  const [profileTheme, setProfileTheme] = useState(localStorage.getItem('ucmp-profile-theme') || 'slate');
   const [attendance, setAttendance] = useState([]);
   const [classes, setClasses] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
@@ -127,15 +126,8 @@ export default function StudentDashboard() {
 
   const attendanceVal = overallAttendance || 0;
 
-  const bgClasses = {
-    slate: "bg-gradient-to-b from-[#E0F2FE] via-[#F1F5F9] to-[#FCE7F3] dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950",
-    sakura: "bg-gradient-to-b from-pink-100/30 via-zinc-50 to-pink-50/20 dark:from-zinc-950 dark:via-zinc-900 dark:to-pink-950/20",
-    nature: "bg-gradient-to-b from-emerald-100/20 via-zinc-50 to-teal-50/20 dark:from-zinc-950 dark:via-zinc-900 dark:to-emerald-950/15"
-  };
-  const activeBg = bgClasses[profileTheme] || bgClasses.slate;
-
   return (
-    <div className={`space-y-8 pb-24 p-6 -mt-6 -mx-6 -mb-6 w-[calc(100%+3rem)] min-h-[calc(100vh-64px)] ${activeBg} transition-colors duration-500 text-foreground overflow-y-auto text-left`}>
+    <div className="space-y-8 pb-24 p-6 -mt-6 -mx-6 -mb-6 w-[calc(100%+3rem)] min-h-[calc(100vh-64px)] bg-[#F9FBFC] dark:bg-[#0D1512] transition-colors duration-300 text-foreground overflow-y-auto text-left">
 
       {/* Dynamic breathing and focus animation styling */}
       <style>{`
@@ -195,35 +187,18 @@ export default function StudentDashboard() {
           </p>
         </div>
 
-        {/* Right Side: The Dynamic Theme Profile Card (Pinterest Inspired) */}
-        <div className={`lg:w-80 shrink-0 border rounded-3xl p-6 shadow-sm transition-all duration-500 relative overflow-hidden flex items-center gap-4 ${profileTheme === 'slate' ? 'bg-white dark:bg-zinc-900 border-white/20 dark:border-zinc-800/40 text-foreground' :
-          profileTheme === 'sakura' ? 'bg-gradient-to-b from-pink-50/50 via-white to-pink-100/50 dark:from-zinc-950 dark:via-zinc-900 dark:to-pink-950/20 border-pink-200/50 dark:border-pink-900/30' :
-            'bg-gradient-to-b from-emerald-50/40 via-white to-teal-50/40 dark:from-zinc-950 dark:via-zinc-900 dark:to-emerald-950/10 border-emerald-100/70 dark:border-emerald-900/20 shadow-emerald-100/10'
-          }`}>
-          {/* Custom Theme Background Decorations */}
-          {profileTheme === 'sakura' && (
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-pink-500/5 pointer-events-none" />
-          )}
-          {profileTheme === 'nature' && (
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-emerald-500/5 pointer-events-none" />
-          )}
-
+        {/* Right Side: The Profile Card */}
+        <div className="lg:w-80 shrink-0 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm flex items-center gap-4 relative overflow-hidden text-foreground">
           {/* Avatar frame */}
           <div className="relative w-16 h-16 shrink-0 z-10">
             {profile?.profilePictureUrl ? (
               <img
                 src={profile.profilePictureUrl}
                 alt={profile?.name || 'User'}
-                className={`w-16 h-16 rounded-full object-cover border-2 shadow-inner transition-all duration-300 ${profileTheme === 'slate' ? 'border-slate-200 dark:border-zinc-700' :
-                  profileTheme === 'sakura' ? 'border-pink-300 shadow-[0_0_12px_rgba(244,114,182,0.3)]' :
-                    'border-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.35)]'
-                  }`}
+                className="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-zinc-700 shadow-inner"
               />
             ) : (
-              <div className={`w-16 h-16 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center border-2 ${profileTheme === 'slate' ? 'border-slate-200 dark:border-zinc-700' :
-                profileTheme === 'sakura' ? 'border-pink-300' :
-                  'border-emerald-400'
-                }`}>
+              <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center border-2 border-slate-200 dark:border-zinc-700">
                 <User className="w-8 h-8 text-slate-400" />
               </div>
             )}
@@ -238,15 +213,8 @@ export default function StudentDashboard() {
               {profile?.collegeId}
             </p>
             <div className="flex items-center gap-1.5 mt-2">
-              <span className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-all shadow-sm ${profileTheme === 'slate' ? 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700' :
-                profileTheme === 'sakura' ? 'bg-pink-100 dark:bg-pink-950/35 text-pink-600 dark:text-pink-400 border border-pink-200/35' :
-                  'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100/50'
-                }`}>
-                {
-                  profileTheme === 'slate' ? '💼' :
-                    profileTheme === 'sakura' ? '🌸' :
-                      '🌿'
-                }
+              <span className="w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700 shadow-sm">
+                🎓
               </span>
             </div>
           </div>
