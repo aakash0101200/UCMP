@@ -331,8 +331,8 @@ export default function AttendancePage() {
   const [summary, setSummary] = useState([]);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState('overview'); // 'overview' | 'history'
-  const [showBreakdown, setShowBreakdown] = useState(false);
+  const [subjectsExpanded, setSubjectsExpanded] = useState(false);
+  const [historyExpanded, setHistoryExpanded] = useState(false);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -364,7 +364,7 @@ export default function AttendancePage() {
   const dangerCount = summary.filter(s => s.totalClasses > 0 && ((s.attended / s.totalClasses) * 100) < 60).length;
 
   return (
-    <div className="space-y-5">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -374,27 +374,26 @@ export default function AttendancePage() {
         <button
           onClick={fetchAll}
           disabled={loading}
-          className="p-2 hover:bg-muted/50 rounded-lg transition-colors"
+          className="p-2 hover:bg-muted/50 rounded-lg transition-colors border border-border/40"
           title="Refresh"
         >
           <RefreshCw className={`w-4 h-4 text-muted-foreground ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
-        {/* ── LEFT: Overall + Scanner ─────────────────────────────────── */}
-        <div className="lg:col-span-1 space-y-5">
-          {/* Overall Gauge */}
-          <div className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl p-5 shadow-sm">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+      {/* Top Grid: Overall Attendance & Live Class Verification */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Overall Gauge */}
+        <div className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider mb-4">
               Overall Attendance
             </h3>
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-indigo-500" /></div>
             ) : (
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-36 h-36">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <div className="w-28 h-28 shrink-0">
                   <CircularProgressbar
                     value={avg}
                     text={activeSubjects.length > 0 ? `${avg.toFixed(1)}%` : '--'}
@@ -408,138 +407,150 @@ export default function AttendancePage() {
                   />
                 </div>
 
-                {/* Stat pills */}
-                <div className="flex gap-2 flex-wrap justify-center">
-                  <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 rounded-full">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{safeCount} Safe</span>
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                    <div className="flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 rounded-full">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">{safeCount} Safe</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2.5 py-0.5 bg-amber-500/10 rounded-full">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                      <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">{warnCount} Warn</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2.5 py-0.5 bg-red-500/10 rounded-full">
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">{dangerCount} Danger</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 rounded-full">
-                    <div className="w-2 h-2 rounded-full bg-amber-500" />
-                    <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">{warnCount} Warning</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1 bg-red-500/10 rounded-full">
-                    <div className="w-2 h-2 rounded-full bg-red-500" />
-                    <span className="text-xs font-semibold text-red-500">{dangerCount} Danger</span>
-                  </div>
-                </div>
 
-                {/* Requirement note */}
-                <p className="text-center text-xs text-muted-foreground">
-                  {activeSubjects.length === 0
-                    ? 'No class sessions conducted yet.'
-                    : avg >= 75
-                      ? '✓ You meet the 75% requirement'
-                      : avg >= 60
-                        ? `⚠ ${(75 - avg).toFixed(1)}% below the requirement`
-                        : '✗ Critical — contact your coordinator'}
-                </p>
+                  <p className="text-left text-xs text-muted-foreground max-w-xs leading-relaxed">
+                    {activeSubjects.length === 0
+                      ? 'No class sessions conducted yet.'
+                      : avg >= 75
+                        ? '✓ You meet the 75% requirement'
+                        : avg >= 60
+                          ? `⚠ ${(75 - avg).toFixed(1)}% below the requirement`
+                          : '✗ Critical — contact your coordinator'}
+                  </p>
+                </div>
               </div>
             )}
           </div>
-
-          {/* Live Scanner */}
-          <ScannerPanel onSuccess={fetchAll} />
         </div>
 
-        {/* ── RIGHT: Subject List + History ───────────────────────────── */}
-        <div className="lg:col-span-2">
-          {/* Tab switcher */}
-          <div className="flex gap-1 p-1 bg-[#F3F4F6] dark:bg-zinc-800 rounded-xl mb-4 w-fit">
-            {[
-              { key: 'overview', icon: BookOpen, label: 'Subjects' },
-              { key: 'history', icon: History, label: 'History' },
-            ].map(({ key, icon: Icon, label }) => (
-              <button
-                key={key}
-                onClick={() => setTab(key)}
-                className={`px-4 py-2 text-sm font-medium rounded-lg flex items-center gap-1.5 transition-all ${tab === key
-                  ? 'bg-white dark:bg-zinc-900 text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                <Icon className="w-4 h-4" /> {label}
-              </button>
-            ))}
-          </div>
+        {/* Live Scanner */}
+        <ScannerPanel onSuccess={fetchAll} />
+      </div>
 
-          <AnimatePresence mode="wait">
-            {tab === 'overview' ? (
+      {/* Bottom Collapsible Sections */}
+      <div className="space-y-4">
+        {/* Accordion 1: Subject-wise Breakdown */}
+        <div className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl overflow-hidden shadow-sm">
+          <button
+            onClick={() => setSubjectsExpanded(!subjectsExpanded)}
+            className="w-full flex items-center justify-between p-4 hover:bg-slate-50/50 dark:hover:bg-zinc-900/50 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-indigo-500" />
+              <span className="font-semibold text-sm">Subject-wise Breakdown</span>
+              {!loading && (
+                <span className="text-xs px-2 py-0.5 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 rounded-full font-medium">
+                  {summary.length} {summary.length === 1 ? 'subject' : 'subjects'}
+                </span>
+              )}
+            </div>
+            <ChevronDown
+              className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
+                subjectsExpanded ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+
+          <AnimatePresence initial={false}>
+            {subjectsExpanded && (
               <motion.div
-                key="overview"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl p-4 shadow-sm"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="overflow-hidden"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-sm">Subject-wise Breakdown</h3>
-                  <span className="text-xs text-muted-foreground">{summary.length} subjects</span>
+                <div className="px-4 pb-4 border-t border-border/30 pt-4">
+                  {loading ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3, 4].map(i => (
+                        <div key={i} className="h-14 bg-muted/30 rounded-xl animate-pulse" />
+                      ))}
+                    </div>
+                  ) : summary.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                      <BookOpen className="w-10 h-10 text-muted-foreground/20 mb-2" />
+                      <p className="font-medium text-sm">No attendance data yet</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Attendance records will appear here after your first class.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {summary.map((s, i) => <SubjectCard key={s.subjectId} subject={s} index={i} />)}
+                    </div>
+                  )}
                 </div>
-
-                {!showBreakdown ? (
-                  <div className="flex flex-col items-center justify-center py-10 text-center">
-                    <BookOpen className="w-10 h-10 text-muted-foreground/30 mb-3 animate-pulse" />
-                    <p className="text-sm font-medium text-muted-foreground">Subject breakdown is hidden by default.</p>
-                    <button
-                      onClick={() => setShowBreakdown(true)}
-                      className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition shadow-sm"
-                    >
-                      Show Subject Breakdown
-                    </button>
-                  </div>
-                ) : loading ? (
-                  <div className="space-y-3">
-                    {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="h-14 bg-muted/30 rounded-xl animate-pulse" />
-                    ))}
-                  </div>
-                ) : summary.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <BookOpen className="w-12 h-12 text-muted-foreground/20 mb-3" />
-                    <p className="font-medium">No attendance data yet</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Attendance records will appear here after your first class.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {summary.map((s, i) => <SubjectCard key={s.subjectId} subject={s} index={i} />)}
-                  </div>
-                )}
               </motion.div>
-            ) : (
-              <motion.div
-                key="history"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl p-4 shadow-sm"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-sm">Attendance History</h3>
-                  <span className="text-xs text-muted-foreground">{history.length} records</span>
-                </div>
+            )}
+          </AnimatePresence>
+        </div>
 
-                {loading ? (
-                  <div className="space-y-2">
-                    {[1, 2, 3].map(i => <div key={i} className="h-10 bg-muted/30 rounded-lg animate-pulse" />)}
-                  </div>
-                ) : history.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <History className="w-12 h-12 text-muted-foreground/20 mb-3" />
-                    <p className="font-medium">No history yet</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Sessions you attend will appear in this log.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="max-h-[520px] overflow-y-auto pr-1">
-                    {history.map((r, i) => <HistoryItem key={i} record={r} index={i} />)}
-                  </div>
-                )}
+        {/* Accordion 2: Attendance History */}
+        <div className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl overflow-hidden shadow-sm">
+          <button
+            onClick={() => setHistoryExpanded(!historyExpanded)}
+            className="w-full flex items-center justify-between p-4 hover:bg-slate-50/50 dark:hover:bg-zinc-900/50 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2">
+              <History className="w-4 h-4 text-indigo-500" />
+              <span className="font-semibold text-sm">Attendance History</span>
+              {!loading && (
+                <span className="text-xs px-2 py-0.5 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 rounded-full font-medium">
+                  {history.length} {history.length === 1 ? 'record' : 'records'}
+                </span>
+              )}
+            </div>
+            <ChevronDown
+              className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
+                historyExpanded ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+
+          <AnimatePresence initial={false}>
+            {historyExpanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                <div className="px-4 pb-4 border-t border-border/30 pt-2">
+                  {loading ? (
+                    <div className="space-y-2 pt-2">
+                      {[1, 2, 3].map(i => <div key={i} className="h-10 bg-muted/30 rounded-lg animate-pulse" />)}
+                    </div>
+                  ) : history.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                      <History className="w-10 h-10 text-muted-foreground/20 mb-2" />
+                      <p className="font-medium text-sm">No history yet</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Sessions you attend will appear in this log.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="max-h-[400px] overflow-y-auto pr-1 divide-y divide-border/20">
+                      {history.map((r, i) => <HistoryItem key={i} record={r} index={i} />)}
+                    </div>
+                  )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
