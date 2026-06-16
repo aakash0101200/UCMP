@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getSectionSchedule, getFacultySchedule, getResolvedSectionSchedule, getResolvedFacultySchedule, cancelClass, getAcademicTerms } from '../../Services/timetable';
 import { getProfile } from '../../Services/profile';
 import { getActiveRole } from '../../Services/auth';
+import { getCacheSync } from '../../utils/apiCache';
+
 import { Clock, MapPin, User, BookOpen, AlertCircle, Loader2, LayoutGrid, List, AlertTriangle, X, HelpCircle, Layers, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -95,13 +97,58 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
   const isMobile = useIsMobile();
   const [selectedTerm, setSelectedTerm] = useState(term);
   const [availableTerms, setAvailableTerms] = useState([]);
-  const [entries, setEntries] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  const role = getActiveRole();
+  const isFaculty = role === 'FACULTY';
+
+  const getCachedWeeklyEntries = (userRole, termValue) => {
+    const collegeId = localStorage.getItem('collegeId');
+    const profileCached = getCacheSync(`profile_${collegeId}`)?.data;
+    if (!profileCached) return null;
+
+    const weekDates = getDatesForCurrentWeek();
+    const cachedList = [];
+    let allCached = true;
+
+    if (userRole === 'STUDENT' && profileCached.student?.sectionId) {
+      const sectionId = profileCached.student.sectionId;
+      for (const dateStr of Object.values(weekDates)) {
+        const cached = getCacheSync(`resolved_schedule_${sectionId}_${dateStr}_${termValue}`);
+        if (cached) {
+          cachedList.push(...(cached.data || []));
+        } else {
+          allCached = false;
+          break;
+        }
+      }
+    } else if (userRole === 'FACULTY' && profileCached.faculty?.facultyId) {
+      const facultyId = profileCached.faculty.facultyId;
+      for (const dateStr of Object.values(weekDates)) {
+        const cached = getCacheSync(`resolved_faculty_${facultyId}_${dateStr}_${termValue}`);
+        if (cached) {
+          cachedList.push(...(cached.data || []));
+        } else {
+          allCached = false;
+          break;
+        }
+      }
+    } else {
+      allCached = false;
+    }
+
+    return allCached ? cachedList : null;
+  };
+
+  const [entries, setEntries] = useState(() => {
+    return getCachedWeeklyEntries(role, selectedTerm) || [];
+  });
+  const [loading, setLoading] = useState(() => {
+    return getCachedWeeklyEntries(role, selectedTerm) === null;
+  });
   const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState(isMobile ? 'list' : 'grid');
   const [mobileDay, setMobileDay] = useState(getCurrentDay()); // Mobile: show one day at a time
-  const role = getActiveRole();
-  const isFaculty = role === 'FACULTY';
+
   const theme = {
     primaryBg: isFaculty ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-indigo-600 dark:bg-indigo-500',
     primaryText: isFaculty ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400',
@@ -182,7 +229,10 @@ export default function WeeklyScheduleGrid({ term = '2026-27-ODD' }) {
 
   useEffect(() => {
     async function fetchSchedule() {
-      setLoading(true);
+      const cached = getCachedWeeklyEntries(role, selectedTerm);
+      if (cached === null) {
+        setLoading(true);
+      }
       setError(null);
       try {
         const collegeId = localStorage.getItem('collegeId');

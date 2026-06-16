@@ -19,6 +19,8 @@ import {
   AlertCircle
 } from "lucide-react";
 
+import { getCacheSync } from "../../utils/apiCache";
+
 const getGreetingName = (name) => {
   if (!name) return "";
   const parts = name.trim().split(/\s+/);
@@ -31,11 +33,35 @@ const getGreetingName = (name) => {
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState(null);
-  const [attendance, setAttendance] = useState([]);
-  const [classes, setClasses] = useState([]);
-  const [announcements, setAnnouncements] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  const [profile, setProfile] = useState(() => {
+    const collegeId = localStorage.getItem("collegeId");
+    return getCacheSync(`profile_${collegeId}`)?.data || null;
+  });
+  const [attendance, setAttendance] = useState(() => {
+    return getCacheSync('attendance_summary')?.data || [];
+  });
+  const [classes, setClasses] = useState(() => {
+    const sectionId = localStorage.getItem("sectionId");
+    if (!sectionId) return [];
+    const d = new Date();
+    const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const currentTerm = "SPRING_2026";
+    return getCacheSync(`resolved_schedule_${sectionId}_${todayStr}_${currentTerm}`)?.data || [];
+  });
+  const [announcements, setAnnouncements] = useState(() => {
+    const collegeId = localStorage.getItem("collegeId");
+    const sectionId = localStorage.getItem("sectionId");
+    if (sectionId && collegeId) {
+      return getCacheSync(`announcements_student_${collegeId}_${sectionId}`)?.data || [];
+    }
+    return getCacheSync('announcements_global')?.data || [];
+  });
+
+  const [loading, setLoading] = useState(() => {
+    const collegeId = localStorage.getItem("collegeId");
+    return !getCacheSync(`profile_${collegeId}`);
+  });
   const [error, setError] = useState(null);
 
   // Mock assignments matching the actual list on AssignmentPage.jsx
@@ -47,56 +73,50 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     async function loadDashboardData() {
-      setLoading(true);
+      const collegeId = localStorage.getItem("collegeId");
+      const hasProfile = !!getCacheSync(`profile_${collegeId}`);
+      if (!hasProfile) {
+        setLoading(true);
+      }
       setError(null);
       try {
-        const collegeId = localStorage.getItem("collegeId");
         if (!collegeId) {
           throw new Error("No user college ID found.");
         }
 
-        // 1. Fetch Profile
-        const profileRes = await getProfile(collegeId);
-        const profileData = profileRes.data;
-        setProfile(profileData);
+        const sectionId = localStorage.getItem("sectionId");
 
-        const sectionId = profileData.student?.sectionId;
+        // Parallelize all network requests
+        const profilePromise = getProfile(collegeId);
+        const attPromise = getAttendanceSummary();
+        
+        const schedulePromise = sectionId ? (async () => {
+          const termsRes = await getAcademicTerms();
+          const currentTerm = termsRes.data?.[0] || "SPRING_2026";
+          const d = new Date();
+          const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          return getResolvedSectionSchedule(sectionId, todayStr, currentTerm);
+        })() : Promise.resolve({ data: [] });
 
-        // 2. Fetch Attendance Summary
-        try {
-          const attRes = await getAttendanceSummary();
-          setAttendance(attRes.data || []);
-        } catch (e) {
-          console.error("Failed to load attendance summary:", e);
+        const annPromise = sectionId 
+          ? getStudentAnnouncements(collegeId, sectionId) 
+          : getAnnouncements();
+
+        const [profileRes, attRes, scheduleRes, annRes] = await Promise.all([
+          profilePromise,
+          attPromise.catch(e => { console.error("Attendance summary error:", e); return { data: [] }; }),
+          schedulePromise.catch(e => { console.error("Schedule error:", e); return { data: [] }; }),
+          annPromise.catch(e => { console.error("Announcements error:", e); return { data: [] }; })
+        ]);
+
+        setProfile(profileRes.data);
+        setAttendance(attRes.data || []);
+        setClasses(scheduleRes.data || []);
+        setAnnouncements(annRes.data || []);
+
+        if (profileRes.data?.student?.sectionId) {
+          localStorage.setItem("sectionId", profileRes.data.student.sectionId);
         }
-
-        // 3. Fetch Today's Classes Schedule
-        if (sectionId) {
-          try {
-            const termsRes = await getAcademicTerms();
-            const currentTerm = termsRes.data?.[0] || "SPRING_2026";
-            const d = new Date();
-            const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-            const scheduleRes = await getResolvedSectionSchedule(sectionId, todayStr, currentTerm);
-            setClasses(scheduleRes.data || []);
-          } catch (e) {
-            console.error("Failed to load today's classes schedule:", e);
-          }
-        }
-
-        // 4. Fetch Announcements
-        try {
-          let annRes;
-          if (sectionId) {
-            annRes = await getStudentAnnouncements(collegeId, sectionId);
-          } else {
-            annRes = await getAnnouncements();
-          }
-          setAnnouncements(annRes.data || []);
-        } catch (e) {
-          console.error("Failed to load announcements:", e);
-        }
-
       } catch (err) {
         console.error("Failed to load dashboard data:", err);
         setError("Could not load workspace. Please try logging in again.");
@@ -128,6 +148,7 @@ export default function StudentDashboard() {
       </div>
     );
   }
+
 
   // Calculate overall attendance average
   const activeAttendance = attendance.filter(curr => curr.totalClasses > 0);
