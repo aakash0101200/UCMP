@@ -15,16 +15,19 @@ import { useWebSocket } from '../../hooks/useWebSocket';
 import LocationAccessGuard from '../../components/Attendance/LocationAccessGuard';
 
 // ── Colour helpers ─────────────────────────────────────────────────────────
-function getStatusColor(pct) {
-  if (pct >= 75) return { ring: '#22c55e', text: 'text-emerald-500', bg: 'bg-emerald-500/10', bar: '#16a34a', label: 'SAFE' };
-  if (pct >= 60) return { ring: '#f59e0b', text: 'text-amber-500', bg: 'bg-amber-500/10', bar: '#d97706', label: 'WARNING' };
-  return { ring: '#ef4444', text: 'text-red-500', bg: 'bg-red-500/10', bar: '#dc2626', label: 'DANGER' };
+function getStatusColor(pct, totalClasses) {
+  if (totalClasses === 0) {
+    return { ring: '#94a3b8', text: 'text-slate-600 dark:text-zinc-400', bg: 'bg-slate-100 dark:bg-zinc-800', bar: '#cbd5e1', label: 'NO CLASSES HELD YET' };
+  }
+  if (pct >= 75) return { ring: '#22c55e', text: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-950/40', bar: '#16a34a', label: 'SAFE' };
+  if (pct >= 60) return { ring: '#f59e0b', text: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-950/40', bar: '#d97706', label: 'WARNING' };
+  return { ring: '#ef4444', text: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-950/40', bar: '#dc2626', label: 'DANGER' };
 }
 
 // ── Subject Attendance Bar Card ────────────────────────────────────────────
 function SubjectCard({ subject, index }) {
-  const pct = subject.percentage ?? 0;
-  const c = getStatusColor(pct);
+  const pct = subject.totalClasses > 0 ? (subject.attended / subject.totalClasses) * 100 : 0;
+  const c = getStatusColor(pct, subject.totalClasses);
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -43,7 +46,7 @@ function SubjectCard({ subject, index }) {
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="flex-1 h-2.5 rounded-full bg-muted overflow-hidden">
+        <div className="flex-1 h-5 rounded-full bg-muted overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(pct, 100)}%` }}
@@ -53,7 +56,7 @@ function SubjectCard({ subject, index }) {
           />
         </div>
         <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-          <span className="font-semibold text-foreground">{pct.toFixed(1)}%</span>
+          <span className="font-semibold text-foreground">{subject.totalClasses > 0 ? `${pct.toFixed(1)}%` : '--'}</span>
           <span>({subject.attended}/{subject.totalClasses})</span>
         </div>
       </div>
@@ -198,7 +201,7 @@ function ScannerPanel({ onSuccess }) {
   };
 
   return (
-    <div className="bg-background border border-border/50 rounded-xl p-5 shadow-sm">
+    <div className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl p-5 shadow-sm">
       <div className="flex items-center gap-2 mb-1">
         <div className={`w-2 h-2 rounded-full ${activeSession ? 'bg-green-500 animate-pulse' : 'bg-slate-400'}`} />
         <h3 className="font-semibold text-base">Live Class Verification</h3>
@@ -259,15 +262,15 @@ function ScannerPanel({ onSuccess }) {
 
         <button
           onClick={handleMark}
-          disabled={!activeSession || status === 'loading' || status === 'success'}
+          disabled={!activeSession || status === 'loading' || showLocationGuard || status === 'success'}
           className={`w-full max-w-[260px] py-3 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2
-            ${status === 'loading' ? 'bg-indigo-400 cursor-not-allowed'
+            ${(status === 'loading' || showLocationGuard) ? 'bg-indigo-400 cursor-not-allowed'
               : status === 'success' ? 'bg-emerald-600'
                 : 'bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20'}`}
         >
-          {status === 'loading' && <Loader2 className="w-4 h-4 animate-spin" />}
+          {(status === 'loading' || showLocationGuard) && <Loader2 className="w-4 h-4 animate-spin" />}
           {status === 'success' && <CheckCircle2 className="w-4 h-4" />}
-          {status === 'loading' ? 'Verifying...' : status === 'success' ? 'Marked!' : 'Submit Attendance'}
+          {(status === 'loading' || showLocationGuard) ? 'Verifying...' : status === 'success' ? 'Marked!' : 'Submit Attendance'}
         </button>
 
         {message && (
@@ -329,6 +332,7 @@ export default function AttendancePage() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('overview'); // 'overview' | 'history'
+  const [showBreakdown, setShowBreakdown] = useState(false);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -349,14 +353,15 @@ export default function AttendancePage() {
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
   // Compute overall average
-  const avg = summary.length
-    ? summary.reduce((s, x) => s + x.percentage, 0) / summary.length
+  const activeSubjects = summary.filter(s => s.totalClasses > 0);
+  const avg = activeSubjects.length
+    ? activeSubjects.reduce((s, x) => s + (x.attended / x.totalClasses) * 100, 0) / activeSubjects.length
     : 0;
-  const avgColor = getStatusColor(avg);
+  const avgColor = getStatusColor(avg, activeSubjects.length);
 
-  const safeCount = summary.filter(s => s.percentage >= 75).length;
-  const warnCount = summary.filter(s => s.percentage >= 60 && s.percentage < 75).length;
-  const dangerCount = summary.filter(s => s.percentage < 60).length;
+  const safeCount = summary.filter(s => s.totalClasses > 0 && ((s.attended / s.totalClasses) * 100) >= 75).length;
+  const warnCount = summary.filter(s => s.totalClasses > 0 && ((s.attended / s.totalClasses) * 100) >= 60 && ((s.attended / s.totalClasses) * 100) < 75).length;
+  const dangerCount = summary.filter(s => s.totalClasses > 0 && ((s.attended / s.totalClasses) * 100) < 60).length;
 
   return (
     <div className="space-y-5">
@@ -381,7 +386,7 @@ export default function AttendancePage() {
         {/* ── LEFT: Overall + Scanner ─────────────────────────────────── */}
         <div className="lg:col-span-1 space-y-5">
           {/* Overall Gauge */}
-          <div className="bg-background border border-border/50 rounded-xl p-5 shadow-sm">
+          <div className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl p-5 shadow-sm">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
               Overall Attendance
             </h3>
@@ -392,7 +397,7 @@ export default function AttendancePage() {
                 <div className="w-36 h-36">
                   <CircularProgressbar
                     value={avg}
-                    text={`${avg.toFixed(1)}%`}
+                    text={activeSubjects.length > 0 ? `${avg.toFixed(1)}%` : '--'}
                     styles={buildStyles({
                       textSize: '16px',
                       textColor: 'currentColor',
@@ -421,11 +426,13 @@ export default function AttendancePage() {
 
                 {/* Requirement note */}
                 <p className="text-center text-xs text-muted-foreground">
-                  {avg >= 75
-                    ? '✓ You meet the 75% requirement'
-                    : avg >= 60
-                      ? `⚠ ${(75 - avg).toFixed(1)}% below the requirement`
-                      : '✗ Critical — contact your coordinator'}
+                  {activeSubjects.length === 0
+                    ? 'No class sessions conducted yet.'
+                    : avg >= 75
+                      ? '✓ You meet the 75% requirement'
+                      : avg >= 60
+                        ? `⚠ ${(75 - avg).toFixed(1)}% below the requirement`
+                        : '✗ Critical — contact your coordinator'}
                 </p>
               </div>
             )}
@@ -438,7 +445,7 @@ export default function AttendancePage() {
         {/* ── RIGHT: Subject List + History ───────────────────────────── */}
         <div className="lg:col-span-2">
           {/* Tab switcher */}
-          <div className="flex gap-1 p-1 bg-muted/40 rounded-xl mb-4 w-fit">
+          <div className="flex gap-1 p-1 bg-[#F3F4F6] dark:bg-zinc-800 rounded-xl mb-4 w-fit">
             {[
               { key: 'overview', icon: BookOpen, label: 'Subjects' },
               { key: 'history', icon: History, label: 'History' },
@@ -447,7 +454,7 @@ export default function AttendancePage() {
                 key={key}
                 onClick={() => setTab(key)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg flex items-center gap-1.5 transition-all ${tab === key
-                  ? 'bg-background text-foreground shadow-sm'
+                  ? 'bg-white dark:bg-zinc-900 text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
@@ -464,14 +471,25 @@ export default function AttendancePage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2 }}
-                className="bg-background border border-border/50 rounded-xl p-4 shadow-sm"
+                className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl p-4 shadow-sm"
               >
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-sm">Subject-wise Breakdown</h3>
                   <span className="text-xs text-muted-foreground">{summary.length} subjects</span>
                 </div>
 
-                {loading ? (
+                {!showBreakdown ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <BookOpen className="w-10 h-10 text-muted-foreground/30 mb-3 animate-pulse" />
+                    <p className="text-sm font-medium text-muted-foreground">Subject breakdown is hidden by default.</p>
+                    <button
+                      onClick={() => setShowBreakdown(true)}
+                      className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition shadow-sm"
+                    >
+                      Show Subject Breakdown
+                    </button>
+                  </div>
+                ) : loading ? (
                   <div className="space-y-3">
                     {[1, 2, 3, 4].map(i => (
                       <div key={i} className="h-14 bg-muted/30 rounded-xl animate-pulse" />
@@ -498,7 +516,7 @@ export default function AttendancePage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2 }}
-                className="bg-background border border-border/50 rounded-xl p-4 shadow-sm"
+                className="bg-white dark:bg-zinc-900 border border-border/50 rounded-xl p-4 shadow-sm"
               >
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-sm">Attendance History</h3>

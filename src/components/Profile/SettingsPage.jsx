@@ -278,13 +278,11 @@ export default function SettingsPage({ userRole = 'student' }) {
         <p className="text-sm text-slate-500 dark:text-slate-400">Loading settings...</p>
       </div>
     );
-  }
-
-  return (
+  }  return (
     <div className="space-y-6 pb-12 text-left">
 
       {/* Header Area */}
-      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-zinc-800/10 border ${theme.border} p-6 rounded-3xl shadow-sm ${theme.card}`}>
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-zinc-800/10 border ${theme.border} p-6 rounded-xl shadow-sm ${theme.card}`}>
         <div>
           <span className={`text-xs font-semibold tracking-wider uppercase ${theme.accentText}`}>
             User Configuration Control
@@ -298,722 +296,709 @@ export default function SettingsPage({ userRole = 'student' }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+      {/* Horizontal Tabs Switcher */}
+      <div className="flex bg-white/80 dark:bg-zinc-800/80 p-1.5 rounded-xl border border-slate-200 dark:border-zinc-700/60 w-fit gap-2 shadow-sm">
+        <button
+          type="button"
+          onClick={() => setActiveTab('profile')}
+          className={`px-5 py-2.5 text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 ${
+            activeTab === 'profile'
+              ? theme.accentBg + ' shadow-sm'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
+          }`}
+        >
+          <User className="w-3.5 h-3.5" />
+          Personal Details
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('password')}
+          className={`px-5 py-2.5 text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 ${
+            activeTab === 'password'
+              ? theme.accentBg + ' shadow-sm'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
+          }`}
+        >
+          <KeyRound className="w-3.5 h-3.5" />
+          Change Password
+        </button>
+        {isSuperAdmin && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('maintenance')}
+            className={`px-5 py-2.5 text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 ${
+              activeTab === 'maintenance'
+                ? theme.accentBg + ' shadow-sm'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
+            }`}
+          >
+            <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
+            System Maintenance
+          </button>
+        )}
+      </div>
 
-        {/* Left Column: Profile Card + Navigation Tabs */}
-        <div className="lg:col-span-1 space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
 
-          {/* Profile Overview Card */}
-          <div className={`border rounded-3xl p-6 text-center space-y-4 shadow-sm transition-all duration-300 relative overflow-hidden ${selectedThemePreset.style.card}`}>
+        {/* TAB 1: Profile Info Form */}
+        {activeTab === 'profile' && (
+          <div className={`border ${theme.border} rounded-xl p-6 sm:p-8 space-y-6 shadow-sm ${theme.card}`}>
 
-            {/* Role Badge */}
-            <div className="relative z-10 flex justify-center">
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider flex items-center gap-1.5 bg-slate-100 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 border border-slate-200/50 dark:border-zinc-600">
-                <span>{role === 'student' ? '🎓' : (role === 'faculty' ? '📚' : '🛡️')}</span>
-                <span>{role.toUpperCase()}</span>
-              </span>
-            </div>
+            {/* Merged Profile Picture and Info Block at the top */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-slate-100 dark:border-zinc-700/60">
+              <div className="relative w-24 h-24 shrink-0 group">
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={profile?.name || 'User'}
+                    className="w-24 h-24 rounded-full object-cover border-2 shadow-inner transition-all duration-300 border-slate-200 dark:border-zinc-700"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full flex items-center justify-center border-2 transition-all duration-300 bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700">
+                    <User className="w-12 h-12 text-slate-400" />
+                  </div>
+                )}
+                {/* Floating Camera Button */}
+                <label htmlFor="avatar-file-upload" className="absolute bottom-0 right-0 p-1.5 bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 hover:scale-110 text-white rounded-full cursor-pointer shadow-md transition-all">
+                  <Camera className="w-3.5 h-3.5" />
+                  <input
+                    id="avatar-file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
 
-            <div className="relative mx-auto w-24 h-24 z-10 group">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={profile?.name || 'User'}
-                  className={`w-24 h-24 rounded-full object-cover border-2 shadow-inner transition-all duration-300 ${selectedThemePreset.style.avatarBorder}`}
-                />
-              ) : (
-                <div className={`w-24 h-24 rounded-full flex items-center justify-center border-2 transition-all duration-300 bg-slate-100 dark:bg-zinc-800 ${selectedThemePreset.style.avatarBorder}`}>
-                  <User className="w-12 h-12 text-slate-400" />
+              <div className="flex-1 text-center sm:text-left space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center sm:justify-start">
+                  <h3 className="font-semibold text-xl text-slate-900 dark:text-white leading-tight">
+                    {profile?.name}
+                  </h3>
+                  <span className="w-fit mx-auto sm:mx-0 px-2.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider flex items-center gap-1 bg-slate-100 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 border border-slate-200/50 dark:border-zinc-600">
+                    <span>{role === 'student' ? '🎓' : (role === 'faculty' ? '📚' : '🛡️')}</span>
+                    <span>{role.toUpperCase()}</span>
+                  </span>
                 </div>
-              )}
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                  {profile?.collegeId}
+                </p>
 
-              {/* Floating Camera Button */}
-              <label htmlFor="avatar-file-upload" className="absolute bottom-0 right-0 p-1.5 bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 hover:scale-110 text-white rounded-full cursor-pointer shadow-md transition-all">
-                <Camera className="w-3.5 h-3.5" />
-                <input
-                  id="avatar-file-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </label>
+                {/* Email & Roll/Dept Quick Info (Row) */}
+                <div className="flex flex-wrap gap-x-4 gap-y-1.5 justify-center sm:justify-start pt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {profile?.email && (
+                    <div className="flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{profile.email}</span>
+                    </div>
+                  )}
+                  {profile?.department && (
+                    <div className="flex items-center gap-1.5">
+                      <BadgeInfo className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{profile.department}</span>
+                    </div>
+                  )}
+                  {profile?.student?.rollNumber && (
+                    <div className="flex items-center gap-1.5">
+                      <FileCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>Roll: {profile.student.rollNumber} • Yr {profile.student.year}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg text-slate-900 dark:text-white leading-tight">
-                {profile?.name}
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">
-                {profile?.collegeId}
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                Personal Information
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Manage your personal details. Core academic and organizational data are restricted to read-only for security reasons.
               </p>
-              <div className="mt-3 flex flex-wrap gap-1.5 justify-center">
-                {profile?.roles?.map((r) => (
-                  <span key={r} className={`px-2 py-0.5 rounded-full text-[9px] font-bold bg-primary/10 text-primary uppercase tracking-wider`}>
-                    {r}
-                  </span>
-                ))}
-              </div>
             </div>
 
-            <div className={`pt-4 border-t ${theme.border} text-left space-y-2 text-xs text-slate-500 dark:text-slate-400`}>
-              {profile?.email && (
-                <div className="flex items-center gap-2 truncate">
-                  <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>{profile.email}</span>
+            <form onSubmit={handleUpdateProfile} className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+                {/* Name field (READ-ONLY) */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Full Name (Read-Only)
+                  </label>
+                  <input
+                    type="text"
+                    disabled
+                    value={profile?.name || ''}
+                    className="px-4 py-3 text-sm rounded-xl border bg-slate-100 dark:bg-zinc-800 cursor-not-allowed border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-slate-400"
+                  />
                 </div>
-              )}
-              {profile?.department && (
-                <div className="flex items-center gap-2">
-                  <BadgeInfo className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>{profile.department}</span>
+
+                {/* College ID field (READ-ONLY) */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    College ID / Code
+                  </label>
+                  <input
+                    type="text"
+                    disabled
+                    value={profile?.collegeId || ''}
+                    className="px-4 py-3 text-sm rounded-xl border bg-slate-100 dark:bg-zinc-800 cursor-not-allowed border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-slate-400 font-mono"
+                  />
                 </div>
-              )}
-              {profile?.student?.rollNumber && (
-                <div className="flex items-center gap-2">
-                  <FileCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>Roll: {profile.student.rollNumber} • Yr {profile.student.year}</span>
+
+                {/* Email field (READ-ONLY) */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    disabled
+                    value={profile?.email || ''}
+                    className="px-4 py-3 text-sm rounded-xl border bg-slate-100 dark:bg-zinc-800 cursor-not-allowed border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-slate-400"
+                  />
                 </div>
-              )}
-            </div>
-          </div>
 
-          {/* Navigation Controls */}
-          <div className={`border ${theme.border} rounded-3xl p-2.5 space-y-1 shadow-sm ${theme.card}`}>
-            <button
-              onClick={() => setActiveTab('profile')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${activeTab === 'profile'
-                ? theme.accentBg + ' shadow-sm'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
-                }`}
-            >
-              <User className="w-4 h-4" />
-              <span>Personal Details</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('password')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${activeTab === 'password'
-                ? theme.accentBg + ' shadow-sm'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
-                }`}
-            >
-              <KeyRound className="w-4 h-4" />
-              <span>Change Password</span>
-            </button>
-            {isSuperAdmin && (
-              <button
-                onClick={() => setActiveTab('maintenance')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${activeTab === 'maintenance'
-                  ? theme.accentBg + ' shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800/40'
-                  }`}
-              >
-                <ShieldAlert className="w-4 h-4 text-rose-500" />
-                <span>System Maintenance</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Right Column: Tab View Content */}
-        <div className="lg:col-span-3">
-
-          {/* TAB 1: Profile Info Form */}
-          {activeTab === 'profile' && (
-            <div className={`border ${theme.border} rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm ${theme.card}`}>
-              <div>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                  Personal Information
-                </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Manage your personal details. Core academic and organizational data are restricted to read-only for security reasons.
-                </p>
-              </div>
-
-              <form onSubmit={handleUpdateProfile} className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
-                  {/* Name field (READ-ONLY) */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      Full Name (Read-Only)
-                    </label>
+                {/* Phone Number (EDITABLE) */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
-                      disabled
-                      value={profile?.name || ''}
-                      className="px-3.5 py-2.5 text-xs rounded-xl border bg-slate-100 dark:bg-zinc-800 cursor-not-allowed border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-slate-400"
+                      placeholder="e.g. 9876543210"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all`}
                     />
-                  </div>
-
-                  {/* College ID field (READ-ONLY) */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      College ID / Code
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      value={profile?.collegeId || ''}
-                      className="px-3.5 py-2.5 text-xs rounded-xl border bg-slate-100 dark:bg-zinc-800 cursor-not-allowed border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-slate-400 font-mono"
-                    />
-                  </div>
-
-                  {/* Email field (READ-ONLY) */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      disabled
-                      value={profile?.email || ''}
-                      className="px-3.5 py-2.5 text-xs rounded-xl border bg-slate-100 dark:bg-zinc-800 cursor-not-allowed border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-slate-400"
-                    />
-                  </div>
-
-                  {/* Phone Number (EDITABLE) */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      Phone Number
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input
-                        type="text"
-                        placeholder="e.g. 9876543210"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className={`w-full pl-10 pr-4 py-2.5 text-xs rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all`}
-                      />
-                    </div>
-                  </div>
-
-
-
-                  {/* Address (EDITABLE) */}
-                  <div className="flex flex-col gap-1.5 sm:col-span-2">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      Residential Address
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
-                      <textarea
-                        rows={2}
-                        placeholder="Enter your current address details..."
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className={`w-full pl-10 pr-4 py-2.5 text-xs rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all resize-none`}
-                      />
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Role Specific Meta Card (READ-ONLY info) */}
-                <div className={`p-4 rounded-2xl border text-xs text-slate-500 dark:text-slate-400 space-y-3 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-200 dark:border-zinc-800/40`}>
-                  <div className="flex items-center gap-2 font-bold text-[10px] uppercase tracking-wider text-slate-400">
-                    <Info className="w-3.5 h-3.5" />
-                    <span>Academic Scope Details</span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-1">
-                    {role === 'student' && (
-                      <>
-                        <div>
-                          <span className="font-semibold text-slate-400">Branch Name:</span>{' '}
-                          <span className="font-medium text-slate-800 dark:text-white">{profile?.student?.batchName || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-slate-400">Current Year:</span>{' '}
-                          <span className="font-medium text-slate-800 dark:text-white">Year {profile?.student?.year || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-slate-400">Assigned Section:</span>{' '}
-                          <span className="font-medium text-slate-800 dark:text-white">{profile?.student?.sectionName || 'N/A'}</span>
-                        </div>
-                      </>
-                    )}
-                    {role === 'faculty' && (
-                      <>
-                        <div>
-                          <span className="font-semibold text-slate-400">Department:</span>{' '}
-                          <span className="font-medium text-slate-800 dark:text-white">{profile?.faculty?.department || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-slate-400">Designation:</span>{' '}
-                          <span className="font-medium text-slate-800 dark:text-white">{profile?.faculty?.designation || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-slate-400">Office Location:</span>{' '}
-                          <span className="font-medium text-slate-800 dark:text-white">{profile?.faculty?.officeLocation || 'N/A'}</span>
-                        </div>
-                      </>
-                    )}
-                    {role === 'admin' && (
-                      <>
-                        <div>
-                          <span className="font-semibold text-slate-400">Scoped Department:</span>{' '}
-                          <span className="font-medium text-slate-800 dark:text-white">{profile?.department || 'Global (All)'}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-slate-400">Year Scope:</span>{' '}
-                          <span className="font-medium text-slate-800 dark:text-white">{profile?.yearScope ? `Year ${profile.yearScope}` : 'Global (All)'}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-slate-400">Access Tier:</span>{' '}
-                          <span className="font-medium text-slate-800 dark:text-white">
-                            {(!profile?.department || profile.department.toLowerCase() === 'administration') ? 'Super Admin' : 'Department Admin'}
-                          </span>
-                        </div>
-                      </>
-                    )}
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-3">
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all ${theme.accentBg} disabled:opacity-50`}
-                  >
-                    {saving ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Save className="w-3.5 h-3.5" />
-                    )}
-                    <span>{saving ? 'Saving changes...' : 'Save Profile Details'}</span>
-                  </button>
+                {/* Address (EDITABLE) */}
+                <div className="flex flex-col gap-1.5 sm:col-span-2">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Residential Address
+                  </label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                    <textarea
+                      rows={2}
+                      placeholder="Enter your current address details..."
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all resize-none`}
+                    />
+                  </div>
                 </div>
-              </form>
-            </div>
-          )}
 
-          {/* TAB 2: Change Password Form */}
-          {activeTab === 'password' && (
-            <div className={`border ${theme.border} rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm ${theme.card}`}>
-              <div>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                  Security Configuration
-                </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Change your system password. A strong password helps block unauthorized entries to your dashboard.
-                </p>
               </div>
 
-              <form onSubmit={handleUpdatePassword} className="space-y-6">
+              {/* Role Specific Meta Card (READ-ONLY info) */}
+              <div className={`p-5 rounded-xl border text-sm text-slate-500 dark:text-slate-400 space-y-3 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-200 dark:border-zinc-800/40`}>
+                <div className="flex items-center gap-2 font-bold text-[10px] uppercase tracking-wider text-slate-400">
+                  <Info className="w-3.5 h-3.5" />
+                  <span>Academic Scope Details</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-1 text-sm">
+                  {role === 'student' && (
+                    <>
+                      <div>
+                        <span className="font-semibold text-slate-400">Branch Name:</span>{' '}
+                        <span className="font-medium text-slate-800 dark:text-white">{profile?.student?.batchName || 'N/A'}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-400">Current Year:</span>{' '}
+                        <span className="font-medium text-slate-800 dark:text-white">Year {profile?.student?.year || 'N/A'}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-400">Assigned Section:</span>{' '}
+                        <span className="font-medium text-slate-800 dark:text-white">{profile?.student?.sectionName || 'N/A'}</span>
+                      </div>
+                    </>
+                  )}
+                  {role === 'faculty' && (
+                    <>
+                      <div>
+                        <span className="font-semibold text-slate-400">Department:</span>{' '}
+                        <span className="font-medium text-slate-800 dark:text-white">{profile?.faculty?.department || 'N/A'}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-400">Designation:</span>{' '}
+                        <span className="font-medium text-slate-800 dark:text-white">{profile?.faculty?.designation || 'N/A'}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-400">Office Location:</span>{' '}
+                        <span className="font-medium text-slate-800 dark:text-white">{profile?.faculty?.officeLocation || 'N/A'}</span>
+                      </div>
+                    </>
+                  )}
+                  {role === 'admin' && (
+                    <>
+                      <div>
+                        <span className="font-semibold text-slate-400">Scoped Department:</span>{' '}
+                        <span className="font-medium text-slate-800 dark:text-white">{profile?.department || 'Global (All)'}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-400">Year Scope:</span>{' '}
+                        <span className="font-medium text-slate-800 dark:text-white">{profile?.yearScope ? `Year ${profile.yearScope}` : 'Global (All)'}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-400">Access Tier:</span>{' '}
+                        <span className="font-medium text-slate-800 dark:text-white">
+                          {(!profile?.department || profile.department.toLowerCase() === 'administration') ? 'Super Admin' : 'Department Admin'}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
 
-                <div className="space-y-4 max-w-xl">
+              <div className="flex justify-end pt-3">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold shadow-sm transition-all ${theme.accentBg} disabled:opacity-50`}
+                >
+                  {saving ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Save className="w-3.5 h-3.5" />
+                  )}
+                  <span>{saving ? 'Saving changes...' : 'Save Profile Details'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
-                  {/* Old Password */}
-                  <div className="flex flex-col gap-1.5 relative">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      Current Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showOldPass ? 'text' : 'password'}
-                        placeholder="Enter your current password..."
-                        value={oldPassword}
-                        onChange={(e) => setOldPassword(e.target.value)}
-                        className={`w-full pl-3.5 pr-10 py-2.5 text-xs rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all font-mono`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowOldPass(!showOldPass)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                      >
-                        {showOldPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
+        {/* TAB 2: Change Password Form */}
+        {activeTab === 'password' && (
+          <div className={`border ${theme.border} rounded-xl p-6 sm:p-8 space-y-6 shadow-sm ${theme.card}`}>
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                Security Configuration
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Change your system password. A strong password helps block unauthorized entries to your dashboard.
+              </p>
+            </div>
+
+            <form onSubmit={handleUpdatePassword} className="space-y-6">
+
+              <div className="space-y-4 max-w-xl">
+
+                {/* Old Password */}
+                <div className="flex flex-col gap-1.5 relative">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Current Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showOldPass ? 'text' : 'password'}
+                      placeholder="Enter your current password..."
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      className={`w-full pl-4 pr-10 py-3 text-sm rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all font-mono`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowOldPass(!showOldPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      {showOldPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
-
-                  {/* New Password */}
-                  <div className="flex flex-col gap-1.5 relative">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      New Strong Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showNewPass ? 'text' : 'password'}
-                        placeholder="Choose a strong password..."
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className={`w-full pl-3.5 pr-10 py-2.5 text-xs rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all font-mono`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPass(!showNewPass)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                      >
-                        {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Confirm Password */}
-                  <div className="flex flex-col gap-1.5 relative">
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      Confirm New Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showConfirmPass ? 'text' : 'password'}
-                        placeholder="Re-type your new password..."
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`w-full pl-3.5 pr-10 py-2.5 text-xs rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all font-mono`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPass(!showConfirmPass)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                      >
-                        {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-
                 </div>
 
-                {/* Password Checklist & Match Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl">
+                {/* New Password */}
+                <div className="flex flex-col gap-1.5 relative">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    New Strong Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPass ? 'text' : 'password'}
+                      placeholder="Choose a strong password..."
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className={`w-full pl-4 pr-10 py-3 text-sm rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all font-mono`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPass(!showNewPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
 
-                  {/* Checklist */}
-                  <div className={`p-4 rounded-2xl border text-xs space-y-2 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-200 dark:border-zinc-800/40 text-slate-500 dark:text-slate-400`}>
-                    <div className="font-bold text-[9px] uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
-                      <ShieldAlert className="w-3.5 h-3.5" />
-                      <span>Security Strength Checklist</span>
-                    </div>
+                {/* Confirm Password */}
+                <div className="flex flex-col gap-1.5 relative">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Confirm New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPass ? 'text' : 'password'}
+                      placeholder="Re-type your new password..."
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={`w-full pl-4 pr-10 py-3 text-sm rounded-xl border ${theme.inputBg} focus:outline-none focus:ring-1 ${theme.ring} text-slate-800 dark:text-slate-100 transition-all font-mono`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPass(!showConfirmPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
 
-                    <div className="space-y-1.5 text-[11px]">
-                      <div className="flex items-center gap-2">
-                        {passChecks.length ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
-                        ) : (
-                          <X className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                        <span className={passChecks.length ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>At least 8 characters</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {passChecks.upper ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
-                        ) : (
-                          <X className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                        <span className={passChecks.upper ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>One uppercase letter (A-Z)</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {passChecks.lower ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
-                        ) : (
-                          <X className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                        <span className={passChecks.lower ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>One lowercase letter (a-z)</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {passChecks.digit ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
-                        ) : (
-                          <X className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                        <span className={passChecks.digit ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>One numeric digit (0-9)</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {passChecks.special ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
-                        ) : (
-                          <X className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                        <span className={passChecks.special ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>One special character (@#$%^&+=!)</span>
-                      </div>
-                    </div>
+              </div>
+
+              {/* Password Checklist & Match Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl text-sm">
+
+                {/* Checklist */}
+                <div className={`p-5 rounded-xl border text-sm space-y-2 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-200 dark:border-zinc-800/40 text-slate-500 dark:text-slate-400`}>
+                  <div className="font-bold text-[10px] uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5" />
+                    <span>Security Strength Checklist</span>
                   </div>
 
-                  {/* Match Indicator card */}
-                  <div className={`p-4 rounded-2xl border text-xs flex flex-col justify-center gap-3 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-200 dark:border-zinc-800/40 text-slate-500`}>
-                    <div className="font-bold text-[9px] uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                      <FileCheck className="w-3.5 h-3.5" />
-                      <span>Password Match Status</span>
-                    </div>
-
-                    {newPassword && confirmPassword ? (
-                      isPasswordMatch ? (
-                        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center gap-2 text-xs font-semibold">
-                          <Check className="w-4 h-4 stroke-[3]" />
-                          <span>Passwords Match! Ready.</span>
-                        </div>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center gap-2">
+                      {passChecks.length ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
                       ) : (
-                        <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 rounded-xl flex items-center gap-2 text-xs font-semibold">
-                          <X className="w-4 h-4 stroke-[3]" />
-                          <span>Passwords do not match yet.</span>
-                        </div>
-                      )
-                    ) : (
-                      <div className="p-3 bg-slate-100 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-slate-500 rounded-xl flex items-center gap-2 text-xs">
-                        <Info className="w-4 h-4" />
-                        <span>Awaiting input...</span>
-                      </div>
-                    )}
+                        <X className="w-3.5 h-3.5 text-slate-400" />
+                      )}
+                      <span className={passChecks.length ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>At least 8 characters</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passChecks.upper ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
+                      ) : (
+                        <X className="w-3.5 h-3.5 text-slate-400" />
+                      )}
+                      <span className={passChecks.upper ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>One uppercase letter (A-Z)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passChecks.lower ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
+                      ) : (
+                        <X className="w-3.5 h-3.5 text-slate-400" />
+                      )}
+                      <span className={passChecks.lower ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>One lowercase letter (a-z)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passChecks.digit ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
+                      ) : (
+                        <X className="w-3.5 h-3.5 text-slate-400" />
+                      )}
+                      <span className={passChecks.digit ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>One numeric digit (0-9)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passChecks.special ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
+                      ) : (
+                        <X className="w-3.5 h-3.5 text-slate-400" />
+                      )}
+                      <span className={passChecks.special ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>One special character (@#$%^&+=!)</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-3 max-w-xl">
-                  <button
-                    type="submit"
-                    disabled={saving || !isPasswordValid || !isPasswordMatch || !oldPassword}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all ${theme.accentBg} disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    {saving ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <KeyRound className="w-3.5 h-3.5" />
-                    )}
-                    <span>{saving ? 'Encrypting...' : 'Change Password'}</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
+                {/* Match Indicator card */}
+                <div className={`p-5 rounded-xl border text-sm flex flex-col justify-center gap-3 bg-slate-50/50 dark:bg-zinc-950/20 border-slate-200 dark:border-zinc-800/40 text-slate-500`}>
+                  <div className="font-bold text-[10px] uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <FileCheck className="w-3.5 h-3.5" />
+                    <span>Password Match Status</span>
+                  </div>
 
-          {/* TAB 3: System Maintenance */}
-          {activeTab === 'maintenance' && isSuperAdmin && (
-            <div className={`border ${theme.border} rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm ${theme.card}`}>
-              <div>
-                <div className="flex items-center gap-2">
-                  <ShieldAlert className="w-6 h-6 text-rose-500" />
-                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                    System Developer Maintenance
-                  </h2>
+                  {newPassword && confirmPassword ? (
+                    isPasswordMatch ? (
+                      <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center gap-2 text-sm font-semibold">
+                        <Check className="w-4 h-4 stroke-[3]" />
+                        <span>Passwords Match! Ready.</span>
+                      </div>
+                    ) : (
+                      <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 rounded-xl flex items-center gap-2 text-sm font-semibold">
+                        <X className="w-4 h-4 stroke-[3]" />
+                        <span>Passwords do not match yet.</span>
+                      </div>
+                    )
+                  ) : (
+                    <div className="p-3.5 bg-slate-100 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-slate-500 rounded-xl flex items-center gap-2 text-sm">
+                      <Info className="w-4 h-4" />
+                      <span>Awaiting input...</span>
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Perform high-impact administrative cleanups and reset options. These operations execute direct database mutations and are strictly meant for testing environments.
-                </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                {/* 1. Wipe Timetable */}
-                <div className="border border-red-200/40 dark:border-red-950/40 rounded-2xl p-5 space-y-4 bg-red-50/5 dark:bg-red-950/5 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-rose-500">
-                      <Database className="w-4 h-4" />
-                      <span className="font-bold text-xs uppercase tracking-wider">Wipe Timetable Data</span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Deletes all scheduled timetable entries, extra class overrides, cancellations, and class subject assignments.
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    {showConfirmField.timetable ? (
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">
-                          Type "WIPE" to confirm:
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            placeholder="Type WIPE"
-                            value={confirmInputs.timetable}
-                            onChange={(e) => setConfirmInputs(prev => ({ ...prev, timetable: e.target.value }))}
-                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
-                          />
-                          <button
-                            onClick={() => handleWipeAction('timetable', wipeTimetable, 'Timetable data')}
-                            disabled={confirmInputs.timetable !== 'WIPE' || wipingState.timetable}
-                            className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
-                          >
-                            {wipingState.timetable ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                            Wipe
-                          </button>
-                          <button
-                            onClick={() => setShowConfirmField(prev => ({ ...prev, timetable: false }))}
-                            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setShowConfirmField(prev => ({ ...prev, timetable: true }))}
-                        className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        <span>Wipe Timetable Data</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* 2. Wipe Attendance */}
-                <div className="border border-red-200/40 dark:border-red-950/40 rounded-2xl p-5 space-y-4 bg-red-50/5 dark:bg-red-950/5 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-rose-500">
-                      <Database className="w-4 h-4" />
-                      <span className="font-bold text-xs uppercase tracking-wider">Wipe Attendance Data</span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Deletes all student attendance record history, session logs, and class segment records.
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    {showConfirmField.attendance ? (
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">
-                          Type "WIPE" to confirm:
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            placeholder="Type WIPE"
-                            value={confirmInputs.attendance}
-                            onChange={(e) => setConfirmInputs(prev => ({ ...prev, attendance: e.target.value }))}
-                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
-                          />
-                          <button
-                            onClick={() => handleWipeAction('attendance', wipeAttendance, 'Attendance data')}
-                            disabled={confirmInputs.attendance !== 'WIPE' || wipingState.attendance}
-                            className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
-                          >
-                            {wipingState.attendance ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                            Wipe
-                          </button>
-                          <button
-                            onClick={() => setShowConfirmField(prev => ({ ...prev, attendance: false }))}
-                            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setShowConfirmField(prev => ({ ...prev, attendance: true }))}
-                        className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        <span>Wipe Attendance Data</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* 3. Wipe Alerts */}
-                <div className="border border-red-200/40 dark:border-red-950/40 rounded-2xl p-5 space-y-4 bg-red-50/5 dark:bg-red-950/5 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-rose-500">
-                      <Database className="w-4 h-4" />
-                      <span className="font-bold text-xs uppercase tracking-wider">Wipe Communications & Alerts</span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Deletes all global, batch, and section-specific announcements, updates, and notice board logs.
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    {showConfirmField.alerts ? (
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">
-                          Type "WIPE" to confirm:
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            placeholder="Type WIPE"
-                            value={confirmInputs.alerts}
-                            onChange={(e) => setConfirmInputs(prev => ({ ...prev, alerts: e.target.value }))}
-                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
-                          />
-                          <button
-                            onClick={() => handleWipeAction('alerts', wipeAlerts, 'Announcements and alerts')}
-                            disabled={confirmInputs.alerts !== 'WIPE' || wipingState.alerts}
-                            className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
-                          >
-                            {wipingState.alerts ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                            Wipe
-                          </button>
-                          <button
-                            onClick={() => setShowConfirmField(prev => ({ ...prev, alerts: false }))}
-                            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setShowConfirmField(prev => ({ ...prev, alerts: true }))}
-                        className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        <span>Wipe Alerts & Notices</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* 4. Reset User Directory */}
-                <div className="border border-red-200 dark:border-red-900/60 rounded-2xl p-5 space-y-4 bg-red-50/10 dark:bg-red-950/10 flex flex-col justify-between md:col-span-2">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-rose-600 dark:text-rose-500">
-                      <AlertTriangle className="w-4 h-4 text-red-600" />
-                      <span className="font-bold text-xs uppercase tracking-wider">Reset User Directory (Nuclear Option)</span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Deletes all student registry files, faculty assignments, personal profiles, and login user credentials from the database.
-                      <strong className="text-red-600 dark:text-red-400 ml-1">Warning:</strong> To protect admin access, this deletes all user classes EXCEPT accounts assigned with the ADMIN role.
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    {showConfirmField.directory ? (
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-red-600 uppercase tracking-wider block">
-                          Type "WIPE" to confirm this full system reset:
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            placeholder="Type WIPE"
-                            value={confirmInputs.directory}
-                            onChange={(e) => setConfirmInputs(prev => ({ ...prev, directory: e.target.value }))}
-                            className={`flex-1 px-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-300 dark:border-red-900 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600`}
-                          />
-                          <button
-                            onClick={() => handleWipeAction('directory', wipeDirectory, 'User Directory')}
-                            disabled={confirmInputs.directory !== 'WIPE' || wipingState.directory}
-                            className="px-5 py-1.5 bg-rose-700 hover:bg-rose-800 disabled:opacity-40 disabled:hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
-                          >
-                            {wipingState.directory ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                            Full Wipe
-                          </button>
-                          <button
-                            onClick={() => setShowConfirmField(prev => ({ ...prev, directory: false }))}
-                            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setShowConfirmField(prev => ({ ...prev, directory: true }))}
-                        className="w-full py-2.5 bg-red-600/10 hover:bg-red-600/20 text-red-700 dark:text-red-400 border border-red-600/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
-                      >
-                        <AlertTriangle className="w-4 h-4" />
-                        <span>Reset User Directory (Wipe Students, Faculty & Logins)</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
+              <div className="flex justify-end pt-3 max-w-xl">
+                <button
+                  type="submit"
+                  disabled={saving || !isPasswordValid || !isPasswordMatch || !oldPassword}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold shadow-sm transition-all ${theme.accentBg} disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {saving ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <KeyRound className="w-3.5 h-3.5" />
+                  )}
+                  <span>{saving ? 'Encrypting...' : 'Change Password'}</span>
+                </button>
               </div>
-            </div>
-          )}
+            </form>
+          </div>
+        )}
 
-        </div>
+        {/* TAB 3: System Maintenance */}
+        {activeTab === 'maintenance' && isSuperAdmin && (
+          <div className={`border ${theme.border} rounded-xl p-6 sm:p-8 space-y-6 shadow-sm ${theme.card}`}>
+            <div>
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="w-6 h-6 text-rose-500" />
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                  System Developer Maintenance
+                </h2>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Perform high-impact administrative cleanups and reset options. These operations execute direct database mutations and are strictly meant for testing environments.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* 1. Wipe Timetable */}
+              <div className="border border-red-200/40 dark:border-red-950/40 rounded-xl p-5 space-y-4 bg-red-50/5 dark:bg-red-950/5 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-rose-500">
+                    <Database className="w-4 h-4" />
+                    <span className="font-bold text-xs uppercase tracking-wider">Wipe Timetable Data</span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Deletes all scheduled timetable entries, extra class overrides, cancellations, and class subject assignments.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  {showConfirmField.timetable ? (
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">
+                        Type "WIPE" to confirm:
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Type WIPE"
+                          value={confirmInputs.timetable}
+                          onChange={(e) => setConfirmInputs(prev => ({ ...prev, timetable: e.target.value }))}
+                          className={`flex-1 px-4 py-3 text-sm rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
+                        />
+                        <button
+                          onClick={() => handleWipeAction('timetable', wipeTimetable, 'Timetable data')}
+                          disabled={confirmInputs.timetable !== 'WIPE' || wipingState.timetable}
+                          className="px-5 py-3 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:hover:bg-rose-600 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-1"
+                        >
+                          {wipingState.timetable ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                          Wipe
+                        </button>
+                        <button
+                          onClick={() => setShowConfirmField(prev => ({ ...prev, timetable: false }))}
+                          className="px-5 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowConfirmField(prev => ({ ...prev, timetable: true }))}
+                      className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Wipe Timetable Data</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 2. Wipe Attendance */}
+              <div className="border border-red-200/40 dark:border-red-950/40 rounded-xl p-5 space-y-4 bg-red-50/5 dark:bg-red-950/5 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-rose-500">
+                    <Database className="w-4 h-4" />
+                    <span className="font-bold text-xs uppercase tracking-wider">Wipe Attendance Data</span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Deletes all student attendance record history, session logs, and class segment records.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  {showConfirmField.attendance ? (
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">
+                        Type "WIPE" to confirm:
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Type WIPE"
+                          value={confirmInputs.attendance}
+                          onChange={(e) => setConfirmInputs(prev => ({ ...prev, attendance: e.target.value }))}
+                          className={`flex-1 px-4 py-3 text-sm rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
+                        />
+                        <button
+                          onClick={() => handleWipeAction('attendance', wipeAttendance, 'Attendance data')}
+                          disabled={confirmInputs.attendance !== 'WIPE' || wipingState.attendance}
+                          className="px-5 py-3 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:hover:bg-rose-600 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-1"
+                        >
+                          {wipingState.attendance ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                          Wipe
+                        </button>
+                        <button
+                          onClick={() => setShowConfirmField(prev => ({ ...prev, attendance: false }))}
+                          className="px-5 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowConfirmField(prev => ({ ...prev, attendance: true }))}
+                      className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Wipe Attendance Data</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 3. Wipe Alerts */}
+              <div className="border border-red-200/40 dark:border-red-950/40 rounded-xl p-5 space-y-4 bg-red-50/5 dark:bg-red-950/5 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-rose-500">
+                    <Database className="w-4 h-4" />
+                    <span className="font-bold text-xs uppercase tracking-wider">Wipe Communications & Alerts</span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Deletes all global, batch, and section-specific announcements, updates, and notice board logs.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  {showConfirmField.alerts ? (
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">
+                        Type "WIPE" to confirm:
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Type WIPE"
+                          value={confirmInputs.alerts}
+                          onChange={(e) => setConfirmInputs(prev => ({ ...prev, alerts: e.target.value }))}
+                          className={`flex-1 px-4 py-3 text-sm rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-200 dark:border-red-950 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500`}
+                        />
+                        <button
+                          onClick={() => handleWipeAction('alerts', wipeAlerts, 'Announcements and alerts')}
+                          disabled={confirmInputs.alerts !== 'WIPE' || wipingState.alerts}
+                          className="px-5 py-3 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:hover:bg-rose-600 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-1"
+                        >
+                          {wipingState.alerts ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                          Wipe
+                        </button>
+                        <button
+                          onClick={() => setShowConfirmField(prev => ({ ...prev, alerts: false }))}
+                          className="px-5 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowConfirmField(prev => ({ ...prev, alerts: true }))}
+                      className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Wipe Alerts & Notices</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 4. Reset User Directory */}
+              <div className="border border-red-200 dark:border-red-900/60 rounded-xl p-5 space-y-4 bg-red-50/10 dark:bg-red-950/10 flex flex-col justify-between md:col-span-2">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-rose-600 dark:text-rose-500">
+                    <AlertTriangle className="w-4 h-4 text-red-600" />
+                    <span className="font-bold text-xs uppercase tracking-wider">Reset User Directory (Nuclear Option)</span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Deletes all student registry files, faculty assignments, personal profiles, and login user credentials from the database.
+                    <strong className="text-red-600 dark:text-red-400 ml-1">Warning:</strong> To protect admin access, this deletes all user classes EXCEPT accounts assigned with the ADMIN role.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  {showConfirmField.directory ? (
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-red-600 uppercase tracking-wider block">
+                        Type "WIPE" to confirm this full system reset:
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Type WIPE"
+                          value={confirmInputs.directory}
+                          onChange={(e) => setConfirmInputs(prev => ({ ...prev, directory: e.target.value }))}
+                          className={`flex-1 px-4 py-3 text-sm rounded-xl border bg-slate-50 dark:bg-zinc-900 border-red-300 dark:border-red-900 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600`}
+                        />
+                        <button
+                          onClick={() => handleWipeAction('directory', wipeDirectory, 'User Directory')}
+                          disabled={confirmInputs.directory !== 'WIPE' || wipingState.directory}
+                          className="px-5 py-3 bg-rose-700 hover:bg-rose-800 disabled:opacity-40 disabled:hover:bg-rose-700 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-1"
+                        >
+                          {wipingState.directory ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                          Full Wipe
+                        </button>
+                        <button
+                          onClick={() => setShowConfirmField(prev => ({ ...prev, directory: false }))}
+                          className="px-5 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowConfirmField(prev => ({ ...prev, directory: true }))}
+                      className="w-full py-3.5 bg-red-600/10 hover:bg-red-600/20 text-red-700 dark:text-red-400 border border-red-600/30 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
+                    >
+                      <AlertTriangle className="w-4 h-4" />
+                      <span>Reset User Directory (Wipe Students, Faculty & Logins)</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
