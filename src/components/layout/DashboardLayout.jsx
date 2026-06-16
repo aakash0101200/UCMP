@@ -320,7 +320,7 @@ export default function DashboardLayout({ children, onLogout }) {
   const isFaculty = activeRole?.toLowerCase() === 'faculty';
 
   const mainClass = isStudent
-    ? "flex-1 min-w-0 space-y-4 p-6 transition-colors duration-300 relative z-0 bg-gradient-to-b from-[#E0F2FE] via-[#F1F5F9] to-[#FCE7F3] dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 min-h-[calc(100vh-64px)] overflow-y-auto"
+    ? "flex-1 min-w-0 space-y-4 p-6 transition-colors duration-300 relative z-0 bg-[#F8FAFC] dark:bg-zinc-950 min-h-[calc(100vh-64px)] overflow-y-auto"
     : isFaculty
       ? "flex-1 min-w-0 space-y-4 p-6 transition-colors duration-300 min-h-[calc(100vh-64px)] bg-[#F9FBFC] dark:bg-[#0D1512] overflow-y-auto"
       : "flex-1 min-w-0 space-y-4 p-6 transition-colors duration-300 min-h-[calc(100vh-64px)] bg-[#F8F9FA] dark:bg-[#0B0F19] overflow-y-auto";
@@ -351,9 +351,6 @@ export default function DashboardLayout({ children, onLogout }) {
           />
 
           <main className={mainClass}>
-            {isStudent && (
-              <div className="absolute inset-0 bg-white/45 dark:bg-zinc-950/20 backdrop-blur-[60px] pointer-events-none -z-10" />
-            )}
             {activeSession && (
               <div className="p-4 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-lg backdrop-blur-sm animate-pulse text-left">
                 <div className="flex items-center gap-3">

@@ -94,16 +94,20 @@ export default function StudentAttendanceScanner() {
                     value={code}
                     onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, ''))} // only numbers
                     placeholder="000000"
-                    className="w-full max-w-[240px] text-center text-4xl tracking-widest font-mono bg-neutral-950 border border-neutral-600 text-white rounded-2xl py-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    disabled={status === 'loading' || showLocationGuard || status === 'success'}
+                    className="w-full max-w-[240px] text-center text-4xl tracking-widest font-mono bg-neutral-950 border border-neutral-600 text-white rounded-2xl py-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 />
 
                 <button
                     onClick={handleMarkAttendance}
-                    disabled={status === 'loading'}
-                    className={`mt-6 w-full max-w-[240px] py-4 rounded-xl font-bold text-white transition ${status === 'loading' ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/30 shadow-lg'
-                        }`}
+                    disabled={status === 'loading' || showLocationGuard || status === 'success'}
+                    className={`mt-6 w-full max-w-[240px] py-4 rounded-xl font-bold text-white transition ${
+                        (status === 'loading' || showLocationGuard || status === 'success')
+                            ? 'bg-indigo-400 cursor-not-allowed'
+                            : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/30 shadow-lg'
+                    }`}
                 >
-                    {status === 'loading' ? 'Verifying Coordinates...' : 'Submit Attendance'}
+                    {(status === 'loading' || showLocationGuard) ? 'Verifying Coordinates...' : status === 'success' ? 'Marked!' : 'Submit Attendance'}
                 </button>
 
                 {message && (

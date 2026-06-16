@@ -130,8 +130,9 @@ export default function StudentDashboard() {
   }
 
   // Calculate overall attendance average
-  const overallAttendance = attendance.length
-    ? attendance.reduce((acc, curr) => acc + (curr.percentage || 0), 0) / attendance.length
+  const activeAttendance = attendance.filter(curr => curr.totalClasses > 0);
+  const overallAttendance = activeAttendance.length
+    ? activeAttendance.reduce((acc, curr) => acc + (curr.attended / curr.totalClasses) * 100, 0) / activeAttendance.length
     : 0;
 
   const attendanceVal = overallAttendance || 0;
@@ -237,7 +238,7 @@ export default function StudentDashboard() {
         {/* Attendance Card */}
         <Link
           to="/student/attendance"
-          className="bg-white dark:bg-zinc-900/90 rounded-[2.5rem] p-5 shadow-sm border border-white/20 dark:border-zinc-800/40 flex flex-col items-center hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+          className="bg-white dark:bg-zinc-900/90 rounded-[2.5rem] p-5 shadow-sm border border-slate-200/50 dark:border-zinc-800/40 flex flex-col items-center hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
         >
           <div className="w-full flex justify-between items-center mb-4 text-gray-700 dark:text-zinc-300">
             <span className="text-sm font-medium">Attendance %</span>
@@ -274,7 +275,7 @@ export default function StudentDashboard() {
         {/* Active Courses Card */}
         <Link
           to="/student/courses"
-          className="bg-white dark:bg-zinc-900/90 rounded-[2.5rem] p-5 shadow-sm border border-white/20 dark:border-zinc-800/40 flex flex-col items-center hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+          className="bg-white dark:bg-zinc-900/90 rounded-[2.5rem] p-5 shadow-sm border border-slate-200/50 dark:border-zinc-800/40 flex flex-col items-center hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
         >
           <div className="w-full flex justify-between items-center mb-4 text-gray-700 dark:text-zinc-300">
             <span className="text-sm font-medium">Active Courses</span>
@@ -288,7 +289,7 @@ export default function StudentDashboard() {
         {/* Pending Tasks Card */}
         <Link
           to="/student/assignment"
-          className="bg-white dark:bg-zinc-900/90 rounded-[2.5rem] p-5 shadow-sm border border-white/20 dark:border-zinc-800/40 flex flex-col items-center hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+          className="bg-white dark:bg-zinc-900/90 rounded-[2.5rem] p-5 shadow-sm border border-slate-200/50 dark:border-zinc-800/40 flex flex-col items-center hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
         >
           <div className="w-full flex justify-between items-center mb-4 text-gray-700 dark:text-zinc-300">
             <span className="text-sm font-medium">Pending Tasks</span>
@@ -300,7 +301,7 @@ export default function StudentDashboard() {
         </Link>
 
         {/* GPA Card */}
-        <div className="bg-white dark:bg-zinc-900/90 rounded-[2.5rem] p-5 shadow-sm border border-white/20 dark:border-zinc-800/40 flex flex-col items-center">
+        <div className="bg-white dark:bg-zinc-900/90 rounded-[2.5rem] p-5 shadow-sm border border-slate-200/50 dark:border-zinc-800/40 flex flex-col items-center">
           <div className="w-full flex justify-between items-center mb-4 text-gray-700 dark:text-zinc-300">
             <span className="text-sm font-medium">GPA</span>
             <Award className="w-5 h-5 text-gray-400" />
@@ -311,7 +312,7 @@ export default function StudentDashboard() {
       {/* END: Stats Grid */}
 
       {/* BEGIN: Daily Focus Card */}
-      <section className="bg-white dark:bg-zinc-900/90 rounded-[3rem] p-10 shadow-sm border border-white/20 dark:border-zinc-800/40 flex flex-col items-center justify-center space-y-6" data-purpose="daily-focus">
+      <section className="bg-white dark:bg-zinc-900/90 rounded-[3rem] p-10 shadow-sm border border-slate-200/50 dark:border-zinc-800/40 flex flex-col items-center justify-center space-y-6" data-purpose="daily-focus">
         <div className="relative w-[120px] h-[120px] flex items-center justify-center">
           <div className="absolute w-[120px] h-[120px] border border-blue-500/20 rounded-full animate-ring-1"></div>
           <div className="absolute w-[100px] h-[100px] border border-blue-500/30 rounded-full animate-ring-2"></div>
@@ -330,12 +331,12 @@ export default function StudentDashboard() {
         <h2 className="text-2xl font-medium text-gray-900 dark:text-white px-1">Today's Schedule</h2>
         <div className="space-y-3">
           {classes.length === 0 ? (
-            <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-[2rem] p-8 text-center text-gray-500 dark:text-zinc-400 shadow-sm border border-white/20 dark:border-zinc-800/40">
+            <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-[2rem] p-8 text-center text-gray-500 dark:text-zinc-400 shadow-sm border border-slate-200/50 dark:border-zinc-800/40">
               No classes scheduled for today.
             </div>
           ) : (
             classes.map((cls, idx) => (
-              <div key={idx} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-[2rem] p-4 flex items-center gap-4 shadow-sm border border-white/20 dark:border-zinc-800/40 hover:shadow-md hover:scale-[1.005] transition-all duration-200">
+              <div key={idx} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-[2rem] p-4 flex items-center gap-4 shadow-sm border border-slate-200/50 dark:border-zinc-800/40 hover:shadow-md hover:scale-[1.005] transition-all duration-200">
                 <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/50 rounded-full flex items-center justify-center shrink-0">
                   <BookOpen className="w-5 h-5 text-blue-500" />
                 </div>
@@ -357,12 +358,12 @@ export default function StudentDashboard() {
         <h2 className="text-2xl font-medium text-gray-900 dark:text-white px-1">Recent Notices</h2>
         <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
           {announcements.length === 0 ? (
-            <div className="min-w-[200px] bg-white dark:bg-zinc-900/90 rounded-[2rem] p-6 shadow-sm border border-white/20 dark:border-zinc-800/40 flex items-center justify-center text-center text-gray-500 dark:text-zinc-400">
+            <div className="min-w-[200px] bg-white dark:bg-zinc-900/90 rounded-[2rem] p-6 shadow-sm border border-slate-200/50 dark:border-zinc-800/40 flex items-center justify-center text-center text-gray-500 dark:text-zinc-400">
               No recent notices.
             </div>
           ) : (
             announcements.map((ann, idx) => (
-              <div key={idx} className="min-w-[220px] max-w-[260px] bg-white dark:bg-zinc-900/90 rounded-[2rem] p-6 shadow-sm border border-white/20 dark:border-zinc-800/40 flex flex-col justify-between hover:shadow-md transition-all duration-200">
+              <div key={idx} className="min-w-[220px] max-w-[260px] bg-white dark:bg-zinc-900/90 rounded-[2rem] p-6 shadow-sm border border-slate-200/50 dark:border-zinc-800/40 flex flex-col justify-between hover:shadow-md transition-all duration-200">
                 <p className="text-gray-800 dark:text-zinc-200 font-medium leading-snug line-clamp-2">
                   {ann.title}
                 </p>
