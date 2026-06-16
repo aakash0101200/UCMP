@@ -4,7 +4,7 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import {
   CheckCircle2, XCircle, Clock, AlertTriangle, MapPin,
-  BookOpen, Loader2, RefreshCw, History, Zap
+  BookOpen, Loader2, RefreshCw, History, Zap, ChevronDown
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import {
@@ -17,11 +17,39 @@ import LocationAccessGuard from '../../components/Attendance/LocationAccessGuard
 // ── Colour helpers ─────────────────────────────────────────────────────────
 function getStatusColor(pct, totalClasses) {
   if (totalClasses === 0) {
-    return { ring: '#94a3b8', text: 'text-slate-600 dark:text-zinc-400', bg: 'bg-slate-100 dark:bg-zinc-800', bar: '#cbd5e1', label: 'NO CLASSES HELD YET' };
+    return {
+      ring: '#94a3b8',
+      text: 'text-slate-600 dark:text-zinc-400',
+      bg: 'bg-slate-100 dark:bg-zinc-800',
+      barGradient: 'linear-gradient(to right, #cbd5e1, #cbd5e1)',
+      label: 'NO CLASSES HELD YET'
+    };
   }
-  if (pct >= 75) return { ring: '#22c55e', text: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-950/40', bar: '#16a34a', label: 'SAFE' };
-  if (pct >= 60) return { ring: '#f59e0b', text: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-950/40', bar: '#d97706', label: 'WARNING' };
-  return { ring: '#ef4444', text: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-950/40', bar: '#dc2626', label: 'DANGER' };
+  if (pct >= 75) {
+    return {
+      ring: '#10b981',
+      text: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-emerald-100 dark:bg-emerald-950/40',
+      barGradient: 'linear-gradient(to right, #10b981, #34d399)',
+      label: 'SAFE'
+    };
+  }
+  if (pct >= 60) {
+    return {
+      ring: '#f59e0b',
+      text: 'text-amber-700 dark:text-amber-400',
+      bg: 'bg-amber-100 dark:bg-amber-950/40',
+      barGradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+      label: 'WARNING'
+    };
+  }
+  return {
+    ring: '#f43f5e',
+    text: 'text-rose-600 dark:text-rose-400',
+    bg: 'bg-rose-100 dark:bg-rose-950/40',
+    barGradient: 'linear-gradient(to right, #f43f5e, #fb7185)',
+    label: 'CRITICAL'
+  };
 }
 
 // ── Subject Attendance Bar Card ────────────────────────────────────────────
@@ -33,29 +61,29 @@ function SubjectCard({ subject, index }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
-      className="p-3 bg-background border border-border/50 rounded-xl hover:shadow-md transition-shadow"
+      className="p-4 bg-white dark:bg-zinc-900 border border-border/50 rounded-xl hover:shadow-md transition-all duration-200"
     >
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <span className="text-sm font-semibold">{subject.subjectCode}</span>
-          <span className="ml-2 text-xs text-muted-foreground">{subject.subjectName}</span>
+          <div className="text-sm font-semibold text-foreground tracking-tight">{subject.subjectCode}</div>
+          <div className="text-xs text-muted-foreground mt-0.5">{subject.subjectName}</div>
         </div>
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${c.bg} ${c.text}`}>
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.bg} ${c.text} tracking-wide`}>
           {c.label}
         </span>
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="flex-1 h-5 rounded-full bg-muted overflow-hidden">
+        <div className="flex-grow h-2.5 rounded-full bg-[#F1F5F9] dark:bg-zinc-800 overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(pct, 100)}%` }}
             transition={{ delay: index * 0.06 + 0.2, duration: 0.6, ease: 'easeOut' }}
             className="h-full rounded-full"
-            style={{ backgroundColor: c.bar }}
+            style={{ backgroundImage: c.barGradient }}
           />
         </div>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+        <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap shrink-0">
           <span className="font-semibold text-foreground">{subject.totalClasses > 0 ? `${pct.toFixed(1)}%` : '--'}</span>
           <span>({subject.attended}/{subject.totalClasses})</span>
         </div>
@@ -491,7 +519,7 @@ export default function AttendancePage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {summary.map((s, i) => <SubjectCard key={s.subjectId} subject={s} index={i} />)}
                     </div>
                   )}
