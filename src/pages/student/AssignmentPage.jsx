@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getProfile } from "../../Services/profile";
 import { getAttendanceSummary } from "../../Services/attendance";
 import { getAssignmentsForSection, getAcademicTerms } from "../../Services/timetable";
+import { getCacheSync } from "../../utils/apiCache";
 import {
   Compass,
   Calendar,
@@ -17,48 +18,63 @@ import {
 } from "lucide-react";
 
 export default function AssignmentPage() {
-  const [profile, setProfile] = useState(null);
-  const [attendance, setAttendance] = useState([]);
-  const [assignments, setAssignments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(() => {
+    const collegeId = localStorage.getItem("collegeId");
+    return getCacheSync(`profile_${collegeId}`)?.data || null;
+  });
+  const [attendance, setAttendance] = useState(() => {
+    return getCacheSync('attendance_summary')?.data || [];
+  });
+  const [assignments, setAssignments] = useState(() => {
+    const sectionId = localStorage.getItem("sectionId");
+    if (!sectionId) return [];
+    const currentTerm = "SPRING_2026";
+    return getCacheSync(`assignments_section_${sectionId}_${currentTerm}`)?.data || [];
+  });
+  const [loading, setLoading] = useState(() => {
+    const collegeId = localStorage.getItem("collegeId");
+    return !getCacheSync(`profile_${collegeId}`);
+  });
   const [error, setError] = useState(null);
   const [launchingId, setLaunchingId] = useState(null);
 
   useEffect(() => {
     async function loadLaunchpadData() {
-      setLoading(true);
+      const collegeId = localStorage.getItem("collegeId");
+      const hasProfile = !!getCacheSync(`profile_${collegeId}`);
+      if (!hasProfile) {
+        setLoading(true);
+      }
       setError(null);
       try {
-        const collegeId = localStorage.getItem("collegeId");
         if (!collegeId) {
           throw new Error("No user college ID found. Please log in again.");
         }
 
-        // 1. Fetch Profile to get Section
-        const profileRes = await getProfile(collegeId);
-        const profileData = profileRes.data;
-        setProfile(profileData);
+        const sectionId = localStorage.getItem("sectionId");
 
-        const sectionId = profileData.student?.sectionId;
+        // Kick off all promises in parallel
+        const profilePromise = getProfile(collegeId);
+        const attPromise = getAttendanceSummary();
+        
+        const assignPromise = sectionId ? (async () => {
+          const termsRes = await getAcademicTerms();
+          const currentTerm = termsRes.data?.[0] || "SPRING_2026";
+          return getAssignmentsForSection(sectionId, currentTerm);
+        })() : Promise.resolve({ data: [] });
 
-        // 2. Fetch Attendance Summary
-        try {
-          const attRes = await getAttendanceSummary();
-          setAttendance(attRes.data || []);
-        } catch (e) {
-          console.error("Failed to load attendance summary:", e);
-        }
+        const [profileRes, attRes, assignRes] = await Promise.all([
+          profilePromise,
+          attPromise.catch(e => { console.error("Attendance summary error in assignment:", e); return { data: [] }; }),
+          assignPromise.catch(e => { console.error("Assignments error:", e); return { data: [] }; })
+        ]);
 
-        // 3. Fetch Assignments for this Section
-        if (sectionId) {
-          try {
-            const termsRes = await getAcademicTerms();
-            const currentTerm = termsRes.data?.[0] || "SPRING_2026";
-            const assignRes = await getAssignmentsForSection(sectionId, currentTerm);
-            setAssignments(assignRes.data || []);
-          } catch (e) {
-            console.error("Failed to load assignments:", e);
-          }
+        setProfile(profileRes.data);
+        setAttendance(attRes.data || []);
+        setAssignments(assignRes.data || []);
+
+        if (profileRes.data?.student?.sectionId) {
+          localStorage.setItem("sectionId", profileRes.data.student.sectionId);
         }
       } catch (err) {
         console.error("Failed to load launchpad data:", err);
@@ -70,6 +86,7 @@ export default function AssignmentPage() {
 
     loadLaunchpadData();
   }, []);
+
 
   // Returns the Google URL with path.
   const getGoogleUrl = (baseUrl, path = "") => {

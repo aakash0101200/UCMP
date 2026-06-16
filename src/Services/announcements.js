@@ -1,4 +1,5 @@
 import API from './api';
+import { withCache, clearCache } from '../utils/apiCache';
 
 const announcementsAPI = {
   get: (url, config) => {
@@ -25,17 +26,52 @@ const announcementsAPI = {
   }
 };
 
-export const getAnnouncements = () => announcementsAPI.get('/');
-export const getSectionAnnouncements = (sectionId) => announcementsAPI.get(`/section/${sectionId}`);
-export const getStudentAnnouncements = (collegeId, sectionId) => announcementsAPI.get(`/student/${collegeId}/section/${sectionId}`);
-export const createAnnouncement = (data) => announcementsAPI.post('/add', data);
-export const deleteAnnouncement = (id) => announcementsAPI.delete(`/${id}`);
-export const updateAnnouncement = (id, data) => announcementsAPI.put(`/${id}`, data);
+export const getAnnouncements = (force = false) => {
+  const fetchFn = () => announcementsAPI.get('/');
+  return force ? fetchFn() : withCache('announcements_global', fetchFn, 30000); // 30s cache
+};
+
+export const getSectionAnnouncements = (sectionId, force = false) => {
+  const fetchFn = () => announcementsAPI.get(`/section/${sectionId}`);
+  return force ? fetchFn() : withCache(`announcements_section_${sectionId}`, fetchFn, 30000); // 30s cache
+};
+
+export const getStudentAnnouncements = (collegeId, sectionId, force = false) => {
+  const fetchFn = () => announcementsAPI.get(`/student/${collegeId}/section/${sectionId}`);
+  return force ? fetchFn() : withCache(`announcements_student_${collegeId}_${sectionId}`, fetchFn, 30000); // 30s cache
+};
+
+export const createAnnouncement = (data) => {
+  clearCache();
+  return announcementsAPI.post('/add', data);
+};
+
+export const deleteAnnouncement = (id) => {
+  clearCache();
+  return announcementsAPI.delete(`/${id}`);
+};
+
+export const updateAnnouncement = (id, data) => {
+  clearCache();
+  return announcementsAPI.put(`/${id}`, data);
+};
 
 // ─── Quick-Connect Messaging ─────────────────────────────────────────────────
-export const sendFacultyMessage = (data) => announcementsAPI.post('/message', data);
-export const acknowledgeMessage = (id) => API.patch(`/announcements/${id}/ack`);
-export const replyToMessage = (id, reply) => API.patch(`/announcements/${id}/reply`, { reply });
+export const sendFacultyMessage = (data) => {
+  clearCache();
+  return announcementsAPI.post('/message', data);
+};
+
+export const acknowledgeMessage = (id) => {
+  clearCache();
+  return API.patch(`/announcements/${id}/ack`);
+};
+
+export const replyToMessage = (id, reply) => {
+  clearCache();
+  return API.patch(`/announcements/${id}/reply`, { reply });
+};
+
 export const getStudentsInSection = (sectionId) => API.get(`/sections/${sectionId}/students`);
 
-export default announcementsAPI;
+export default announcementsAPI;

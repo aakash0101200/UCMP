@@ -192,7 +192,8 @@ function ScannerPanel({ onSuccess }) {
         sessionId: activeSession.id,
         code,
         latitude: coords.latitude,
-        longitude: coords.longitude
+        longitude: coords.longitude,
+        accuracy: coords.accuracy
       });
       setStatus('success');
       setMessage('Attendance marked successfully!');
@@ -210,10 +211,10 @@ function ScannerPanel({ onSuccess }) {
 
   const handleLocationRejected = (errorCode) => {
     const msgs = {
-      DENIED: 'Location access was denied. Please allow location permissions in your browser settings and try again.',
-      UNAVAILABLE: 'Could not determine your location. Please check your device\'s GPS/location services.',
-      TIMEOUT: 'Location request timed out. Please ensure you have a clear GPS signal and try again.',
-      UNSUPPORTED: 'Your browser does not support geolocation. Please use a modern browser.'
+      DENIED: 'Location access was blocked by your browser. Tap the lock/site-info icon in your address bar → Permissions → Location → Allow, then try again.',
+      UNAVAILABLE: 'Could not determine your location. If you are indoors, try moving near a window or ensure Wi-Fi is enabled on your device.',
+      TIMEOUT: 'Location request timed out. Please ensure your Wi-Fi or mobile data is on, or try moving to an area with better signal.',
+      UNSUPPORTED: 'Your browser does not support geolocation. Please use Chrome, Safari, or Firefox.'
     };
     setStatus('error');
     setMessage(msgs[errorCode] || 'Location access failed. Please try again.');
