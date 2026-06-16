@@ -4,7 +4,7 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import {
   CheckCircle2, XCircle, Clock, AlertTriangle, MapPin,
-  BookOpen, Loader2, RefreshCw, History, Zap
+  BookOpen, Loader2, RefreshCw, History, Zap, ChevronDown
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import {
