@@ -205,16 +205,31 @@ export const mockAssignments = {
 };
 
 export const mockAttendanceSummary = {
-  data: {
-    totalLectures: 32,
-    attendedLectures: 28,
-    attendancePercentage: 87.5
-  }
+  data: [
+    {
+      subjectId: 1,
+      subjectName: "Data Structures",
+      subjectCode: "CS301",
+      totalClasses: 20,
+      attended: 18,
+      percentage: 90.0,
+      status: "SAFE"
+    },
+    {
+      subjectId: 2,
+      subjectName: "Operating Systems",
+      subjectCode: "CS303",
+      totalClasses: 12,
+      attended: 10,
+      percentage: 83.33,
+      status: "SAFE"
+    }
+  ]
 };
 
 export const mockAttendanceHistory = {
   data: [
-    { id: 1, date: "2026-05-22", subjectName: "Data Structures", status: "PRESENT" },
-    { id: 2, date: "2026-05-20", subjectName: "Operating Systems", status: "PRESENT" }
+    { id: 1, markedAt: "2026-05-22T10:00:00Z", date: "2026-05-22", subjectName: "Data Structures", sectionName: "Section A", status: "PRESENT", markedBy: "TOTP" },
+    { id: 2, markedAt: "2026-05-20T11:30:00Z", date: "2026-05-20", subjectName: "Operating Systems", sectionName: "Section A", status: "PRESENT", markedBy: "FACULTY" }
   ]
 };
